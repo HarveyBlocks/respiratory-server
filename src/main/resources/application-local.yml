@@ -1,0 +1,16 @@
+respiratory:
+  db:
+    host: redis
+    password: 123456
+  redis:
+    host: redis
+    password: 123456
+  es:
+    host: redis
+    port: 9200
+  file-save-path:
+    video: "C:/Users/27970/Desktop/IT/nginx-1.18.0/html/hvideo/videos/"
+    img: "C:/Users/27970/Desktop/IT/nginx-1.18.0/html/hvideo/imgs/"
+  jwt:
+    jks:
+      password: hmall123

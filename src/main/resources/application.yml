@@ -1,0 +1,86 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: respiratory
+  datasource:
+    #    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: jdbc:mysql://${respiratory.db.host}:3306/respiratory-user?useSSL=false&serverTimezone=UTC
+      username: root
+      password: ${respiratory.db.password}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+  redis:
+    host: ${respiratory.redis.host}
+    port: 6379
+    password: ${respiratory.redis.password}
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 10
+        min-idle: 1
+        time-between-eviction-runs: 10s
+  main:
+    # 允许循环依赖
+    allow-circular-references: true
+logging:
+  level:
+    org.harvey.respiratory.server: debug
+  pattern:
+    dateformat: HH:mm:ss:SSS
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  type-aliases-package: org.harvey.respiratory.server.pojo.entity
+knife4j:
+  enable: true
+  openapi:
+    title: database-practice
+    description: "数据库实践,被拦截的用户(未登录的),将没有返回值, 而是statue_code = 401"
+    email: harvey.blocks@outlook.com
+    concat: Harvey Blocks
+    url: https://www.baidu.com
+    version: v1.0.0
+    group:
+      default:
+        group-name: default
+        api-rule: package
+        api-rule-resources:
+          - org.harvey.respiratory.server.controller
+# jwt配置
+respiratory:
+  jwt:
+    location: classpath:hmall.jks
+    alias: hmall
+    password: ${respiratory.jwt.jks.password} # 解析文件的密钥(文件本身也是密钥)
+    tokenTTL: 30m
+  auth:
+    include-paths:
+      - "/user/logout"
+      - "/user/me"
+      - "/user/update"
+      - "/user/create"
+      - "/upload/respiratory/**"
+    root-auth-paths:
+      - "/user/create"
+  constants:
+    authorization-header: "authorization"
+    redis-host: ${respiratory.redis.host}
+    es-host: ${respiratory.es.host}
+    es-port: ${respiratory.es.port}
+    video-upload-dir: ${respiratory.file-save-path.video}
+    image-upload-dir: ${respiratory.file-save-path.img}
+    restrict-request-times: "20"
+    clear-click-history-wait-seconds: 600
+    max-page-size: 10
+    default-page-size: 5
+    sensitive-words:
+      - "敏感"
+      - "这是敏感词"

@@ -1,0 +1,16 @@
+respiratory:
+  db:
+    host: mysql
+    password: 123456
+  redis:
+    host: redis
+    password: 123456
+  es:
+    host: es
+    port: 9200
+  file-save-path:
+    video: "etc/nginx/videos/"
+    img: "etc/nginx/imgs/"
+  jwt:
+    jks:
+      password: hmall123
