@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.enums.Role;
@@ -24,19 +26,24 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("`user_security`")
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserSecurity implements Serializable {
 
     @TableField(exist = false)
     public static final String DEFAULT_NAME = "unknown";
 
     /**
-     * 主键
+     * 主键, 不用医保号是因为医保号可能不是升序插入的
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 手机号码
+     * 手机号码, 实际上有外键的功能,
+     * 但并不会建立实际的外键, 因为外键应当指向主键,
+     * 而phone不能成为主键
+     * 因为phone可以脱离数据库的表存在
      */
     private String phone;
 
@@ -65,8 +72,6 @@ public class UserSecurity implements Serializable {
      */
     private Role role;
 
-    public UserSecurity() {
-    }
 
     public UserSecurity(UserDto userDto) {
         this.name = userDto.getName();

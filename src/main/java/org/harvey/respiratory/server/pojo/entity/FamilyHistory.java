@@ -1,0 +1,48 @@
+package org.harvey.respiratory.server.pojo.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
+
+/**
+ * 家族病史(由于患者家属的就诊记录不一定在本数据库中, 故不能直接使用患者家属的患者id)
+ * 患者本人在患者表中id
+ * 家族史记录id
+ * 家族成员关系enum(有很多), 该属性冗余, 不属于BC FC, 但为了提高效率
+ * 疾病表id
+ *
+ * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
+ * @version 1.0
+ * @date 2025-05-13 00:55
+ */
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@TableName("tb_family_history")
+@NoArgsConstructor
+@AllArgsConstructor
+public class FamilyHistory {
+    /**
+     * 家族史记录id, 冗余, 不然就要全属性主键了, 这不好
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private long id;
+    /**
+     * 患者本人在患者表中id
+     */
+    private long patientId;
+    /**
+     * 家族成员关系enum(有很多)
+     */
+    private FamilyRelationship familyRelationship;
+    /**
+     * 疾病表id
+     */
+    private int diseaseId;
+}
