@@ -3,12 +3,13 @@ package org.harvey.respiratory.server.pojo.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.harvey.respiratory.server.pojo.enums.DoctorJob;
 import org.harvey.respiratory.server.pojo.enums.Sex;
 
 import java.sql.Date;
@@ -35,46 +36,40 @@ import java.sql.Date;
 @TableName("tb_patient")
 @NoArgsConstructor
 @AllArgsConstructor
+@ApiModel(description = "患者信息")
 public class Patient {
-    /**
-     * 患者
-     */
+    @ApiModelProperty(value = "新增时需要为null, 更新时不能为null, 就是依据id更新")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private long id;
+    private Long id;
 
-    /**
-     * 手机号码(unique, char(11))
-     */
+    @ApiModelProperty(value = "手机号码(unique, char(11)), 不可为null", required = true)
     private String phone;
 
-    /**
-     * 名称(varchar(63))
-     */
+
+    @ApiModelProperty(value = "名称(varchar(63)), 不可为null", required = true)
     private String name;
 
-    /**
-     * 职称(enum-普通/主管/药物)
-     */
+    @ApiModelProperty(value = "职称(enum-普通/主管/药物), 不可为null", required = true)
     private Sex sex;
-    /**
-     * 医疗服务机构表id
-     */
+
+    @ApiModelProperty(value = "医疗服务机构表id, 不可为null", required = true)
     private Date birthDate;
-    /**
-     * 家庭住址(varchar(255))
-     */
+
+    @ApiModelProperty(value = "家庭住址(varchar(255)), 不可为null", required = true)
     private Date address;
-    /**
-     * 身高(m) (float)
-     */
+
+    @ApiModelProperty(value = "身高(m) (float), 不可为null", required = true)
     private Date height;
 
-    /**
-     * 体重(kg) (float)
-     */
+    @ApiModelProperty(value = "体重(kg) (float), 不可为null", required = true)
     private Date weight;
-    /**
-     * 医保表id
-     */
-    private int healthcareId;
+
+    @ApiModelProperty(value = "医保表id, 可以为null")
+    private Long healthcareId;
+
+    @ApiModelProperty(value = "医保类型, 可以为null")
+    private String healthcareType;
+
+    @ApiModelProperty(value = "医保余额")
+    private Integer balance;
 }

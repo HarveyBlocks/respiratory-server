@@ -1,6 +1,9 @@
 package org.harvey.respiratory.server.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,42 +25,48 @@ import java.sql.Date;
 @TableName("tb_specific_using_drugs_intermediation")
 @NoArgsConstructor
 @AllArgsConstructor
+@ApiModel("具体药物使用记录")
 public class SpecificUsingDrugsIntermediation {
     /**
      * 就诊号/就诊表id, 和 drug id 一起是联合主键
      */
+    @ApiModelProperty(value = "就诊号/就诊表id, 和 drug id 一起是联合主键", required = true)
     private long visitDoctorId;
-    /**
-     * 药品表id, 和 visit doctor id 一起是联合主键
-     */
+
+    @ApiModelProperty(value = "药品表id, 和 visit doctor id 一起是联合主键", required = true)
     private long drugId;
-    /**
-     * 患者表id(冗余, 为了提高效率)
-     */
-    private String patientId;
-    /**
-     * 使用剂量(varchar(63)), 由于单位不确定, 所以是字符串
-     */
+
+    @ApiModelProperty(value = "药品数量, 和费用计算相关")
+    private int count;
+
+    @ApiModelProperty(value = "药品表id, 和 visit doctor id 一起是联合主键", required = true)
+    private long medicalProviderId;
+
+    @ApiModelProperty(value = "患者表id(冗余, 为了提高效率)")
+    private int patientId;
+
+    @ApiModelProperty(value = "使用剂量(varchar(63)), 由于单位不确定, 所以是字符串")
     private String dosageUsed;
-    /**
-     * 使用天数(int)
-     */
+
+    @ApiModelProperty(value = "使用天数(int)")
     private int dayTimeUsed;
-    /**
-     * 使用频率(varchar(63)), 同样不知道单位
-     */
+
+    @ApiModelProperty(value = " 使用频率(varchar(63)), 同样不知道单位")
     private String frequencyUsed;
-    /**
-     * 治疗开始时间(date)
-     */
+
+    @ApiModelProperty(value = "治疗开始时间(date)")
     private Date treatStart;
-    /**
-     * 治疗结束时间(date)
-     */
+
+    @ApiModelProperty(value = "治疗结束时间(date)")
     private Date treatEnd;
 
-    /**
-     * 其他用药指导(TEXT)
-     */
+
+    @ApiModelProperty(value = "其他用药指导(TEXT)")
     private String otherMedicationGuidance;
+    /**
+     * 逻辑删除字段, 不给用户显现
+     */
+    @ApiModelProperty(value = "逻辑删除字段", hidden = true)
+    @JsonIgnore
+    private Boolean deleted;
 }

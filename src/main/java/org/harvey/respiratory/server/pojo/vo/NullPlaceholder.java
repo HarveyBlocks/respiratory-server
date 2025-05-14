@@ -11,5 +11,6 @@ import io.swagger.annotations.ApiModel;
  */
 @ApiModel(description = "啥都没有,就是null,只是个记号")
 public class NullPlaceholder {
-    private NullPlaceholder(){}
+    private NullPlaceholder() {
+    }
 }

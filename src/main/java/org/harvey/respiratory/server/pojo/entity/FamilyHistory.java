@@ -3,6 +3,8 @@ package org.harvey.respiratory.server.pojo.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,22 +29,27 @@ import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
 @TableName("tb_family_history")
 @NoArgsConstructor
 @AllArgsConstructor
+@ApiModel("家庭病史")
 public class FamilyHistory {
     /**
      * 家族史记录id, 冗余, 不然就要全属性主键了, 这不好
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @ApiModelProperty(value = "家族史记录id, 冗余, 不过没有这个, 就要全属性主键了, 这不好")
     private long id;
     /**
      * 患者本人在患者表中id
      */
+    @ApiModelProperty(value = "患者本人在患者表中id")
     private long patientId;
     /**
      * 家族成员关系enum(有很多)
      */
+    @ApiModelProperty(value = "家族成员关系enum(有很多)")
     private FamilyRelationship familyRelationship;
     /**
      * 疾病表id
      */
+    @ApiModelProperty(value = "疾病表id")
     private int diseaseId;
 }

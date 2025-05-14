@@ -20,15 +20,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ApiModel(description = "简单的用户信息")
 public class UserDto implements Serializable {
-    @ApiModelProperty(value = "用户权限",example = "UNKNOWN for 未知, DEVELOPER for 开发者")
+    @ApiModelProperty(value = "用户权限")
     private Role role;
     @ApiModelProperty("用户主键")
     private Long id;
-    @ApiModelProperty("昵称")
+    @ApiModelProperty("姓名")
     private String name;
 
     public UserDto() {
     }
+
     public UserDto(UserSecurity userSecurity) {
         this.role = userSecurity.getRole();
         this.id = userSecurity.getId();

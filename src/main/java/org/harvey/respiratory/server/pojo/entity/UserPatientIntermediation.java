@@ -1,37 +1,33 @@
 package org.harvey.respiratory.server.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
- * 医保表
- * 医保号/医保id
- * 医保类型
+ * 用户病人中间表
+ * 用户可以持有多个病人的信息
+ * 病人可以被多个用户持有
+ * 不适合作为Model
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2025-05-13 00:53
+ * @date 2025-05-12 23:53
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("tb_healthcare")
+@TableName("tb_user_patient_intermediation")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Healthcare {
+public class UserPatientIntermediation {
     /**
-     * 医保号/医保表id, 用户来提供
+     * 不能为null
      */
-    private long id;
-
+    private long userId;
     /**
-     * 医保类型
+     * 不能为null
      */
-    private String type;
+    private long patientId;
 }

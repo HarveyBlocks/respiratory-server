@@ -3,6 +3,8 @@ package org.harvey.respiratory.server.pojo.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,35 +28,41 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName("tb_follow_up")
 @NoArgsConstructor
+@ApiModel("随访信息")
 @AllArgsConstructor
 public class FollowUp {
     /**
      * 随访表id
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @ApiModelProperty(value = "随访表id")
     private long id;
-
 
     /**
      * 就诊号, 冗余字段, 但是为了提高效率
      */
+    @ApiModelProperty(value = " 就诊号, 冗余字段, 但是为了提高效率")
     private long visitDoctorId;
     /**
      * 过敏症改善情况(varchar(255))
      */
+    @ApiModelProperty(value = "过敏症改善情况(varchar(255))")
     private String allergiesImprove;
     /**
      * 身体发育情况(varchar(255))
      */
+    @ApiModelProperty(value = "身体发育情况(varchar(255))")
     private String physicalDevelopment;
 
     /**
      * 药物不良反应(varchar(255))
      */
+    @ApiModelProperty(value = "药物不良反应(varchar(255))")
     private String adverseDrugReaction;
 
     /**
      * 不良反应处理方法(varchar(255))
      */
+    @ApiModelProperty(value = "不良反应处理方法(varchar(255))")
     private String adverseReactionTreatment;
 }

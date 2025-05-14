@@ -56,8 +56,11 @@ public class Video implements Serializable {
     @ApiModelProperty("创建时间")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private LocalDateTime createTime;
-    public Video(){}
-    public Video(VideoDoc videoDoc){
+
+    public Video() {
+    }
+
+    public Video(VideoDoc videoDoc) {
         this.id = videoDoc.getId();
         this.userId = videoDoc.getUserId();
         this.icon = videoDoc.getIcon();

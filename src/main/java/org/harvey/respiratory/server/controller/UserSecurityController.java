@@ -52,7 +52,7 @@ public class UserSecurityController {
      */
     @PostMapping("/code")
     @ApiOperation("发送验证码")
-    public Result<NullPlaceholder> sendCode(@RequestParam("phone") String phone) {
+    public Result<NullPlaceholder> sendCode(@RequestBody @ApiParam("phone") String phone) {
         // 发送短信验证码并保存验证码
         String code = userSecurityService.sendCode(phone);
         if (code == null) {

@@ -30,7 +30,7 @@ public class VideoDto implements Serializable {
     @ApiModelProperty("评论量")
     private Integer comments;
 
-    public VideoDto(Video video){
+    public VideoDto(Video video) {
         this.nickName = video.getNickName();
         this.title = video.getTitle();
         this.click = video.getClick();

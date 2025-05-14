@@ -1,7 +1,7 @@
 package org.harvey.respiratory.server.pojo.enums;
 
 /**
- * TODO
+ * 家庭关系
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -25,9 +25,9 @@ public enum FamilyRelationship {
     // 奶奶
     GRANDMOTHER,
     // 外婆?
-    FATHER_OF_FATHER,
-    // 外公?
     FATHER_OF_MATHER,
+    // 外公?
+    MATHER_OF_MATHER,
     // 叔叔
     YOUNGER_BROTHER_OF_FATHER,
     // 伯伯

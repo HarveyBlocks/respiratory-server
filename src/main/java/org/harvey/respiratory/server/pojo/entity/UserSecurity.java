@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户
+ * 用户, 不可暴露给外界
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0

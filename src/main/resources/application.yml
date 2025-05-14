@@ -43,7 +43,7 @@ knife4j:
   enable: true
   openapi:
     title: database-practice
-    description: "数据库实践,被拦截的用户(未登录的),将没有返回值, 而是statue_code = 401"
+    description: "医疗系统,被拦截的用户(未登录的),将没有返回值, 而是statue_code = 401"
     email: harvey.blocks@outlook.com
     concat: Harvey Blocks
     url: https://www.baidu.com

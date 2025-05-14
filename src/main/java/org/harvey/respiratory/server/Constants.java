@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server;
 
+import java.text.SimpleDateFormat;
 import java.util.Set;
 
 /**
@@ -21,4 +22,5 @@ public class Constants {
     public static final long CLEAR_CLICK_HISTORY_WAIT_MILLIONS = 10*60*1000;
 
     public static final long CHAT_RECORD_TIME_INTERVAL = 60 * 60 * 1000; // 一小时
+    public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 }

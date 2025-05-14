@@ -10,34 +10,36 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.harvey.respiratory.server.pojo.enums.Role;
 
 /**
- * 医疗服务机构表
- * id
- * 名称(varchar(63))
- * 地址(varchar(255))
+ * 医疗提供者的职位
+ * 医疗科室
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2025-05-13 00:46
+ * @date 2025-05-14 00:01
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("tb_medical_provider_form")
-@ApiModel("医疗提供机构")
+@ApiModel("医生职务")
 @NoArgsConstructor
 @AllArgsConstructor
-public class MedicalProviderForm {
+public class MedicalProviderJob {
 
-    @TableId(value = "id", type = IdType.AUTO)
-    @ApiModelProperty("医疗提供机构id")
-    private Long id;
-
-    @ApiModelProperty("名称(varchar(63))")
+    @TableId(type = IdType.AUTO)
+    @ApiModelProperty("主键")
+    private Integer id;
+    @ApiModelProperty("职位名")
     private String name;
 
-    @ApiModelProperty("地址(varchar(255))")
-    private String address;
-
+    @ApiModelProperty("职位可以持有的权限")
+    private Role role;
+    /**
+     * 单位, 分
+     */
+    @ApiModelProperty("职位的对每次问诊的消费,单位, 分")
+    private Integer expenseEveryVisit;
 }

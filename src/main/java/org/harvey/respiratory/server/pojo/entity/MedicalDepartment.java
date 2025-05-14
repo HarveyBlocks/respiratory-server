@@ -12,32 +12,34 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 医疗服务机构表
- * id
- * 名称(varchar(63))
- * 地址(varchar(255))
+ * 医疗科室
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2025-05-13 00:46
+ * @date 2025-05-14 00:04
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_medical_provider_form")
-@ApiModel("医疗提供机构")
+@TableName("tb_follow_up")
 @NoArgsConstructor
+@ApiModel("随访信息")
 @AllArgsConstructor
-public class MedicalProviderForm {
+public class MedicalDepartment {
+    @TableId(type = IdType.AUTO)
+    @ApiModelProperty(value = "主键")
+    private int id;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    @ApiModelProperty("医疗提供机构id")
-    private Long id;
-
-    @ApiModelProperty("名称(varchar(63))")
+    @ApiModelProperty(value = "科室名")
     private String name;
-
-    @ApiModelProperty("地址(varchar(255))")
-    private String address;
-
+    /**
+     * 外面的大类, null for 没有外面的大类了
+     */
+    @ApiModelProperty(value = "外面的大类, null for 没有外面的大类了")
+    private Integer outerDepartment;
+    /**
+     * 单位, 分, 不能为null
+     */
+    @ApiModelProperty(value = "单位, 分, 不能为null")
+    private int expenseEveryVisit;
 }

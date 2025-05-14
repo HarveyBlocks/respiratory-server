@@ -9,5 +9,5 @@ package org.harvey.respiratory.server.pojo.enums;
  * @date 2025-05-13 00:54
  */
 public enum Sex {
-    MALE,FEMALE
+    MALE, FEMALE
 }

@@ -8,7 +8,7 @@ package org.harvey.respiratory.server.exception;
  * @date 2025-05-12 23:42
  */
 public class UnfinishedException extends RuntimeException {
-    public UnfinishedException() {
+    public UnfinishedException(Object... destroy) {
         super();
     }
 

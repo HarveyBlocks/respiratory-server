@@ -4,14 +4,20 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.UnfinishedException;
+import org.harvey.respiratory.server.pojo.dto.TakeVisitNumberDto;
+import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
- * TODO
+ * 就
+ * <p>
+ * 医生进行问诊
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -22,17 +28,51 @@ import java.util.List;
 @Api(tags = "就诊")
 @RequestMapping("/visit")
 public class VisitDoctorController {
-
-    @GetMapping("/{id}")
-    @ApiOperation("获取就诊信息")
-    public Result<?> getById(@PathVariable("id") @ApiParam("就诊表的id") long id) {
+    @PostMapping("/take-number")
+    @ApiOperation("取号")
+    public Result<Long> getById(
+            @RequestBody @ApiParam("takeVisitNumber")
+            TakeVisitNumberDto medicalProviderId) {
+        // 插入取号信息
+        // 返回取号id
         throw new UnfinishedException();
     }
 
 
-    @PostMapping("/")
-    @ApiOperation("插入就诊信息, 这是一大坨")
-    public Result<List<?>> insert(long id) {
+    @GetMapping("/{id}")
+    @ApiOperation("获取就诊信息")
+    public Result<VisitDoctor> getById(@PathVariable("id") @ApiParam("就诊表的id") Long id) {
+        // 药物医生能依据具体就诊号查询到需要的具体用药信息, 其余查不到, 也就是说, 这个方法药物医生是查不到任何东西的
+        // 普通医生要进行校验
+        // 主管医生可以进行查询
+        throw new UnfinishedException();
+    }
+
+
+    @GetMapping("/all/role/{start-date}/{end-date}/{page}/{limit}")
+    @ApiOperation("查询当前角色相关寻访信息")
+    public Result<List<VisitDoctor>> queryByRole(
+            @PathVariable(name = "start-date") @ApiParam(value = "yyyy-MM-dd, 0补前", required = true) String startDate,
+            @PathVariable(name = "end-date") @ApiParam(value = "yyyy-MM-dd, 0补前", required = true) String endDate,
+            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
+            Integer page,
+            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度", defaultValue = "10")
+            Integer limit) {
+        // 依据权限, 如果是患者查询, 则患者相关
+        // 如果是医生查询, 就是医生相关
+        SimpleDateFormat simpleDateFormat = Constants.DEFAULT_DATE_FORMAT;
+        throw new UnfinishedException();
+    }
+
+    @GetMapping("/all/any/{start-date}/{end-date}/{page}/{limit}")
+    @ApiOperation("查询任意寻访信息")
+    public Result<List<VisitDoctor>> queryAny(
+            @PathVariable(name = "start-date") @ApiParam("YYYY-MM-DD, 0补前") String startDate,
+            @PathVariable(name = "end-date") @ApiParam("YYYY-MM-DD, 0补前") String endDate,
+            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始",defaultValue = "1") Integer page,
+            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度",defaultValue = "10") Integer limit) {
+        // 依据权限, 如果是患者查询, 则患者相关
+        // 如果是医生查询, 就是医生相关
         throw new UnfinishedException();
     }
 }

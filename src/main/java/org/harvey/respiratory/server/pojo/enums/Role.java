@@ -13,7 +13,6 @@ import lombok.Getter;
  */
 @Getter
 public enum Role implements IEnum<String> {
-
     UNKNOWN("未知"),
     PATIENT("患者"),
     NORMAL_DOCTOR("普通医生"),
@@ -25,9 +24,7 @@ public enum Role implements IEnum<String> {
     private final String comment;// description
 
 
-
     Role(String comment) {
-
         this.comment = comment;
     }
 
