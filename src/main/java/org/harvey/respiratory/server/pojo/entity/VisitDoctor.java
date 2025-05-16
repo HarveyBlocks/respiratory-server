@@ -25,24 +25,24 @@ import java.time.LocalDateTime;
 @TableName("tb_visit_doctor")
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel("就诊, 只读")
+@ApiModel("就诊, 作为model是只读")
 public class VisitDoctor {
     /**
      * 就诊号
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @ApiModelProperty(value = "就诊号")
-    private long id;
+    private Long id;
     /**
      * 患者id, 不应该为null
      */
     @ApiModelProperty(value = "患者id, 不应该为null")
-    private long patientId;
+    private Long patientId;
     /**
      * 医疗服务者id, 不可以为null
      */
     @ApiModelProperty(value = "医疗服务者id, 不可以为null")
-    private long medicalProviderId;
+    private Long medicalProviderId;
     /**
      * 简要介绍(varchar(255)), 如果医生不提供, 就是病症名的list
      */

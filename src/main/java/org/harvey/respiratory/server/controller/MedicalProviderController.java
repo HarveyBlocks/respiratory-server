@@ -29,7 +29,7 @@ public class MedicalProviderController {
     @ApiOperation("登记医疗提供者信息")
     @ApiResponse(code = 200, message = "返回插入后的id")
     public Result<Long> registerPatientInformation(
-            @RequestBody@ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.")
+            @RequestBody @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.")
             MedicalProvider medicalProvider) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(medicalProvider);

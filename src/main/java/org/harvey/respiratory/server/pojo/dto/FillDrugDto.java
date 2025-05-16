@@ -23,6 +23,6 @@ public class FillDrugDto {
     @ApiModelProperty("药物规格(varchar(63))")
     private String specification;
     @ApiModelProperty("药品数量, 和抓药数量相关")
-    private int count;
+    private Integer count;
 
 }

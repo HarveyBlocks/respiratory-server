@@ -9,23 +9,24 @@ import org.harvey.respiratory.server.pojo.dto.UserDto;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:12
+ * @date 2025-06-01 14:12
  */
 public class UserHolder {
     private static final ThreadLocal<UserDto> TL = new ThreadLocal<>();
 
-    public static void saveUser(UserDto user){
+    public static void saveUser(UserDto user) {
         TL.set(user);
     }
 
-    public static UserDto getUser(){
+    public static UserDto getUser() {
         return TL.get();
     }
 
-    public static void removeUser(){
+    public static void removeUser() {
         TL.remove();
     }
-    public static Long currentUserId(){
+
+    public static Long currentUserId() {
         try {
             return getUser().getId();
         } catch (NullPointerException e) {

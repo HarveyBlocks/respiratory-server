@@ -32,7 +32,7 @@ public class MedicalProviderForm {
 
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty("医疗提供机构id")
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty("名称(varchar(63))")
     private String name;

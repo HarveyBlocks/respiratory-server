@@ -11,12 +11,13 @@ import org.springframework.stereotype.Component;
 import java.security.KeyPair;
 import java.time.Duration;
 import java.util.Date;
+
 /**
  * JWT解析token与编码
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 15:17
+ * @date 2025-06-01 15:17
  */
 @Component
 public class JwtTool {
@@ -79,7 +80,7 @@ public class JwtTool {
 
         // 5.数据解析
         try {
-           return Long.valueOf(userPayload.toString());
+            return Long.valueOf(userPayload.toString());
         } catch (RuntimeException e) {
             // 数据格式有误
             throw new UnauthorizedException("无效的token");

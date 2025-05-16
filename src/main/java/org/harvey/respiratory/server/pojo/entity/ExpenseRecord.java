@@ -18,6 +18,14 @@ import lombok.experimental.Accessors;
  * 类别(varchar(63))
  * 金额(int/分)
  * 描述(varchar(255))
+ * <p>
+ * <p>
+ * tb_expenses_record
+ * id int8 comment '费用表主键id' primary key,
+ * visit_doctor_id int8 not null comment '就诊号/就诊表',
+ * category varchar(63)  not null  comment '消费类别',
+ * description varchar(255) not null  comment '描述',
+ * amount int4  not null  comment  '金额,分'
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -36,12 +44,12 @@ public class ExpenseRecord {
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @ApiModelProperty(value = "费用表id")
-    private long id;
+    private Long id;
     /**
      * 就诊号/就诊表id
      */
     @ApiModelProperty(value = "就诊号/就诊表id")
-    private long visitDoctorId;
+    private Long visitDoctorId;
     /**
      * 类别(varchar(63))
      */
@@ -52,7 +60,7 @@ public class ExpenseRecord {
      * 金额/分(int)
      */
     @ApiModelProperty(value = "金额/分(int)")
-    private int amount;
+    private Integer amount;
 
     /**
      * 描述(varchar(255))

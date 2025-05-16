@@ -1,4 +1,4 @@
-package org.harvey.respiratory.server.pojo.entity;
+package org.harvey.respiratory.server.pojo.doc;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 /**
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:09
+ * @date 2025-06-01 14:09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

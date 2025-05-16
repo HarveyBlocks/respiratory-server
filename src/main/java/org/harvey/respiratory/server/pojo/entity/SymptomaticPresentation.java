@@ -44,12 +44,12 @@ public class SymptomaticPresentation {
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @ApiModelProperty(value = "症状id")
-    private long id;
+    private Long id;
     /**
      * 就诊号/就诊表id
      */
     @ApiModelProperty(value = "就诊号/就诊表id")
-    private long visitDoctorId;
+    private Long visitDoctorId;
     /**
      * 名称(varchar(63))
      */
@@ -94,6 +94,6 @@ public class SymptomaticPresentation {
     /**
      * 逻辑删除
      */
-    @ApiModelProperty(value = "逻辑删除",hidden = true)
+    @ApiModelProperty(value = "逻辑删除", hidden = true)
     private boolean deleted;
 }

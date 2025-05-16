@@ -19,14 +19,14 @@ import javax.websocket.server.ServerEndpointConfig;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2023-12-30 15:11
+ * @date 2025-5-30 15:11
  */
 @Configuration
 @Slf4j
 public class GetHttpSessionConfig extends ServerEndpointConfig.Configurator {
 
+    public static final String SESSION_USER_KEY = "user";
     private static StringRedisTemplate stringRedisTemplate;
-
     private static JwtTool jwtTool;
 
     @Autowired
@@ -71,6 +71,4 @@ public class GetHttpSessionConfig extends ServerEndpointConfig.Configurator {
         }
         sec.getUserProperties().put(SESSION_USER_KEY, userDto);
     }
-
-    public static final String SESSION_USER_KEY = "user";
 }

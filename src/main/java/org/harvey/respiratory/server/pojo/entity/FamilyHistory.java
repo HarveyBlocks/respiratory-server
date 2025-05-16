@@ -19,6 +19,7 @@ import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
  * 家族成员关系enum(有很多), 该属性冗余, 不属于BC FC, 但为了提高效率
  * 疾病表id
  *
+ *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-13 00:55
@@ -36,20 +37,20 @@ public class FamilyHistory {
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @ApiModelProperty(value = "家族史记录id, 冗余, 不过没有这个, 就要全属性主键了, 这不好")
-    private long id;
+    private Long id;
     /**
      * 患者本人在患者表中id
      */
     @ApiModelProperty(value = "患者本人在患者表中id")
-    private long patientId;
+    private Long patientId;
     /**
      * 家族成员关系enum(有很多)
      */
     @ApiModelProperty(value = "家族成员关系enum(有很多)")
-    private FamilyRelationship familyRelationship;
+    private FamilyRelationship familyRelationshipId;
     /**
      * 疾病表id
      */
     @ApiModelProperty(value = "疾病表id")
-    private int diseaseId;
+    private Integer diseaseId;
 }

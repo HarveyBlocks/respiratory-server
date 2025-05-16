@@ -1,13 +1,13 @@
 package org.harvey.respiratory.server.exception;
 
 /**
- *   未完成的异常
+ * 未完成的异常
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-12 23:42
  */
-public class UnfinishedException extends RuntimeException {
+public class UnfinishedException extends ServerExceptionException {
     public UnfinishedException(Object... destroy) {
         super();
     }
@@ -25,10 +25,7 @@ public class UnfinishedException extends RuntimeException {
     }
 
     protected UnfinishedException(
-            String message,
-            Throwable cause,
-            boolean enableSuppression,
-            boolean writableStackTrace) {
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

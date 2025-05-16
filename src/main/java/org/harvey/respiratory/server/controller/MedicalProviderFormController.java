@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.exception.UnfinishedException;
-import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
@@ -28,7 +27,7 @@ public class MedicalProviderFormController {
     @PostMapping("/register")
     @ApiOperation("登记医疗提供机构信息")
     public Result<Long> registerPatientInformation(
-            @RequestBody  @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.")
+            @RequestBody @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.")
             MedicalProviderForm form) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(form);
@@ -60,12 +59,13 @@ public class MedicalProviderFormController {
     }
 
 
-
     @GetMapping("/all/{page}/{limit}")
     @ApiOperation("查询医疗提供者信息")
     public Result<List<MedicalProviderForm>> query(
-            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始",defaultValue = "1") Integer page,
-            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度",defaultValue = "10") Integer limit) {
+            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
+            Integer page,
+            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度", defaultValue = "10")
+            Integer limit) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(page, limit);
     }
@@ -78,10 +78,12 @@ public class MedicalProviderFormController {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(form);
     }
+
     @GetMapping("/multiple/{name}")
     @ApiOperation("查询医疗提供者信息")
     public Result<List<MedicalProviderForm>> queryByName(
-            @PathVariable(name = "name", required = false) @ApiParam(value = "依据姓名模糊查询医疗提供机构") String name) {
+            @PathVariable(name = "name", required = false) @ApiParam(value = "依据姓名模糊查询医疗提供机构")
+            String name) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(name);
     }

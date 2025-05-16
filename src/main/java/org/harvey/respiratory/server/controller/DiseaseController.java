@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.entity.Disease;
-import org.harvey.respiratory.server.pojo.entity.FamilyHistory;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +55,8 @@ public class DiseaseController {
             @PathVariable("name") @ApiParam(value = "疾病名", required = true) String name,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(value = "limit", required = false) @ApiParam(value = "页长", defaultValue = "10") Integer limit
+            @PathVariable(value = "limit", required = false) @ApiParam(value = "页长", defaultValue = "10")
+            Integer limit
     ) {
         // 用药物名模糊查询药物
         throw new UnfinishedException();

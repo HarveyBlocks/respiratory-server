@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-04-13 10:47
+ * @date 2025-06-13 10:47
  */
 @Slf4j
 public class IpTool {
@@ -49,12 +49,12 @@ public class IpTool {
             return region;
         }
         if (ip.split(":").length == 8) {
-            log.warn("({})似乎是IPV6?",ip);
+            log.warn("({})似乎是IPV6?", ip);
             return region;
         }
         try {
             region = searcher.search(ip).split("\\|");
-            if (region.length>10) {
+            if (region.length > 10) {
                 return new String[]{};
             }
             log.debug("{region: {}, ioCount: {}}", Arrays.toString(region), searcher.getIOCount());

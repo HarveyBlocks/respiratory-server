@@ -27,9 +27,9 @@ public class Disease {
     /**
      * primary key
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty("主键id")
-    private long id;
+    private Integer id;
     /**
      * 名称
      */

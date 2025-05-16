@@ -25,9 +25,9 @@ public class UserPatientIntermediation {
     /**
      * 不能为null
      */
-    private long userId;
+    private Long userId;
     /**
      * 不能为null
      */
-    private long patientId;
+    private Long patientId;
 }

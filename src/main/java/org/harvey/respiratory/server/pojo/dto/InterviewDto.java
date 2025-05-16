@@ -56,13 +56,13 @@ public class InterviewDto {
         private long drugId;
 
         @ApiModelProperty("药品数量, 和费用计算相关")
-        private int count;
+        private Integer count;
 
         @ApiModelProperty("使用剂量(varchar(63)), 由于单位不确定, 所以是字符串")
         private String dosageUsed;
 
         @ApiModelProperty("使用天数(int)")
-        private int dayTimeUsed;
+        private Integer dayTimeUsed;
 
         @ApiModelProperty("使用频率(varchar(63)), 同样不知道单位")
         private String frequencyUsed;

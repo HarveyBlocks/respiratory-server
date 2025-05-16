@@ -58,8 +58,8 @@ public class FamilyHistoryController {
             @PathVariable("patientId") @ApiParam(value = "病患名", required = true) Long patientId,
             @PathVariable("relationship")
             @ApiParam(value = "病患关系数组." +
-                             " 即使只有一个, 前后`[]`也不应该省略," +
-                             " 但是可能要注意以下URL中`[],`三个符号是不是特殊字符, 是否需要转义",
+                              " 即使只有一个, 前后`[]`也不应该省略," +
+                              " 但是可能要注意以下URL中`[],`三个符号是不是特殊字符, 是否需要转义",
                     example = "`[FATHER,MATHER]`", required = true) String relationships,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,

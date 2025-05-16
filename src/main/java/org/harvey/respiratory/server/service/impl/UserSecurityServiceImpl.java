@@ -6,7 +6,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.dao.UserSecurityMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -35,16 +34,33 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:10
+ * @date 2025-06-01 14:10
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurity> implements UserSecurityService {
+public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurity> implements
+        UserSecurityService {
+    private final RedissonLock<UserDto> redissonLock;
     @Resource
     private PasswordEncoder passwordEncoder;
     @Resource
     private JwtTool jwtTool;
     @Resource
     private JwtProperties jwtProperties;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    public UserSecurityServiceImpl(RedissonLock<UserDto> redissonLock) {
+        this.redissonLock = redissonLock;
+    }
+
+    private static Map<String, String> user2Map(UserDto user) {
+        return Map.of(
+                "id", user.getId().toString(),
+                "nickName", user.getName(),
+                "role", user.getRole().toString(),
+                TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES
+        );
+    }
 
     @Override
     public String sendCode(String phone) {
@@ -113,9 +129,6 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
         return user;
     }
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
     @Override
     public String chooseLoginWay(LoginFormDto loginForm) {
         UserSecurity user /* = null*/;
@@ -131,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
             // 无法决定是密码登录还是验证码登录的情况
             throw new BadRequestException("请正确输入验证码或密码");
         }
-        if (code != null&&!code.isEmpty()) {
+        if (code != null && !code.isEmpty()) {
             if (code.length() != 6) {
                 throw new BadRequestException("请输入正确格式的验证码");
             }
@@ -207,7 +220,12 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
         }
         Role role = userDTO.getRole();
         if (role != null) {
-            user.setRole(role);
+            user.setRoleId(role.getRoleId());
+        }
+
+        String identityCardId = userDTO.getIdentityCardId();
+        if (identityCardId != null && RegexUtils.isIdentifierCardId(identityCardId)) {
+            user.setIdentityCardId(identityCardId);
         }
         user.setUpdateTime(LocalDateTime.now());
         // 更新
@@ -221,7 +239,6 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
             throw new BadRequestException("更新失败,无此用户");
         }
     }
-
 
     private void saveToRedis(UserDto userDTO, String token) {
         if (userDTO == null) {
@@ -238,13 +255,6 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
         return baseMapper.selectOne(lambdaQueryWrapper);
     }
 
-
-    private final RedissonLock<UserDto> redissonLock;
-
-    public UserServiceImpl(RedissonLock<UserDto>  redissonLock) {
-        this.redissonLock = redissonLock;
-    }
-
     @Override
     public UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException {
         log.debug("queryMutexFixByLock");
@@ -256,7 +266,7 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
             // Redis里没有数据
             log.debug("缓存不存在用户:" + userId);
             String lockKey = RedisConstants.USER_LOCK_KEY + UserHolder.currentUserId();
-            return redissonLock.asynchronousLock(lockKey, ()-> getFromDbAndWriteToCache(userId, key));
+            return redissonLock.asynchronousLock(lockKey, () -> getFromDbAndWriteToCache(userId, key));
         } else if (((String) userFieldMap.get("id")).isEmpty()) {
             log.warn("Redis中存在的假数据" + userId);
             return null;
@@ -271,19 +281,6 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
             throw new RuntimeException(e);
         }
     }
-
-
-
-
-    private static Map<String, String> user2Map(UserDto user) {
-        return Map.of(
-                "id", user.getId().toString(),
-                "nickName", user.getName(),
-                "role", user.getRole().toString(),
-                TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES
-        );
-    }
-
 
     /**
      * 解决穿透专用
@@ -322,8 +319,10 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
             stringRedisTemplate.expire(key, plusRandomSec(ttl), TimeUnit.SECONDS);
         }
     }
+
     /**
      * 通过随机改变ttl, 防止雪崩
+     *
      * @return 增加了随机值的ttl
      */
     private Long plusRandomSec(Long ttl) {
@@ -405,7 +404,8 @@ public class UserServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurit
         Boolean exit = stringRedisTemplate.opsForValue()
                 .setIfAbsent(lockKey,
                         "", RedisConstants.LOCK_TTL,
-                        TimeUnit.SECONDS);
+                        TimeUnit.SECONDS
+                );
         // 锁的时效设置成业务完成时间的十倍二十倍, 防止意外
         // 当然意外还是有可能发生, 例如锁的意外释放
         // 释放锁的人必须是当前线程的人,这样可以解决一部分问题

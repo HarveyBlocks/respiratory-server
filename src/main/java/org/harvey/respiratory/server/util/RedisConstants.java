@@ -5,13 +5,13 @@ package org.harvey.respiratory.server.util;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 15:17
+ * @date 2025-06-01 15:17
  */
 public class RedisConstants {
     public static final String LOGIN_CODE_KEY = "video:login:code:";
-    public static final Long LOGIN_CODE_TTL = 3*60L;
+    public static final Long LOGIN_CODE_TTL = 3 * 60L;
     public static final String QUERY_USER_KEY = "video:user:query:token:";
-    public static final Long QUERY_USER_TTL = 30*60L;
+    public static final Long QUERY_USER_TTL = 30 * 60L;
 
     public static final Long CACHE_NULL_TTL = 2L;
 

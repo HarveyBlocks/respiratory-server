@@ -1,7 +1,6 @@
 package org.harvey.respiratory.server.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,9 +22,9 @@ public class DiseaseDiagnosisIntermediation {
     /**
      * 就诊号/就诊表id
      */
-    private long visitDoctorId;
+    private Long visitDoctorId;
     /**
      * 疾病表id
      */
-    private long diseaseId;
+    private Long diseaseId;
 }

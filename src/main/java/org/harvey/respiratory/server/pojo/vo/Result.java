@@ -10,7 +10,7 @@ import lombok.Data;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:11
+ * @date 2025-06-01 14:11
  */
 @Data
 @AllArgsConstructor

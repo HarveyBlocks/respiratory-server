@@ -9,7 +9,7 @@ import lombok.Getter;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 16:09
+ * @date 2025-06-01 16:09
  */
 @Getter
 public enum Role implements IEnum<String> {
@@ -28,13 +28,18 @@ public enum Role implements IEnum<String> {
         this.comment = comment;
     }
 
-    public static Role create(Integer roleValue) {
-        return Role.values()[roleValue];
+    public static Role create(Integer roleId) {
+        // roleId从一开始
+        return Role.values()[roleId - 1];
     }
 
 
     @Override
     public String getValue() {
         return this.name();
+    }
+
+    public int getRoleId() {
+        return ordinal() + 1;
     }
 }

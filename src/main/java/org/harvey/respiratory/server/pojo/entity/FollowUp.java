@@ -18,6 +18,7 @@ import lombok.experimental.Accessors;
  * 身体发育情况(varchar(255))
  * 药物不良反应(varchar(255))
  * 不良反应处理方法(varchar(255))
+ * <p>
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -36,13 +37,13 @@ public class FollowUp {
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @ApiModelProperty(value = "随访表id")
-    private long id;
+    private Long id;
 
     /**
      * 就诊号, 冗余字段, 但是为了提高效率
      */
     @ApiModelProperty(value = " 就诊号, 冗余字段, 但是为了提高效率")
-    private long visitDoctorId;
+    private Long visitDoctorId;
     /**
      * 过敏症改善情况(varchar(255))
      */

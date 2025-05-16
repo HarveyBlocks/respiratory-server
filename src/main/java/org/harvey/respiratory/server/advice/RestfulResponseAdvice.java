@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 17:31
+ * @date 2025-06-01 17:31
  */
 //@ControllerAdvice
 @Deprecated
@@ -24,23 +24,21 @@ public class RestfulResponseAdvice implements ResponseBodyAdvice<Object> {
     public boolean supports(MethodParameter returnType, Class converterType) {
         // 过滤Controller
         Method method = returnType.getMethod();
-        if (method==null) {
+        if (method == null) {
             return false;
         }
-        if("getDocumentation".equals(method.getName())){
+        if ("getDocumentation".equals(method.getName())) {
             return false;
         }
-        if ("swaggerResources".equals(method.getName())) {
-            return false;
-        }
-        return true;
+        return !"swaggerResources".equals(method.getName());
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType,
-                                  MediaType selectedContentType,
-                                  Class selectedConverterType,
-                                  ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(
+            Object body, MethodParameter returnType,
+            MediaType selectedContentType,
+            Class selectedConverterType,
+            ServerHttpRequest request, ServerHttpResponse response) {
 //        System.out.println("-----------------beforeBodyWrite-----------------");
 //        System.out.println(body);
 //        if (response.setStatusCode());

@@ -18,11 +18,10 @@ import lombok.NoArgsConstructor;
 @Data
 @ApiModel("充值")
 public class RechargeDto {
-    @ApiModelProperty("充值的查询依据, 或医保号, 或病患号, 或电话号码, 三选一")
-    private int queryBasisId;
-
-    @ApiModelProperty("充值的查询依据, 或医保号, 或病患号, 或电话号码, 三选一")
-    private String phone;
+    @ApiModelProperty("充值的查询依据, 或医保号, 或病患号, 或身份证, 三选一")
+    private Integer queryBasisId;
+    @ApiModelProperty("充值的查询依据, 或医保号, 或病患号, 或身份证, 三选一, 这是给身份证的")
+    private String identifierCardId;
     @ApiModelProperty(value = "充值金额, 单位, 分, 必正", required = true)
-    private int amount;
+    private Integer amount;
 }

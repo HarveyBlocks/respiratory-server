@@ -36,7 +36,7 @@ public class Drug {
      */
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty("药品id")
-    private long id;
+    private Integer id;
     /**
      * 药物名称(varchar(63))
      */
@@ -46,7 +46,7 @@ public class Drug {
      * 药物单价, 单位, 分
      */
     @ApiModelProperty("药物单价, 单位, 分")
-    private int expenseEach;
+    private Integer expenseEach;
     /**
      * 药物规格(varchar(63))
      */

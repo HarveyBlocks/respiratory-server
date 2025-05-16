@@ -22,34 +22,31 @@ import java.sql.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_specific_using_drugs_intermediation")
+@TableName("tb_specific_using_drug_record")
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel("具体药物使用记录")
-public class SpecificUsingDrugsIntermediation {
+public class SpecificUsingDrugRecord {
     /**
      * 就诊号/就诊表id, 和 drug id 一起是联合主键
      */
     @ApiModelProperty(value = "就诊号/就诊表id, 和 drug id 一起是联合主键", required = true)
-    private long visitDoctorId;
+    private Long visitDoctorId;
 
     @ApiModelProperty(value = "药品表id, 和 visit doctor id 一起是联合主键", required = true)
-    private long drugId;
+    private Integer drugId;
 
     @ApiModelProperty(value = "药品数量, 和费用计算相关")
-    private int count;
+    private Integer count;
 
-    @ApiModelProperty(value = "药品表id, 和 visit doctor id 一起是联合主键", required = true)
-    private long medicalProviderId;
-
-    @ApiModelProperty(value = "患者表id(冗余, 为了提高效率)")
-    private int patientId;
+    @ApiModelProperty(value = "患者表id(冗余, 为了提高查询效率)")
+    private Integer patientId;
 
     @ApiModelProperty(value = "使用剂量(varchar(63)), 由于单位不确定, 所以是字符串")
     private String dosageUsed;
 
     @ApiModelProperty(value = "使用天数(int)")
-    private int dayTimeUsed;
+    private Integer dayTimeUsed;
 
     @ApiModelProperty(value = " 使用频率(varchar(63)), 同样不知道单位")
     private String frequencyUsed;

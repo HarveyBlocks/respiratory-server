@@ -26,6 +26,32 @@ import java.sql.Date;
  * 体重(kg) (float)
  * 医保表id
  *
+ *
+ *
+ * <pre>{@code
+ * create table tb_patient
+ * (
+ *     id          int8                                     not null comment '患者id'
+ *         primary key,
+ *     phone       char(11)                                         not null comment '电话号码, +86 only',
+ *     name        varchar(63)                               not  null comment '姓名',
+ *     sex    enum('MALE','FEMALE')                                 not null comment '性别, 目前只有MALE和FEMALE',
+ *     birth_date       date                            not null comment '出生日期',
+ *     address        varchar(255)              not null comment '家庭地址',
+ *     height        float                      not null comment '升高(m)',
+ *     weight        float                      not null comment '体重(kg)',
+ *      healthcare_id       int8                null comment '医保号', --  考虑拆表
+ *      healthcare_type       varchar(63)       null comment '医保类型',
+ *     healthcare_balance       int4            null comment '医保余额',
+ *     constraint tb_patient_phone
+ *         unique (phone)
+ *     constraint tb_patient_healthcare_id
+ *         unique (healthcare_id)
+ * )
+ *     comment '患者表';
+ *
+ * }</pre>
+ *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-13 00:48
@@ -45,31 +71,28 @@ public class Patient {
     @ApiModelProperty(value = "手机号码(unique, char(11)), 不可为null", required = true)
     private String phone;
 
+    @ApiModelProperty(value = "病患身份证号, char(11) 不可为null", required = true)
+    private String identityCardId;
 
     @ApiModelProperty(value = "名称(varchar(63)), 不可为null", required = true)
     private String name;
 
-    @ApiModelProperty(value = "职称(enum-普通/主管/药物), 不可为null", required = true)
+    @ApiModelProperty(value = "性别, 不可为null", required = true)
     private Sex sex;
 
-    @ApiModelProperty(value = "医疗服务机构表id, 不可为null", required = true)
+    @ApiModelProperty(value = "出生日期, 不可为null", required = true)
     private Date birthDate;
 
     @ApiModelProperty(value = "家庭住址(varchar(255)), 不可为null", required = true)
-    private Date address;
+    private String address;
 
     @ApiModelProperty(value = "身高(m) (float), 不可为null", required = true)
-    private Date height;
+    private float height;
 
     @ApiModelProperty(value = "体重(kg) (float), 不可为null", required = true)
-    private Date weight;
+    private float weight;
 
     @ApiModelProperty(value = "医保表id, 可以为null")
     private Long healthcareId;
 
-    @ApiModelProperty(value = "医保类型, 可以为null")
-    private String healthcareType;
-
-    @ApiModelProperty(value = "医保余额")
-    private Integer balance;
 }

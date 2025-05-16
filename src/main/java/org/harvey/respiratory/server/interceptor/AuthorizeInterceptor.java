@@ -14,16 +14,17 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-02 11:21
+ * @date 2025-06-02 11:21
  */
 public class AuthorizeInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) {
-        if (Constants.ROOT_AUTH_URI.contains(request.getRequestURI())){
-            if (UserHolder.getUser().getRole() != Role.DATABASE_ADMINISTRATOR){
+    public boolean preHandle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler) {
+        if (Constants.ROOT_AUTH_URI.contains(request.getRequestURI())) {
+            if (UserHolder.getUser().getRole() != Role.DATABASE_ADMINISTRATOR) {
                 response.setStatus(401);
                 return false;
             }

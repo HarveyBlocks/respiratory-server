@@ -14,7 +14,7 @@ import java.io.Serializable;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:13
+ * @date 2025-06-01 14:13
  */
 @Data
 @AllArgsConstructor
@@ -26,13 +26,15 @@ public class UserDto implements Serializable {
     private Long id;
     @ApiModelProperty("姓名")
     private String name;
-
+    @ApiModelProperty("用户身份证")
+    private String identityCardId;
     public UserDto() {
     }
 
     public UserDto(UserSecurity userSecurity) {
-        this.role = userSecurity.getRole();
+        this.role = Role.create(userSecurity.getRoleId());
         this.id = userSecurity.getId();
         this.name = userSecurity.getName();
+        this.identityCardId = userSecurity.getIdentityCardId();
     }
 }

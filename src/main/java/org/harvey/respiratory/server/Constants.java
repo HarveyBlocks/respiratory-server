@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 15:17
+ * @date 2025-06-01 15:17
  */
 public class Constants {
     public static final String AUTHORIZATION_HEADER = "authorization";
@@ -19,7 +19,7 @@ public class Constants {
     public static final Integer MAX_PAGE_SIZE = 10;
     public static final String TIME_FIELD = "time_field";
     public static final Integer DEFAULT_PAGE_SIZE = 5;
-    public static final long CLEAR_CLICK_HISTORY_WAIT_MILLIONS = 10*60*1000;
+    public static final long CLEAR_CLICK_HISTORY_WAIT_MILLIONS = 10 * 60 * 1000;
 
     public static final long CHAT_RECORD_TIME_INTERVAL = 60 * 60 * 1000; // 一小时
     public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

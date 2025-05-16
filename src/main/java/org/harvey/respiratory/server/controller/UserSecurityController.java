@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.ResourceNotFountException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
 import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:09
+ * @date 2025-06-01 14:09
  */
 @Slf4j
 @RestController
@@ -45,7 +46,8 @@ public class UserSecurityController {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
+    @Resource
+    private ConstantsProperties constantsProperties;
 
     /**
      * 发送手机验证码
@@ -112,7 +114,6 @@ public class UserSecurityController {
         return Result.ok();
     }
 
-
     /**
      * 登出功能
      *
@@ -165,12 +166,9 @@ public class UserSecurityController {
             map.put(UserSecurityService.NAME_FIELD, UserSecurity.DEFAULT_NAME);
             stringRedisTemplate.opsForHash().putAll(key, map);
         }
-        return new Result<>(new UserDto(Role.UNKNOWN, 1L, "name"));
+        return new Result<>(
+                new UserDto(Role.UNKNOWN, 1L, "name", "350121200410080032"/*TODO 测试数据不好, 因为验证位没有被验证*/));
     }
-
-
-    @Resource
-    private ConstantsProperties constantsProperties;
 
     @ApiOperation(value = "更新用户信息", notes = "没有更新的部分就传null或空字符串,不用传ID")
     @PutMapping("/update")
@@ -178,6 +176,17 @@ public class UserSecurityController {
             @RequestBody @ApiParam("需要用户注册的Json,使用密码") UserDto userDTO,
             @ApiParam(hidden = true) HttpServletRequest request) {
         // 删除原有头像
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("未知的角色");
+        }
+        Role role = user.getRole();
+
+        // 怎么查询权限有没有呢? 当前用户是不是TODO
+        if (role.ordinal() >= Role.CHARGE_DOCTOR.ordinal()) {
+            throw new UnauthorizedException("没有更新的权限");
+        }
+
         userSecurityService.updateUser(userDTO, request.getHeader(Constants.AUTHORIZATION_HEADER));
         return Result.ok();
     }

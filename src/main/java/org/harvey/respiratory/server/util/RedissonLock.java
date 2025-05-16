@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-01-21 21:20
+ * @date 2025-05-21 21:20
  */
 @Component
 public class RedissonLock<T> {
@@ -30,8 +30,9 @@ public class RedissonLock<T> {
 
     /**
      * 分布式锁
+     *
      * @param lockKey lock的键
-     * @param supply 获取值的方法
+     * @param supply  获取值的方法
      * @return id
      */
     public T asynchronousLock(String lockKey, Supplier<T> supply) throws InterruptedException {
@@ -42,10 +43,10 @@ public class RedissonLock<T> {
         long waitTime = -1L;// 等待时间, 默认-1不等待
         long releaseTime = 30L;// 自动释放时间,默认30s
         boolean isLock = lock.tryLock(waitTime, releaseTime, TimeUnit.SECONDS);
-        if(isLock){
+        if (isLock) {
             try {
                 return supply.get();
-            }finally {
+            } finally {
                 lock.unlock();
             }
         }

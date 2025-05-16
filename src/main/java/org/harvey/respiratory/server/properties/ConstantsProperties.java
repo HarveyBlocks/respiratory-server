@@ -6,10 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 /**
- *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-04 17:28
+ * @date 2025-06-04 17:28
  */
 @Data
 @ConfigurationProperties(prefix = "respiratory.constants")

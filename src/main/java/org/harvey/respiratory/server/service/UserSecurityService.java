@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:10
+ * @date 2025-06-01 14:10
  */
 public interface UserSecurityService extends IService<UserSecurity> {
     String TIME_FIELD = Constants.TIME_FIELD;
@@ -28,13 +28,15 @@ public interface UserSecurityService extends IService<UserSecurity> {
      * @return 校验码
      */
     String sendCode(String phone);
+
     UserSecurity selectByPhone(String phone);
+
     /**
      * 用验证码登录验证
      *
-     * @param codeCache  会话保存的验证码
-     * @param phone      新请求的手机号
-     * @param code       新请求的验证码
+     * @param codeCache 会话保存的验证码
+     * @param phone     新请求的手机号
+     * @param code      新请求的验证码
      * @return 用户信息
      */
     UserSecurity loginByCode(String codeCache, String phone, String code);

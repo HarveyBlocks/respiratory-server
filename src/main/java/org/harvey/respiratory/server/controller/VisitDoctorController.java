@@ -69,8 +69,10 @@ public class VisitDoctorController {
     public Result<List<VisitDoctor>> queryAny(
             @PathVariable(name = "start-date") @ApiParam("YYYY-MM-DD, 0补前") String startDate,
             @PathVariable(name = "end-date") @ApiParam("YYYY-MM-DD, 0补前") String endDate,
-            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始",defaultValue = "1") Integer page,
-            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度",defaultValue = "10") Integer limit) {
+            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
+            Integer page,
+            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度", defaultValue = "10")
+            Integer limit) {
         // 依据权限, 如果是患者查询, 则患者相关
         // 如果是医生查询, 就是医生相关
         throw new UnfinishedException();

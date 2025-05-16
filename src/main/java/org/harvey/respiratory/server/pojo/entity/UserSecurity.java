@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:05
+ * @date 2025-06-01 14:05
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -47,6 +48,9 @@ public class UserSecurity implements Serializable {
      */
     private String phone;
 
+
+    private String identityCardId;
+
     /**
      * 密码，加密存储
      */
@@ -70,12 +74,5 @@ public class UserSecurity implements Serializable {
     /**
      * 角色,权限
      */
-    private Role role;
-
-
-    public UserSecurity(UserDto userDto) {
-        this.name = userDto.getName();
-        this.id = userDto.getId();
-        this.role = userDto.getRole();
-    }
+    private Integer roleId;
 }

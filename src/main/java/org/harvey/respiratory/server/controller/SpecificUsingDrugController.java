@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.exception.UnfinishedException;
-import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugsIntermediation;
+import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +37,7 @@ public class SpecificUsingDrugController {
     @PutMapping("/")
     @ApiOperation("更新某一问诊的需要用药")
     public Result<NullPlaceholder> updatePatientDrugHistory(
-            @RequestBody SpecificUsingDrugsIntermediation specificUsing) {
+            @RequestBody SpecificUsingDrugRecord specificUsing) {
         // 更新药品使用
         // 医生可以更新, 用户不行
         // 为了保留证据, 旧信息逻辑删除, 本信息保持不变
@@ -56,7 +56,7 @@ public class SpecificUsingDrugController {
 
     @GetMapping("visit/{id}")
     @ApiOperation("查询该问诊的有关症状")
-    public Result<List<SpecificUsingDrugsIntermediation>> queryVisitDrug(
+    public Result<List<SpecificUsingDrugRecord>> queryVisitDrug(
             @PathVariable("id") @ApiParam(value = "问诊号", required = true) Long visitId) {
         throw new UnfinishedException();
     }

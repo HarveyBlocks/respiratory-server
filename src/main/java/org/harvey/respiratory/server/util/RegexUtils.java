@@ -1,9 +1,11 @@
 package org.harvey.respiratory.server.util;
 
+import java.util.regex.Pattern;
+
 /**
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-01 14:09
+ * @date 2025-06-01 14:09
  */
 public class RegexUtils {
     /**
@@ -15,6 +17,7 @@ public class RegexUtils {
     public static boolean isPhoneEffective(String phone) {
         return match(phone, RegexPatterns.PHONE_REGEX);
     }
+
     /**
      * 是否是可行的密码格式
      *
@@ -26,10 +29,14 @@ public class RegexUtils {
     }
 
     // 校验是否复合正则格式
-    private static boolean match(String str, String regex) {
-        if (str==null|| str.isEmpty()) {
+    private static boolean match(String str, Pattern regex) {
+        if (str == null || str.isEmpty()) {
             return false;
         }
-        return str.matches(regex);
+        return regex.matcher(str).matches();
+    }
+
+    public static boolean isIdentifierCardId(String identityCardId) {
+        return RegexPatterns.IDENTIFIER_ID_PREDICATE.test(identityCardId);
     }
 }

@@ -21,14 +21,14 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_follow_up")
+@TableName("tb_medical_department")
 @NoArgsConstructor
 @ApiModel("随访信息")
 @AllArgsConstructor
 public class MedicalDepartment {
     @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "主键")
-    private int id;
+    private Integer id;
 
     @ApiModelProperty(value = "科室名")
     private String name;
@@ -41,5 +41,5 @@ public class MedicalDepartment {
      * 单位, 分, 不能为null
      */
     @ApiModelProperty(value = "单位, 分, 不能为null")
-    private int expenseEveryVisit;
+    private Integer expenseEveryVisit;
 }

@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.harvey.respiratory.server.pojo.enums.DoctorJob;
 import org.harvey.respiratory.server.pojo.enums.Role;
 
 /**
@@ -31,30 +30,21 @@ import org.harvey.respiratory.server.pojo.enums.Role;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicalProvider {
-
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @ApiModelProperty(value = "新增时需要为null, 更新时不能为null, 就是依据id更新")
     private Long id;
-
-    @ApiModelProperty(value = "用户id, 不可以为null, 但可以让服务器给出值")
-    private Long userId;
-
-    @ApiModelProperty(value = "手机号码(unique, char(11))")
-    private String phone;
-
+    @ApiModelProperty(value = "医疗提供者身份证号, char(11) 不可为null", required = true)
+    private String identityCardId;
     @ApiModelProperty(value = "名称(varchar(63))")
     private String name;
 
     @ApiModelProperty(value = "有关权限,冗余,但是为了提高效率")
-    private Role role;
+    private Integer roleId;
 
     @ApiModelProperty(value = "医疗服务机构表id, 不可以为null")
-    private Long formId;
-
+    private Integer formId;
     @ApiModelProperty(value = "科室的id, 不可以为null")
     private Integer departmentId;
     @ApiModelProperty(value = "职位的id, 不可以为null")
     private Integer jobId;
-
-
 }

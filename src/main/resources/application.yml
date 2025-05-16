@@ -6,7 +6,7 @@ spring:
   datasource:
     #    type: com.alibaba.druid.pool.DruidDataSource
     druid:
-      url: jdbc:mysql://${respiratory.db.host}:3306/respiratory-user?useSSL=false&serverTimezone=UTC
+      url: jdbc:mysql://${respiratory.db.host}:3306/respiratory?useSSL=false&serverTimezone=UTC
       username: root
       password: ${respiratory.db.password}
       driver-class-name: com.mysql.cj.jdbc.Driver

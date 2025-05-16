@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.harvey.respiratory.server.pojo.enums.Role;
 
 /**
  * 医疗提供者的职位
@@ -23,7 +22,7 @@ import org.harvey.respiratory.server.pojo.enums.Role;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_medical_provider_form")
+@TableName("tb_medical_provider_job")
 @ApiModel("医生职务")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,11 +31,12 @@ public class MedicalProviderJob {
     @TableId(type = IdType.AUTO)
     @ApiModelProperty("主键")
     private Integer id;
+
     @ApiModelProperty("职位名")
     private String name;
 
-    @ApiModelProperty("职位可以持有的权限")
-    private Role role;
+    @ApiModelProperty(value = "职位可以持有的权限", hidden = true)
+    private Integer roleId;
     /**
      * 单位, 分
      */

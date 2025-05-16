@@ -2,13 +2,12 @@ package org.harvey.respiratory.server.pojo.doc;
 
 
 import lombok.Data;
-import org.harvey.respiratory.server.pojo.entity.Video;
 import org.harvey.respiratory.server.util.TimeUtil;
 
 /**
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-02-06 15:06
+ * @date 2025-06-06 15:06
  */
 @Data
 public class VideoDoc {
