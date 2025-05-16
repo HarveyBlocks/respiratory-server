@@ -296,6 +296,7 @@ relation-ship13{疾病诊断}-->疾病诊断时间((诊断时间))
 ### 建表
 
 [建表语句](src/main/resources/build_table.sql)
+
 ![建表结果](src/main/resources/respiratory-tables.png)
 
 ## Role
