@@ -2,9 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.entity.RoleEntity;
-import org.harvey.respiratory.server.pojo.enums.Role;
 
 /**
  * 疾病

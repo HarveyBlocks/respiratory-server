@@ -62,5 +62,5 @@ public interface UserSecurityService extends IService<UserSecurity> {
 
     UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException;
 
-    UserDto queryUserById(Long userId);
+
 }

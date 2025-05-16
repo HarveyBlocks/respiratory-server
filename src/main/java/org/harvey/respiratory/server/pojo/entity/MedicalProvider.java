@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.harvey.respiratory.server.pojo.enums.Role;
 
 /**
  * 医疗服务者表

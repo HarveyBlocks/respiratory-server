@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.harvey.respiratory.server.pojo.doc.VideoDoc;
 import org.harvey.respiratory.server.util.TimeUtil;
 
 import java.io.Serializable;
