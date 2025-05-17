@@ -27,10 +27,11 @@ public class UserHolder {
     }
 
     public static Long currentUserId() {
-        try {
-            return getUser().getId();
-        } catch (NullPointerException e) {
+
+        UserDto user = getUser();
+        if (user==null){
             throw new UnauthorizedException("未登录");
         }
+        return user.getId();
     }
 }

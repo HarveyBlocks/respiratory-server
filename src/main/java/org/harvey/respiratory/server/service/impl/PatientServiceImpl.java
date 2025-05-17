@@ -42,6 +42,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         return (PatientService) AopContext.currentProxy();
     }
 
+
     @Override
     public long registerPatientInformation(PatientDto patientDto, long currentUserId) {
         // TODO TEST
@@ -60,14 +61,14 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
         // 查询是否存在记录
         Patient patientFromDb = selectByIdCard(phone);
-        PatientService patientService = currentProxy();
+        PatientService proxy = currentProxy();
         if (patientFromDb != null) {
             // 存在则添加关系, 检查医保
-            return patientService.registerForExistPatient(patientFromDb, patientDto.buildHealthcare(), currentUserId);
+            return proxy.registerForExistPatient(patientFromDb, patientDto.buildHealthcare(), currentUserId);
         } else {
             // 不存在就保存
             // insert patient
-            return patientService.registerForNotExistPatient(
+            return proxy.registerForNotExistPatient(
                     patientDto.buildPatient(), patientDto.buildHealthcare(), currentUserId);
         }
     }
@@ -100,6 +101,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         return patientId;
     }
 
+
     private void updateHealthcare(Long healthcareId, Long patientId) {
         boolean update = super.lambdaUpdate()
                 .set(Patient::getHealthcareId, healthcareId)
@@ -117,15 +119,21 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     @Transactional
     public Long registerForNotExistPatient(Patient patient, Healthcare healthcare, long currentUserId) {
         // 保存病患实体
-        boolean saved = super.save(patient);
-        if (saved) {
+        boolean savedPatient = super.save(patient);
+        if (savedPatient) {
             log.debug("成功登记患者记录");
         } else {
             log.error("登记患者失败, 未知原因");
         }
         // insert user-patient中间表
+        // 数据库存入之后, 如果存中间表失败了, 还需要
         Long patientId = patient.getId();
-        userPatientIntermediationService.save(new UserPatientIntermediation(currentUserId, patientId));
+        boolean savedIntermediation = userPatientIntermediationService.save(new UserPatientIntermediation(currentUserId, patientId));
+        if (savedIntermediation) {
+            log.debug("登记患者-用户连接成功");
+        } else {
+            log.error("登记患者-用户连接失败, 未知原因");
+        }
         // insert health-care
         if (healthcare == null) {
             return patientId;

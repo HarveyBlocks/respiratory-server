@@ -23,8 +23,6 @@ public interface PatientService extends IService<Patient> {
      * 如果不存在, 新增, 存在更新
      *
      * @return 返回id
-     * @see #registerForExistPatient(Patient, Healthcare, long)
-     * @see #registerForNotExistPatient(Patient, Healthcare, long)
      */
 
     long registerPatientInformation(PatientDto patientDto, long currentUserId);
@@ -36,9 +34,8 @@ public interface PatientService extends IService<Patient> {
      * @return patient id
      */
     @Transactional
-    long registerForExistPatient(Patient patientByPhone, Healthcare healthcare, long currentUserId);
-
-
+    long registerForExistPatient(
+            Patient patientFromDb, Healthcare healthcare, long currentUserId);
     /**
      * 插入Patient
      * 登记用户-病患关系
@@ -46,7 +43,6 @@ public interface PatientService extends IService<Patient> {
      */
     @Transactional
     Long registerForNotExistPatient(Patient patient, Healthcare healthcare, long currentUserId);
-
 
     Patient selectByIdCard(String identityCardId);
 }

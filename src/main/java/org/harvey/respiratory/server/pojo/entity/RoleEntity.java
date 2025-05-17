@@ -26,7 +26,7 @@ import lombok.experimental.Accessors;
 @ApiModel(description = "用户权限表")
 public class RoleEntity {
     @TableId(type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * 权限名
      */

@@ -1,6 +1,8 @@
 package org.harvey.respiratory.server.pojo.enums;
 
 
+import com.baomidou.mybatisplus.annotation.IEnum;
+
 /**
  * MALE, FEMALE
  *
@@ -8,6 +10,11 @@ package org.harvey.respiratory.server.pojo.enums;
  * @version 1.0
  * @date 2025-05-13 00:54
  */
-public enum Sex {
-    MALE, FEMALE
+public enum Sex implements IEnum<String> {
+    MALE, FEMALE;
+
+    @Override
+    public String getValue() {
+        return name();
+    }
 }

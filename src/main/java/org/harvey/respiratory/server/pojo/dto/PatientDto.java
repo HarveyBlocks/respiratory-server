@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server.pojo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,7 @@ public class PatientDto {
     private Sex sex;
 
     @ApiModelProperty(value = "出生日期, 不可为null", required = true)
+    @JsonFormat(pattern = "yyyyMMdd", timezone = "GMT+8")
     private Date birthDate;
 
     @ApiModelProperty(value = "家庭住址(varchar(255)), 不可为null", required = true)
