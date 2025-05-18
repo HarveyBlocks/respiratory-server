@@ -23,5 +23,6 @@ public class ConstantsProperties {
     private String redisHost;
     private String esHost;
     private String esPort;
+    private Boolean openIdentityCodeVerify;
     private List<String> sensitiveWords;
 }

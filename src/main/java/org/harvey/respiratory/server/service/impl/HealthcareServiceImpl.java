@@ -31,4 +31,24 @@ public class HealthcareServiceImpl extends ServiceImpl<HealthcareMapper, Healthc
             log.error("添加医保号{}失败. ", healthcare.getHealthcareId());
         }
     }
+
+    @Override
+    public Healthcare queryByCode(long healthcareCode) {
+        Healthcare one = super.lambdaQuery().eq(Healthcare::getHealthcareCode, healthcareCode).one();
+        if (one == null) {
+            log.warn("依据医保号{}未查询到医保", healthcareCode);
+            return null;
+        }
+        return one;
+    }
+
+    @Override
+    public Healthcare queryById(long healthcareId) {
+        Healthcare healthcare = super.getById(healthcareId);
+        if (healthcare == null) {
+            log.warn("依据医保id{}未查询到医保", healthcareId);
+            return null;
+        }
+        return healthcare;
+    }
 }

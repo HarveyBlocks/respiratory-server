@@ -5,6 +5,7 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.harvey.respiratory.server.properties.ConstantsProperties;
+import org.harvey.respiratory.server.util.identifier.IdentifierIdPredicate;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -45,5 +46,10 @@ public class ApplicationConfig {
         return new RestHighLevelClient(RestClient.builder(
                 HttpHost.create("http://" + constantsProperties.getEsHost() + ":" + constantsProperties.getEsPort())
         ));
+    }
+
+    @Bean
+    public IdentifierIdPredicate identifierIdPredicate() {
+        return new IdentifierIdPredicate(constantsProperties.getOpenIdentityCodeVerify());
     }
 }

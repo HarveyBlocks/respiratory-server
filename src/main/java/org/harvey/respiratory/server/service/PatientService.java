@@ -3,9 +3,12 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.dto.PatientDto;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
@@ -44,5 +47,22 @@ public interface PatientService extends IService<Patient> {
     @Transactional
     Long registerForNotExistPatient(Patient patient, Healthcare healthcare, long currentUserId);
 
+    /**
+     * 最简单的查询, 不会做任何的校验
+     */
     Patient selectByIdCard(String identityCardId);
+
+    void updatePatient(Patient patient, long currentUserId);
+
+
+    List<PatientDto> querySelfPatients(long currentUserId, int page, int limit);
+
+    PatientDto queryByHealthcare(UserDto user, long healthcareCode);
+
+    PatientDto queryById(UserDto user, long patientId);
+
+    /**
+     * 如果不存在则注册, 如果存在则返回
+     */
+    PatientDto queryByIdentity(long currentUserId, String cardId);
 }

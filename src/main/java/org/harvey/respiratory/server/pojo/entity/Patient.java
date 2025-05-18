@@ -92,7 +92,7 @@ public class Patient {
     @ApiModelProperty(value = "体重(kg) (float), 不可为null", required = true)
     private float weight;
 
-    @ApiModelProperty(value = "医保表id, 可以为null")
+    @ApiModelProperty(value = "医保表id, 可以为null. 只能在医保接口更新医保, 不能在病患接口更新医保id")
     private Long healthcareId;
 
 }

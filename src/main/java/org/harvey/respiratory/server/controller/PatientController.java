@@ -4,9 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.harvey.respiratory.server.Constants;
+import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.dto.PatientDto;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
@@ -46,7 +49,7 @@ public class PatientController {
 
     @PutMapping("/")
     @ApiOperation("更新患者信息, 不会更新医保信息")
-    public Result<Long> update(
+    public Result<NullPlaceholder> update(
             @RequestBody
             @ApiParam(
                     "更新字段可以为null, 表示保留原有; 也可以不为null, 即使字段值没有发生变化. 一般不把非null字段重新更新为null.")
@@ -57,33 +60,72 @@ public class PatientController {
         // 然后返回id
         // 如果医保更新了, 如果旧医保还有费用, 就抛出异常
         // 如果
-        throw new UnfinishedException(patient);
+        Long currentUserId = UserHolder.currentUserId();
+        if (currentUserId == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        if (patient.getId() == null) {
+            throw new BadRequestException("更新的id字段不能位null");
+        }
+        patientService.updatePatient(patient, currentUserId);
+        return Result.ok();
     }
 
-    @GetMapping("/self")
+    @GetMapping(value = {"/self/{page}/{limit}", "/self/{page}", "/self"})
     @ApiOperation("查询当前用户的所有患者")
-    public Result<List<PatientDto>> querySelfPatient() {
-        throw new UnfinishedException();
+    public Result<List<PatientDto>> querySelfPatients(
+            @PathVariable(value = "page", required = false) @ApiParam(value = "查询页码", defaultValue = "1")
+            Integer page,
+            @PathVariable(value = "limit", required = false)
+            @ApiParam(value = "查询页长", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit
+    ) {
+        Long currentUserId = UserHolder.currentUserId();
+        if (currentUserId == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        if (page == null) {
+            page = 1;
+        }
+        if (limit == null) {
+            limit = Constants.DEFAULT_PAGE_SIZE;
+        }
+        return Result.success(patientService.querySelfPatients(currentUserId, page, limit));
     }
 
-    @GetMapping("/healthcare/{id}")
+    @GetMapping("/healthcare/{code}")
     @ApiOperation("依据医保号查询")
-    public Result<PatientDto> queryPatientByHealthcareId(@PathVariable("id") @ApiParam("医保号") Long healthcareId) {
-        throw new UnfinishedException(healthcareId);
+    public Result<PatientDto> queryPatientByHealthcareId(@PathVariable("code") @ApiParam("医保号") Long healthcareCode) {
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        if(healthcareCode==null){
+            throw new UnauthorizedException("需要医保");
+        }
+        return Result.success(patientService.queryByHealthcare(user, healthcareCode));
     }
 
     @GetMapping("/{id}")
     @ApiOperation("依据患者id查询")
     public Result<PatientDto> queryPatientByPatientId(@PathVariable("id") @ApiParam("patient id") Long patientId) {
         // 是否需要校验, 当前用户是否有权限查询这个病患的信息?
-        throw new UnfinishedException(patientId);
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        return Result.success(patientService.queryById(user, patientId));
     }
 
     @GetMapping("/identityCardId/{cardId}")
     @ApiOperation("依据身份证号吗查询")
-    public Result<NullPlaceholder> queryPatientByPhone(
-            @PathVariable("cardId") @ApiParam("电话号码") String cardId) {
-        throw new UnfinishedException();
+    public Result<PatientDto> queryPatientByPhone(
+            @PathVariable("cardId") @ApiParam("身份证号") String cardId) {
+        Long currentUserId = UserHolder.currentUserId();
+        if (currentUserId == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        // 不会经用户校验
+        return Result.success(patientService.queryByIdentity(currentUserId, cardId));
     }
 
 

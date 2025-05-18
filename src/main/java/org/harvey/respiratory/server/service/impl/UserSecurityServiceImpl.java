@@ -18,6 +18,7 @@ import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.properties.JwtProperties;
 import org.harvey.respiratory.server.service.UserSecurityService;
 import org.harvey.respiratory.server.util.*;
+import org.harvey.respiratory.server.util.identifier.IdentifierIdPredicate;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -208,6 +209,9 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         return token;
     }
 
+    @Resource
+    private IdentifierIdPredicate identifierIdPredicate;
+
     @Override
     @Transactional
     public void updateUser(UserDto userDTO, String token) {
@@ -223,7 +227,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         }
 
         String identityCardId = userDTO.getIdentityCardId();
-        if (identityCardId != null && RegexUtils.isIdentifierCardId(identityCardId)) {
+        if (identityCardId != null && identifierIdPredicate.test(identityCardId)) {
             user.setIdentityCardId(identityCardId);
         }
         user.setUpdateTime(LocalDateTime.now());
@@ -335,7 +339,6 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         LocalDateTime time = LocalDateTime.now().plusSeconds(ttl + random);
         return time.toEpochSecond(ZoneOffset.of("+8"));
     }
-
 
 
 }

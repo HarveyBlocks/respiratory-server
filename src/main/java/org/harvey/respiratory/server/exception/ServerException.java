@@ -7,24 +7,24 @@ package org.harvey.respiratory.server.exception;
  * @version 1.0
  * @date 2025-05-15 23:38
  */
-public class ServerExceptionException extends RuntimeException {
-    public ServerExceptionException() {
+public class ServerException extends RuntimeException {
+    public ServerException() {
         super();
     }
 
-    public ServerExceptionException(String message) {
+    public ServerException(String message) {
         super(message);
     }
 
-    public ServerExceptionException(String message, Throwable cause) {
+    public ServerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ServerExceptionException(Throwable cause) {
+    public ServerException(Throwable cause) {
         super(cause);
     }
 
-    protected ServerExceptionException(
+    protected ServerException(
             String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

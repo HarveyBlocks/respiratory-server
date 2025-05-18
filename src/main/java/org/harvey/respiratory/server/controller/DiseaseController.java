@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.entity.Disease;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
@@ -49,13 +50,14 @@ public class DiseaseController {
         throw new UnfinishedException();
     }
 
-    @GetMapping("/name/{name}/{page}/{limit}")
+    @GetMapping(value = {"/name/{name}/{page}/{limit}", "/name/{name}/{page}", "/name/{name}"})
     @ApiOperation("用名字模糊查询疾病具体信息")
     public Result<List<Disease>> queryByName(
             @PathVariable("name") @ApiParam(value = "疾病名", required = true) String name,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(value = "limit", required = false) @ApiParam(value = "页长", defaultValue = "10")
+            @PathVariable(value = "limit", required = false) @ApiParam(value = "页长",
+                    defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG)
             Integer limit
     ) {
         // 用药物名模糊查询药物

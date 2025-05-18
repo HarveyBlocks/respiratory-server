@@ -22,6 +22,11 @@ public class IdentifierIdPredicate implements Predicate<String> {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
     public static final int LENGTH = 18;
     public static final Map<String, ProvinceIdMessage> ADDRESS_DISTINCT = new AddressOnIdLoader().get();
+    private final boolean openCheckCode;
+
+    public IdentifierIdPredicate(boolean openCheckCode) {
+        this.openCheckCode = openCheckCode;
+    }
 
     @Override
     public boolean test(String sequence) {
@@ -80,6 +85,9 @@ public class IdentifierIdPredicate implements Predicate<String> {
     }
 
     private boolean checkCode(String sequence) {
+        if (!openCheckCode) {
+            return true;
+        }
         char code = sequence.charAt(17);
         int sum = 0;
         for (int i = 0; i < 17; i++) {
@@ -89,7 +97,7 @@ public class IdentifierIdPredicate implements Predicate<String> {
     }
 
     public static void main(String[] args) {
-        IdentifierIdPredicate identifierIdPredicate = new IdentifierIdPredicate();
+        IdentifierIdPredicate identifierIdPredicate = new IdentifierIdPredicate(true);
         System.out.println(identifierIdPredicate.test("330282200410080030"));
     }
 }

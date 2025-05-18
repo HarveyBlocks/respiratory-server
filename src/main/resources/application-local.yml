@@ -14,3 +14,6 @@ respiratory:
   jwt:
     jks:
       password: hmall123
+      tokenTTL: 90000h
+  identity-code:
+    open-code-verify: false

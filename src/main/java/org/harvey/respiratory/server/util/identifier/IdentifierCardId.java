@@ -2,7 +2,6 @@ package org.harvey.respiratory.server.util.identifier;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.harvey.respiratory.server.util.RegexUtils;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -21,12 +20,9 @@ public class IdentifierCardId {
     private final String cityAddress;
     private final String distinctAddress;
     private final Date brithDate;
+    private final String raw;
 
     public static IdentifierCardId phase(String id) {
-        if (!RegexUtils.isIdentifierCardId(id)) {
-            return null;
-        }
-
         // 日期
         Date date;
         try {
@@ -39,16 +35,16 @@ public class IdentifierCardId {
         String province = address.substring(0, 2);
         ProvinceIdMessage provinceIdMessage = IdentifierIdPredicate.ADDRESS_DISTINCT.get(province);
         if (address.endsWith("0000")) {
-            return new IdentifierCardId(provinceIdMessage.getAddress(), "", "", date);
+            return new IdentifierCardId(provinceIdMessage.getAddress(), "", "", date, id);
         }
         String city = address.substring(2, 4);
         CityIdMessage cityIdMessage = provinceIdMessage.getInner(city);
         if (address.endsWith("00")) {
-            return new IdentifierCardId(provinceIdMessage.getAddress(), cityIdMessage.getAddress(), "", date);
+            return new IdentifierCardId(provinceIdMessage.getAddress(), cityIdMessage.getAddress(), "", date, id);
         }
         String distinct = address.substring(4, 6);
         DistrictIdMessage districtIdMessage = cityIdMessage.getInner(distinct);
         return new IdentifierCardId(
-                provinceIdMessage.getAddress(), cityIdMessage.getAddress(), districtIdMessage.getAddress(), date);
+                provinceIdMessage.getAddress(), cityIdMessage.getAddress(), districtIdMessage.getAddress(), date, id);
     }
 }

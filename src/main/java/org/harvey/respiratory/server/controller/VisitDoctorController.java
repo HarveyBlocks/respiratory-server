@@ -31,8 +31,7 @@ public class VisitDoctorController {
     @PostMapping("/take-number")
     @ApiOperation("取号")
     public Result<Long> getById(
-            @RequestBody @ApiParam("takeVisitNumber")
-            TakeVisitNumberDto medicalProviderId) {
+            @RequestBody @ApiParam("takeVisitNumber") TakeVisitNumberDto medicalProviderId) {
         // 插入取号信息
         // 返回取号id
         throw new UnfinishedException();
@@ -56,8 +55,8 @@ public class VisitDoctorController {
             @PathVariable(name = "end-date") @ApiParam(value = "yyyy-MM-dd, 0补前", required = true) String endDate,
             @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度", defaultValue = "10")
-            Integer limit) {
+            @PathVariable(name = "limit", required = false)
+            @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
         // 依据权限, 如果是患者查询, 则患者相关
         // 如果是医生查询, 就是医生相关
         SimpleDateFormat simpleDateFormat = Constants.DEFAULT_DATE_FORMAT;
@@ -71,8 +70,8 @@ public class VisitDoctorController {
             @PathVariable(name = "end-date") @ApiParam("YYYY-MM-DD, 0补前") String endDate,
             @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度", defaultValue = "10")
-            Integer limit) {
+            @PathVariable(name = "limit", required = false)
+            @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
         // 依据权限, 如果是患者查询, 则患者相关
         // 如果是医生查询, 就是医生相关
         throw new UnfinishedException();

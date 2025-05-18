@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
@@ -11,6 +12,8 @@ import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -43,7 +46,7 @@ public class SymptomaticPresentationController {
     }
 
 
-    @GetMapping("history/patient/{id}/{name}")
+    @GetMapping(value = {"history/patient/{id}/{name}", "history/patient/{id}"})
     @ApiOperation("查询病人既往用药史")
     public Result<List<SpecificUsingDrugRecord>> queryPatientDrugHistoryByDrug(
             @PathVariable("id") @ApiParam(value = "病患id", required = true) Long patientId,
@@ -52,13 +55,14 @@ public class SymptomaticPresentationController {
         throw new UnfinishedException();
     }
 
-    @GetMapping("history/patient/{id}/{start}/{end}")
+    @GetMapping(value = {"history/patient/{id}/{start}/{end}", "history/patient/{id}/{start}", "history/patient/{id}"})
     @ApiOperation("查询病人既往用药史")
     public Result<List<SpecificUsingDrugRecord>> queryPatientDrugHistoryByDate(
             @PathVariable("id") @ApiParam(value = "病患id", required = true) Long patientId,
             @PathVariable(value = "start", required = false) @ApiParam(value = "yyyy-MM-dd, 0补前") String startDate,
-            @PathVariable(value = "end", required = false) @ApiParam(value = "yyyy-MM-dd, 0补前") String endDate) {
-        // 病人可以查, 医生可以查
+            @PathVariable(value = "end", required = false) @ApiParam(value = "yyyy-MM-dd, 0补前, 如果不给出, 则是当前日期") String endDate) {
+        // 病人可以查自己登记过的病人, 医生可以查自己问诊的病人, 主管医生可以查任何病人
+        LocalDate now = LocalDate.now();
         // param.startDate<drug.end or drug.start < param.endDate, 表示在时间范围内的用药
         throw new UnfinishedException();
     }

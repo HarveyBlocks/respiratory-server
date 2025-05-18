@@ -36,7 +36,5 @@ public class RegexUtils {
         return regex.matcher(str).matches();
     }
 
-    public static boolean isIdentifierCardId(String identityCardId) {
-        return RegexPatterns.IDENTIFIER_ID_PREDICATE.test(identityCardId);
-    }
+
 }

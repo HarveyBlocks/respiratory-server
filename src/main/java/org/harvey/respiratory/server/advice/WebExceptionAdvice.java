@@ -26,8 +26,8 @@ public class WebExceptionAdvice {
         return new Result<>(500, "服务器异常,请稍后再试");
     }
 
-    @ExceptionHandler(ServerExceptionException.class)
-    public Result<NullPlaceholder> handleUnauthorizedExceptionException(ServerExceptionException e) {
+    @ExceptionHandler(ServerException.class)
+    public Result<NullPlaceholder> handleUnauthorizedExceptionException(ServerException e) {
         log.error(e.toString(), e);
         return new Result<>(401, "服务器异常, 请稍后重试.");
     }

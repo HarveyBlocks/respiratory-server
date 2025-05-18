@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.harvey.respiratory.server.dao.PatientMapper"><!--名字写代理接口-->
+
+    <resultMap id="PatientDtoMap" type="org.harvey.respiratory.server.pojo.dto.PatientDto">
+        <result column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="identity_card_id" property="identityCardId"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="birth_date" property="birthDate"/>
+        <result column="address" property="address"/>
+        <result column="height" property="height"/>
+        <result column="weight" property="weight"/>
+        <result column="healthcare_code" property="healthcareCode"/>
+        <result column="healthcare_type" property="healthcareType"/>
+        <result column="healthcare_balance" property="balance"/>
+    </resultMap>
+
+    <!--
+    select tb_patient.id,
+           tb_patient.phone,
+           tb_patient.name,
+           tb_patient.sex,
+           tb_patient.birth_date,
+           tb_patient.address,
+           tb_patient.height,
+           tb_patient.weight,
+           tb_patient.identity_card_id,
+           tb_healthcare.type healthcare_type,
+           tb_healthcare.healthcare_code,
+           tb_healthcare.balance healthcare_balance ,
+    from tb_user_patient_intermediation
+             JOIN user_security on tb_user_patient_intermediation.user_id = user_security.id
+             JOIN tb_patient on tb_user_patient_intermediation.patient_id = tb_patient.id
+             LEFT JOIN tb_healthcare on tb_healthcare.healthcare_id = tb_patient.healthcare_id
+    where user_security.id = 1923431434245177346
+    limit 0,10;
+    -->
+    <select id="queryByRegisterUser" resultMap="PatientDtoMap"><!--起了别名之后就方便了-->
+        select tb_patient.id,
+        tb_patient.phone,
+        tb_patient.name,
+        tb_patient.sex,
+        tb_patient.birth_date,
+        tb_patient.address,
+        tb_patient.height,
+        tb_patient.weight,
+        tb_patient.identity_card_id,
+        tb_healthcare.type healthcare_type,
+        tb_healthcare.healthcare_code,
+        tb_healthcare.balance healthcare_balance
+        from tb_user_patient_intermediation
+        JOIN user_security on tb_user_patient_intermediation.user_id = user_security.id
+        JOIN tb_patient on tb_user_patient_intermediation.patient_id = tb_patient.id
+        LEFT JOIN tb_healthcare on tb_healthcare.healthcare_id = tb_patient.healthcare_id
+        where user_security.id = #{userId}
+        limit ${start},${len};
+    </select>
+</mapper>

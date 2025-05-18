@@ -13,5 +13,6 @@ import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
  */
 
 public interface UserPatientIntermediationService extends IService<UserPatientIntermediation> {
-    boolean exist(long currentUserId, long patientId);
+    boolean exist(long userId, long patientId);
+    boolean register(long userId, long patientId);
 }

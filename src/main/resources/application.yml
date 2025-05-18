@@ -60,7 +60,7 @@ respiratory:
     location: classpath:hmall.jks
     alias: hmall
     password: ${respiratory.jwt.jks.password} # 解析文件的密钥(文件本身也是密钥)
-    tokenTTL: 30m
+    tokenTTL: ${respiratory.jwt.jks.tokenTTL}
   auth:
     include-paths:
       - "/user/logout"
@@ -81,6 +81,7 @@ respiratory:
     clear-click-history-wait-seconds: 600
     max-page-size: 10
     default-page-size: 5
+    open-identity-code-verify: ${respiratory.identity-code.open-code-verify}
     sensitive-words:
       - "敏感"
       - "这是敏感词"

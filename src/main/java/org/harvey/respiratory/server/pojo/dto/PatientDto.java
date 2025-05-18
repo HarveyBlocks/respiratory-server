@@ -8,11 +8,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.harvey.respiratory.server.pojo.enums.Sex;
 
 import java.sql.Date;
+import java.util.Objects;
 
 /**
  * 患者
@@ -28,7 +30,8 @@ import java.sql.Date;
 @AllArgsConstructor
 @ApiModel(description = "患者信息")
 public class PatientDto {
-
+    @ApiModelProperty(value = "患者的id, 服务端生成, 只可读", required = false)
+    private Long id;
     @ApiModelProperty(value = "手机号码(unique, char(11)), 监护人电话, 不可为null", required = true)
     private String phone;
 
@@ -63,6 +66,29 @@ public class PatientDto {
 
     @ApiModelProperty(value = "医保余额,单位, 分, 可以为null")
     private Integer balance;
+
+    /**
+     *
+     * @param patient not null
+     * @param healthcare not null
+     */
+    public static PatientDto union(Patient patient, Healthcare healthcare) {
+        if (!Objects.equals(patient.getHealthcareId(), healthcare.getHealthcareId())) {
+            throw new ServerException("foreign key not match");
+        }
+
+        return new PatientDto(patient.getId(), patient.getPhone(), patient.getIdentityCardId(), patient.getName(),
+                patient.getSex(), patient.getBirthDate(), patient.getAddress(), patient.getHeight(),
+                patient.getWeight(), healthcare.getHealthcareCode(), healthcare.getType(), healthcare.getBalance()
+        );
+    }
+
+    public static PatientDto adapt(Patient patient) {
+        return new PatientDto(patient.getId(), patient.getPhone(), patient.getIdentityCardId(), patient.getName(),
+                patient.getSex(), patient.getBirthDate(), patient.getAddress(), patient.getHeight(),
+                patient.getWeight(), null, null, null
+        );
+    }
 
     public Patient buildPatient() {
         return new Patient(null, phone, identityCardId, name, sex, birthDate, address, height, weight, null);

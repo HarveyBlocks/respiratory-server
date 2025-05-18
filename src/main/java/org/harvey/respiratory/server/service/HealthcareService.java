@@ -16,4 +16,9 @@ public interface HealthcareService extends IService<Healthcare> {
      * @param healthcare balance 强制为0
      */
     void register(Healthcare healthcare);
+
+    Healthcare queryByCode(long healthcareCode);
+
+
+    Healthcare queryById(long healthcareId);
 }

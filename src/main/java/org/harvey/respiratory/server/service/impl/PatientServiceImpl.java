@@ -1,11 +1,13 @@
 package org.harvey.respiratory.server.service.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.PatientMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.ServerException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.PatientDto;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
@@ -14,11 +16,13 @@ import org.harvey.respiratory.server.service.PatientService;
 import org.harvey.respiratory.server.service.UserPatientIntermediationService;
 import org.harvey.respiratory.server.util.RegexUtils;
 import org.harvey.respiratory.server.util.identifier.IdentifierCardId;
+import org.harvey.respiratory.server.util.identifier.IdentifierIdPredicate;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -45,22 +49,21 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
 
     @Override
     public long registerPatientInformation(PatientDto patientDto, long currentUserId) {
-        // TODO TEST
         // 先查询确认不存在
         String phone = patientDto.getPhone();
         if (!RegexUtils.isPhoneEffective(phone)) {
             throw new BadRequestException("错误的电话号码格式");
         }
         String identityCardId = patientDto.getIdentityCardId();
-        IdentifierCardId cardId = IdentifierCardId.phase(identityCardId);
-        if (cardId == null) {
+        if (!identifierIdPredicate.test(identityCardId)) {
             throw new BadRequestException("错误的身份证号格式");
         }
+        IdentifierCardId cardId = IdentifierCardId.phase(identityCardId);
         if (!cardId.getBrithDate().equals(patientDto.getBirthDate())) {
             throw new BadRequestException("身份证号上的生日和提交的生日冲突");
         }
         // 查询是否存在记录
-        Patient patientFromDb = selectByIdCard(phone);
+        Patient patientFromDb = selectByIdCard(identityCardId);
         PatientService proxy = currentProxy();
         if (patientFromDb != null) {
             // 存在则添加关系, 检查医保
@@ -81,7 +84,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         Long patientId = patientFromDb.getId();
         if (!userPatientIntermediationService.exist(currentUserId, patientId)) {
             // 如果没有建立关系, 需要建立关系
-            userPatientIntermediationService.save(new UserPatientIntermediation(currentUserId, patientId));
+            userPatientIntermediationService.register(currentUserId, patientId);
         }
         // 查询是否有healthcare了;
         if (healthcare == null) {
@@ -128,7 +131,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         // insert user-patient中间表
         // 数据库存入之后, 如果存中间表失败了, 还需要
         Long patientId = patient.getId();
-        boolean savedIntermediation = userPatientIntermediationService.save(new UserPatientIntermediation(currentUserId, patientId));
+        boolean savedIntermediation = userPatientIntermediationService.save(
+                new UserPatientIntermediation(currentUserId, patientId));
         if (savedIntermediation) {
             log.debug("登记患者-用户连接成功");
         } else {
@@ -147,7 +151,135 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
 
     @Override
     public Patient selectByIdCard(String identityCardId) {
-        LambdaQueryChainWrapper<Patient> lambdaQuery = super.lambdaQuery();
-        return lambdaQuery.eq(Patient::getIdentityCardId, identityCardId).one();
+        Patient one = super.lambdaQuery().eq(Patient::getIdentityCardId, identityCardId).one();
+        if (one == null) {
+            log.warn("没有身份证号为{}的患者", identityCardId);
+        }
+        return one;
+    }
+
+    @Override
+    public void updatePatient(Patient patient, long currentUserId) {
+        boolean exist = userPatientIntermediationService.exist(currentUserId, patient.getId());
+        if (!exist) {
+            throw new UnauthorizedException("不能更新无关患者的信息");
+        }
+        update0(patient, currentUserId);
+    }
+
+    private void update0(Patient patient, long currentUserId) {
+        boolean update = super.lambdaUpdate().setEntity(patient).eq(Patient::getId, patient.getId()).update();
+        if (update) {
+            log.debug("{}用户成功更新{}病患", currentUserId, patient.getId());
+        } else {
+            log.debug("{}用户更新{}病患失败", currentUserId, patient.getId());
+        }
+    }
+
+    @Resource
+    private PatientMapper patientMapper;
+
+    @Override
+    public List<PatientDto> querySelfPatients(long currentUserId, int page, int limit) {
+        log.debug("准备查询当前用户的有关患者");
+        int start = (page - 1) * limit;
+        List<PatientDto> results = patientMapper.queryByRegisterUser(currentUserId, start, limit);
+        log.debug("查询当前用户的有关患者成功!, 有记录: {} 条", results.size());
+        return results;
+    }
+
+    @Override
+    public PatientDto queryByHealthcare(UserDto user, long healthcareCode) {
+        Healthcare healthcare = healthcareService.queryByCode(healthcareCode);
+        if (healthcare == null) {
+            return null;
+        }
+        Patient patient = queryByHealthcare(healthcare.getHealthcareId());
+        if (patient == null) {
+            return null;
+        }
+        validRoleOnQueryAny(user, patient);
+        return PatientDto.union(patient, healthcare);
+    }
+
+    @Override
+    public PatientDto queryById(UserDto user, long patientId) {
+        Patient patient = queryById0(patientId);
+        if (patient == null) {
+            return null;
+        }
+        validRoleOnQueryAny(user, patient);
+        if (patient.getHealthcareId() == null) {
+            return PatientDto.adapt(patient);
+        } else {
+            Healthcare healthcare = healthcareService.queryById(patient.getHealthcareId());
+            return PatientDto.union(patient, healthcare);
+        }
+    }
+
+    @Resource
+    private IdentifierIdPredicate identifierIdPredicate;
+
+    @Override
+    public PatientDto queryByIdentity(long currentUserId, String cardId) {
+        if (!identifierIdPredicate.test(cardId)) {
+            throw new BadRequestException("不正确的身份证格式");
+        }
+        Patient patient = selectByIdCard(cardId);
+        if (patient == null) {
+            return null;
+        }
+        boolean exist = userPatientIntermediationService.exist(currentUserId, patient.getId());
+        if (!exist) {
+            // 注册
+            userPatientIntermediationService.register(currentUserId, patient.getId());
+        }
+        if (patient.getHealthcareId() == null) {
+            return PatientDto.adapt(patient);
+        }
+        Healthcare healthcare = healthcareService.queryById(patient.getHealthcareId());
+        return PatientDto.union(patient, healthcare);
+    }
+
+    private Patient queryById0(long patientId) {
+        Patient patient = super.getById(patientId);
+        if (patient == null) {
+            log.warn("未能依据id查询到病患{}", patientId);
+        }
+        return patient;
+    }
+
+    /**
+     * 是否有查询任意病患的权限
+     */
+    private void validRoleOnQueryAny(UserDto user, Patient patient) {
+        switch (user.getRole()) {
+            case PATIENT:
+                Long userId = user.getId();
+                Long patientId = patient.getId();
+                boolean exist = userPatientIntermediationService.exist(userId, patientId);
+                if (!exist) {
+                    log.warn("用户{}由于权限不能获取患者{}", userId, patientId);
+                    throw new UnauthorizedException("没有获取其他病患的权限");
+                }
+            case UNKNOWN:
+                throw new UnauthorizedException("没有获取其他病患的权限");
+            case NORMAL_DOCTOR:
+            case CHARGE_DOCTOR:
+            case MEDICATION_DOCTOR:
+            case DEVELOPER:
+            case DATABASE_ADMINISTRATOR:
+                break;
+            default:
+                throw new ServerException("Unexpected role value: " + user.getRole());
+        }
+    }
+
+    private Patient queryByHealthcare(long healthcare) {
+        Patient patient = super.lambdaQuery().eq(Patient::getHealthcareId, healthcare).one();
+        if (patient == null) {
+            log.warn("依据医保id{}未找到患者", healthcare);
+        }
+        return patient;
     }
 }

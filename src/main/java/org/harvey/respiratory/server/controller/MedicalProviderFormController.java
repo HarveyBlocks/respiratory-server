@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
@@ -27,8 +28,7 @@ public class MedicalProviderFormController {
     @PostMapping("/register")
     @ApiOperation("登记医疗提供机构信息")
     public Result<Long> registerPatientInformation(
-            @RequestBody @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.")
-            MedicalProviderForm form) {
+            @RequestBody @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.") MedicalProviderForm form) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(form);
     }
@@ -36,8 +36,7 @@ public class MedicalProviderFormController {
     @PutMapping("/")
     @ApiOperation("更新医疗提供机构信息")
     public Result<Long> update(
-            @RequestBody
-            @ApiParam("更新字段可以为null, 表示保留原有; 也可以不为null, 即使字段值没有发生变化")
+            @RequestBody @ApiParam("更新字段可以为null, 表示保留原有; 也可以不为null, 即使字段值没有发生变化")
             MedicalProviderForm form) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(form);
@@ -64,8 +63,8 @@ public class MedicalProviderFormController {
     public Result<List<MedicalProviderForm>> query(
             @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(name = "limit", required = false) @ApiParam(value = "页面长度", defaultValue = "10")
-            Integer limit) {
+            @PathVariable(name = "limit", required = false)
+            @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
         // 当前用户必须是主管/开发者
         throw new UnfinishedException(page, limit);
     }
