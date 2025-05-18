@@ -9,13 +9,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.dao.UserSecurityMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
 import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
+import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
-import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.properties.JwtProperties;
+import org.harvey.respiratory.server.service.MedicalProviderService;
 import org.harvey.respiratory.server.service.UserSecurityService;
 import org.harvey.respiratory.server.util.*;
 import org.harvey.respiratory.server.util.identifier.IdentifierIdPredicate;
@@ -211,6 +213,8 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
 
     @Resource
     private IdentifierIdPredicate identifierIdPredicate;
+    @Resource
+    private MedicalProviderService medicalProviderService;
 
     @Override
     @Transactional
@@ -221,15 +225,21 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         if (!StrUtil.isEmpty(name)) {
             user.setName(name);
         }
-        Role role = userDTO.getRole();
-        if (role != null) {
-            user.setRoleId(role.getRoleId());
-        }
+
 
         String identityCardId = userDTO.getIdentityCardId();
         if (identityCardId != null && identifierIdPredicate.test(identityCardId)) {
             user.setIdentityCardId(identityCardId);
+            MedicalProvider medicalProvider = medicalProviderService.selectByIdentityCardId(identityCardId);
+            if (medicalProvider == null) {
+                // 可能是患者了
+                user.setRoleId(Constants.DEFAULT_USER_ROLE_AFTER_REAL_NAME);
+            } else {
+                // 医疗的id
+                user.setRoleId(medicalProvider.getRoleId());
+            }
         }
+
         user.setUpdateTime(LocalDateTime.now());
         // 更新
 
@@ -259,6 +269,13 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
+    public UserSecurity selectByIdentityCardId(String identityCardId) {
+        LambdaQueryWrapper<UserSecurity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.select().eq(UserSecurity::getIdentityCardId, identityCardId);
+        return baseMapper.selectOne(lambdaQueryWrapper);
+    }
+
+    @Override
     public UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException {
         log.debug("queryMutexFixByLock");
         String key = RedisConstants.QUERY_USER_KEY + userId;
@@ -283,6 +300,15 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
             log.error("在转化UserFieldMap时出现错误错误" + userFieldMap);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public UserSecurity selectById(long userId) {
+        UserSecurity userSecurity = super.getById(userId);
+        if (userSecurity == null) {
+            throw new ResourceNotFountException("不能依据id " + userId + " 查询到用户");
+        }
+        return userSecurity;
     }
 
     /**

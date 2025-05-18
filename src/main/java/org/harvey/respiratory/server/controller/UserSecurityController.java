@@ -16,7 +16,6 @@ import org.harvey.respiratory.server.pojo.entity.UserSecurity;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
-import org.harvey.respiratory.server.properties.ConstantsProperties;
 import org.harvey.respiratory.server.service.UserSecurityService;
 import org.harvey.respiratory.server.util.RedisConstants;
 import org.harvey.respiratory.server.util.UserHolder;
@@ -46,8 +45,6 @@ public class UserSecurityController {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-    @Resource
-    private ConstantsProperties constantsProperties;
 
     /**
      * 发送手机验证码
@@ -170,7 +167,8 @@ public class UserSecurityController {
                 new UserDto(Role.UNKNOWN, 1L, "name", "350121200410080032"/*TODO 测试数据不好, 因为验证位没有被验证*/));
     }
 
-    @ApiOperation(value = "更新用户信息", notes = "没有更新的部分就传null或空字符串,不用传ID")
+    @ApiOperation(value = "更新用户信息, 也是用身份证实名, 实名之后可确认权限-病人/医生",
+            notes = "没有更新的部分就传null或空字符串,不用传ID")
     @PutMapping("/update")
     public Result<NullPlaceholder> update(
             @RequestBody @ApiParam("需要用户注册的Json,使用密码") UserDto userDTO,

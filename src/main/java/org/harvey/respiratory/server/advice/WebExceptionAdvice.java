@@ -23,20 +23,27 @@ public class WebExceptionAdvice {
     @ExceptionHandler(RuntimeException.class)
     public Result<NullPlaceholder> handleRuntimeException(RuntimeException e) {
         log.error("[未被登记的异常]: " + e.toString(), e);
-        return new Result<>(500, "服务器异常,请稍后再试");
-    }
-
-    @ExceptionHandler(ServerException.class)
-    public Result<NullPlaceholder> handleUnauthorizedExceptionException(ServerException e) {
-        log.error(e.toString(), e);
-        return new Result<>(401, "服务器异常, 请稍后重试.");
+        return new Result<>(502, "服务器异常,请稍后再试");
     }
 
     @ExceptionHandler(UnfinishedException.class)
-    public Result<NullPlaceholder> handleUnauthorizedExceptionException(UnfinishedException e) {
+    public Result<NullPlaceholder> handleUnfinishedException(UnfinishedException e) {
         log.error(e.toString(), e);
-        return new Result<>(401, "未实现功能, 请耐心等待.");
+        return new Result<>(501, "未实现功能, 请耐心等待.");
     }
+
+    @ExceptionHandler(ServerException.class)
+    public Result<NullPlaceholder> handleServerException(ServerException e) {
+        log.error(e.toString(), e);
+        return new Result<>(500, "服务器异常, 请稍后重试.");
+    }
+
+    @ExceptionHandler(DaoException.class)
+    public Result<NullPlaceholder> handleDaoException(DaoException e) {
+        log.error(e.toString(), e);
+        return new Result<>(406, "未能成功的写操作");
+    }
+
 
     @ExceptionHandler(BadRequestException.class)
     public Result<NullPlaceholder> handleBadRequestException(BadRequestException bre) {
@@ -44,22 +51,22 @@ public class WebExceptionAdvice {
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public Result<NullPlaceholder> handleBadRequestException(ForbiddenException e) {
+    public Result<NullPlaceholder> handleForbiddenException(ForbiddenException e) {
         return new Result<>(405, e.getMessage());
     }
 
     @ExceptionHandler(ResourceNotFountException.class)
-    public Result<NullPlaceholder> handleBadRequestException(ResourceNotFountException e) {
+    public Result<NullPlaceholder> handleResourceNotFountException(ResourceNotFountException e) {
         return new Result<>(404, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public Result<NullPlaceholder> handleBadRequestException(MethodArgumentTypeMismatchException e) {
+    public Result<NullPlaceholder> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         return new Result<>(403, "请求方式错误或URL参数格式不符合要求");
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public Result<NullPlaceholder> handleUnauthorizedExceptionException(UnauthorizedException e) {
+    public Result<NullPlaceholder> handleUnauthorizedException(UnauthorizedException e) {
         return new Result<>(401, e.getMessage());
     }
 

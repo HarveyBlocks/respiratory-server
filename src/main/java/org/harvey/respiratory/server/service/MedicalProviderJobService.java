@@ -3,6 +3,9 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
+import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
+
+import java.util.List;
 
 /**
  * 医疗提供者之职位
@@ -13,4 +16,29 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
  */
 
 public interface MedicalProviderJobService extends IService<MedicalProviderJob> {
+    /**
+     * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
+     */
+    Integer register(MedicalProviderJob job);
+
+    /**
+     * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
+     */
+    void update(MedicalProviderJob newJob);
+
+    /**
+     * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
+     */
+    void delete(long id);
+
+    /**
+     * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_READ
+     */
+    MedicalProviderJob querySelf(long userId);
+
+    List<MedicalProviderJob> queryAny(int page, int limit);
+
+    MedicalProviderJob queryById(int jobId);
+
+    List<MedicalProviderJob> queryByName(String name);
 }

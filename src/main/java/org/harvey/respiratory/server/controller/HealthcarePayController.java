@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Api(tags = {"医保"})
 @RequestMapping("/healthcare")
-public class HealthcareController {
+public class HealthcarePayController {
     @PutMapping("pay")
     @ApiOperation("付款")
     public Result<NullPlaceholder> pay(
@@ -53,7 +53,7 @@ public class HealthcareController {
 
     @ApiOperation("用病号查询余额")
     @PutMapping("balance/healthcare/{healthcareId}")
-    @ApiResponse(code = 200, message = "返回是充值之后的余额")
+    @ApiResponse(code = 200, message = "返回余额")
     public Result<Integer> queryBalance(
             @PathVariable("healthcareId") @ApiParam(value = "医保号id", required = true) Long healthcareId) {
         // 找不到医保, 抛出异常, 让用户重新创建医保

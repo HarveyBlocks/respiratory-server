@@ -2,28 +2,29 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
+import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
+import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
 
 import java.util.List;
 
 /**
- * 医疗提供机构
+ * 医院科室
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-09 20:28
  */
 
-public interface MedicalProviderFormService extends IService<MedicalProviderForm> {
+public interface MedicalProviderDepartmentService extends IService<MedicalProviderDepartment> {
     /**
      * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
      */
-    Integer register(MedicalProviderForm form);
+    Integer register(MedicalProviderDepartment department);
 
     /**
      * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
      */
-    void update(MedicalProviderForm newForm);
+    void update(MedicalProviderDepartment newDepartment);
 
     /**
      * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
@@ -33,15 +34,11 @@ public interface MedicalProviderFormService extends IService<MedicalProviderForm
     /**
      * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_READ
      */
-    MedicalProviderForm querySelf(long userId);
+    MedicalProviderDepartment querySelf(long userId);
 
-    List<MedicalProviderForm> queryAny(int page, int limit);
+    List<MedicalProviderDepartment> queryAny(int page, int limit);
 
-    MedicalProviderForm queryById(int formId);
+    MedicalProviderDepartment queryById(int departmentId);
 
-    List<MedicalProviderForm> queryByName(String name);
-
-    List<MedicalProviderForm> queryByAddress(String address);
-
-
+    List<MedicalProviderDepartment> queryByName(String name);
 }

@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @ApiModel("随访信息")
 @AllArgsConstructor
-public class MedicalDepartment {
+public class MedicalProviderDepartment {
     @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "主键")
     private Integer id;

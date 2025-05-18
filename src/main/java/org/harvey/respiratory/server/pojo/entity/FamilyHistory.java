@@ -19,7 +19,6 @@ import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
  * 家族成员关系enum(有很多), 该属性冗余, 不属于BC FC, 但为了提高效率
  * 疾病表id
  *
- *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-13 00:55
@@ -53,4 +52,10 @@ public class FamilyHistory {
      */
     @ApiModelProperty(value = "疾病表id")
     private Integer diseaseId;
+
+    @ApiModelProperty(value = "家族居住环境共同暴露因素")
+    private String livingEnvironmentCommonFactor;
+
+    @ApiModelProperty(value = "居住在吸烟环境")
+    private Boolean livingInSmokingEnvironment;
 }

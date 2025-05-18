@@ -95,5 +95,5 @@ public class SymptomaticPresentation {
      * 逻辑删除
      */
     @ApiModelProperty(value = "逻辑删除", hidden = true)
-    private boolean deleted;
+    private Boolean deleted;
 }

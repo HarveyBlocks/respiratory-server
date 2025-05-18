@@ -60,7 +60,10 @@ public interface UserSecurityService extends IService<UserSecurity> {
     @Transactional
     void updateUser(UserDto userDTO, String token);
 
+    UserSecurity selectByIdentityCardId(String identityCardId);
+
     UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException;
 
 
+    UserSecurity selectById(long userId);
 }

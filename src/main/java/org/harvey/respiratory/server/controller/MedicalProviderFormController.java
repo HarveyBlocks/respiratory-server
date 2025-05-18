@@ -5,12 +5,19 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
-import org.harvey.respiratory.server.exception.UnfinishedException;
+import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
+import org.harvey.respiratory.server.service.MedicalProviderFormService;
+import org.harvey.respiratory.server.util.RoleConstant;
+import org.harvey.respiratory.server.util.RoleUtil;
+import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -25,28 +32,49 @@ import java.util.List;
 @Api(tags = {"医疗提供机构"})
 @RequestMapping("/medical/form")
 public class MedicalProviderFormController {
+    @Resource
+    private MedicalProviderFormService medicalProviderFormService;
+
     @PostMapping("/register")
     @ApiOperation("登记医疗提供机构信息")
-    public Result<Long> registerPatientInformation(
+    public Result<Integer> register(
             @RequestBody @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.") MedicalProviderForm form) {
         // 当前用户必须是主管/开发者
-        throw new UnfinishedException(form);
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        return Result.success(medicalProviderFormService.register(form));
     }
+
 
     @PutMapping("/")
     @ApiOperation("更新医疗提供机构信息")
-    public Result<Long> update(
+    public Result<NullPlaceholder> update(
             @RequestBody @ApiParam("更新字段可以为null, 表示保留原有; 也可以不为null, 即使字段值没有发生变化")
             MedicalProviderForm form) {
         // 当前用户必须是主管/开发者
-        throw new UnfinishedException(form);
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        medicalProviderFormService.update(form);
+        return Result.ok();
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation("删除医疗提供者信息")
+    @ApiOperation("删除医疗提供机构信息")
     public Result<NullPlaceholder> del(@PathVariable("id") @ApiParam("医疗提供者 id") Long id) {
         // 当前用户必须是主管/开发者
-        throw new UnfinishedException(id);
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        medicalProviderFormService.delete(id);
+        return Result.ok();
     }
 
 
@@ -54,36 +82,58 @@ public class MedicalProviderFormController {
     @ApiOperation("查询医疗提供者自己的机构信息")
     public Result<MedicalProviderForm> query() {
         // 任何医疗提供者可执行
-        throw new UnfinishedException();
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
+        return Result.success(medicalProviderFormService.querySelf(user.getId()));
     }
 
 
-    @GetMapping("/all/{page}/{limit}")
-    @ApiOperation("查询医疗提供者信息")
+    @GetMapping({"/all/{page}/{limit}", "/all/{page}/", "/all"})
+    @ApiOperation("查询医疗提供机构信息")
     public Result<List<MedicalProviderForm>> query(
-            @PathVariable(name = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
+            @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(name = "limit", required = false)
+            @PathVariable(value = "limit", required = false)
             @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
-        // 当前用户必须是主管/开发者
-        throw new UnfinishedException(page, limit);
+        if (page == null) {
+            page = 1;
+        }
+        if (limit == null) {
+            limit = Constants.DEFAULT_PAGE_SIZE;
+        }
+        return Result.success(medicalProviderFormService.queryAny(page, limit));
     }
 
 
     @GetMapping("/one/{id}")
     @ApiOperation("查询医疗提供机构信息")
     public Result<MedicalProviderForm> query(
-            @PathVariable(name = "id") @ApiParam(value = "医疗提供机构的id", required = true) Integer form) {
-        // 当前用户必须是主管/开发者
-        throw new UnfinishedException(form);
+            @PathVariable(value = "id") @ApiParam(value = "医疗提供机构的id", required = true) Integer form) {
+        return Result.success(medicalProviderFormService.queryById(form));
     }
 
-    @GetMapping("/multiple/{name}")
-    @ApiOperation("查询医疗提供者信息")
+    @GetMapping("/name/{name}")
+    @ApiOperation("依据名字查询医疗提供机构信息")
     public Result<List<MedicalProviderForm>> queryByName(
-            @PathVariable(name = "name", required = false) @ApiParam(value = "依据姓名模糊查询医疗提供机构")
+            @PathVariable(value = "name") @ApiParam(value = "依据姓名模糊查询医疗提供机构")
             String name) {
-        // 当前用户必须是主管/开发者
-        throw new UnfinishedException(name);
+        if (name.isEmpty()) {
+            throw new BadRequestException("name can not be empty");
+        }
+        return Result.success(medicalProviderFormService.queryByName(name));
+    }
+
+    @GetMapping("/address/{address}")
+    @ApiOperation("依据地址查询医疗提供机构信息")
+    public Result<List<MedicalProviderForm>> queryByAddress(
+            @PathVariable(value = "address") @ApiParam(value = "依据地址模糊查询医疗提供机构")
+            String address) {
+        if (address.isEmpty()) {
+            throw new BadRequestException("address can not be empty");
+        }
+        return Result.success(medicalProviderFormService.queryByAddress(address));
     }
 }

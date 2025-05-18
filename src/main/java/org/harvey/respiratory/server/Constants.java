@@ -1,5 +1,7 @@
 package org.harvey.respiratory.server;
 
+import org.harvey.respiratory.server.pojo.enums.Role;
+
 import java.text.SimpleDateFormat;
 import java.util.Set;
 
@@ -24,4 +26,5 @@ public class Constants {
 
     public static final long CHAT_RECORD_TIME_INTERVAL = 60 * 60 * 1000; // 一小时
     public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final Integer DEFAULT_USER_ROLE_AFTER_REAL_NAME = Role.PATIENT.getRoleId();
 }

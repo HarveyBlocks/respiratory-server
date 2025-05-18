@@ -3,7 +3,8 @@ package org.harvey.respiratory.server.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.harvey.respiratory.server.pojo.entity.MedicalDepartment;
+import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
+import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 
 /**
  * 医院科室
@@ -13,5 +14,5 @@ import org.harvey.respiratory.server.pojo.entity.MedicalDepartment;
  * @date 2025-05-09 20:28
  */
 @Mapper
-public interface MedicalDepartmentMapper extends BaseMapper<MedicalDepartment> {
+public interface MedicalProviderDepartmentMapper extends BaseMapper<MedicalProviderDepartment> {
 }

@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.HealthcareMapper;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.service.HealthcareService;
 import org.springframework.stereotype.Service;
@@ -34,20 +35,14 @@ public class HealthcareServiceImpl extends ServiceImpl<HealthcareMapper, Healthc
 
     @Override
     public Healthcare queryByCode(long healthcareCode) {
-        Healthcare one = super.lambdaQuery().eq(Healthcare::getHealthcareCode, healthcareCode).one();
-        if (one == null) {
-            log.warn("依据医保号{}未查询到医保", healthcareCode);
-            return null;
-        }
-        return one;
+        return super.lambdaQuery().eq(Healthcare::getHealthcareCode, healthcareCode).one();
     }
 
     @Override
     public Healthcare queryById(long healthcareId) {
         Healthcare healthcare = super.getById(healthcareId);
         if (healthcare == null) {
-            log.warn("依据医保id{}未查询到医保", healthcareId);
-            return null;
+            throw new ResourceNotFountException("依据医保id " + healthcareId + " 未查询到医保");
         }
         return healthcare;
     }

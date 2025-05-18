@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.PatientMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.PatientDto;
@@ -151,11 +152,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
 
     @Override
     public Patient selectByIdCard(String identityCardId) {
-        Patient one = super.lambdaQuery().eq(Patient::getIdentityCardId, identityCardId).one();
-        if (one == null) {
-            log.warn("没有身份证号为{}的患者", identityCardId);
-        }
-        return one;
+        return super.lambdaQuery().eq(Patient::getIdentityCardId, identityCardId).one();
     }
 
     @Override
@@ -192,12 +189,9 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     public PatientDto queryByHealthcare(UserDto user, long healthcareCode) {
         Healthcare healthcare = healthcareService.queryByCode(healthcareCode);
         if (healthcare == null) {
-            return null;
+            throw new ResourceNotFountException("依据医保号 " + healthcareCode + " 未查询到医保");
         }
         Patient patient = queryByHealthcare(healthcare.getHealthcareId());
-        if (patient == null) {
-            return null;
-        }
         validRoleOnQueryAny(user, patient);
         return PatientDto.union(patient, healthcare);
     }
@@ -205,9 +199,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     @Override
     public PatientDto queryById(UserDto user, long patientId) {
         Patient patient = queryById0(patientId);
-        if (patient == null) {
-            return null;
-        }
         validRoleOnQueryAny(user, patient);
         if (patient.getHealthcareId() == null) {
             return PatientDto.adapt(patient);
@@ -227,7 +218,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
         Patient patient = selectByIdCard(cardId);
         if (patient == null) {
-            return null;
+            throw new ResourceNotFountException("依据身份证号" + cardId + "未找到患者");
         }
         boolean exist = userPatientIntermediationService.exist(currentUserId, patient.getId());
         if (!exist) {
@@ -244,7 +235,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     private Patient queryById0(long patientId) {
         Patient patient = super.getById(patientId);
         if (patient == null) {
-            log.warn("未能依据id查询到病患{}", patientId);
+            throw new ResourceNotFountException("不能依据患者id " + patientId + " 查到患者");
         }
         return patient;
     }
