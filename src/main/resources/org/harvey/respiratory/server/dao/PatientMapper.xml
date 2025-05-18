@@ -39,7 +39,7 @@
              JOIN user_security on tb_user_patient_intermediation.user_id = user_security.id
              JOIN tb_patient on tb_user_patient_intermediation.patient_id = tb_patient.id
              LEFT JOIN tb_healthcare on tb_healthcare.healthcare_id = tb_patient.healthcare_id
-    where user_security.id = 1923431434245177346
+    where user_security.id = 114514
     limit 0,10;
     -->
     <select id="queryByRegisterUser" resultMap="PatientDtoMap"><!--起了别名之后就方便了-->
