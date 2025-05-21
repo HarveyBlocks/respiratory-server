@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
 
 /**
  * 家族病史(由于患者家属的就诊记录不一定在本数据库中, 故不能直接使用患者家属的患者id)
@@ -46,7 +45,7 @@ public class FamilyHistory {
      * 家族成员关系enum(有很多)
      */
     @ApiModelProperty(value = "家族成员关系enum(有很多)")
-    private FamilyRelationship familyRelationshipId;
+    private Integer familyRelationshipId;
     /**
      * 疾病表id
      */

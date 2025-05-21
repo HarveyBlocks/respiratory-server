@@ -67,6 +67,9 @@ public class VisitDoctor {
     @ApiModelProperty(value = "总费用, 单位分.医生职业+医生科室+(药品*数量)*for-each, 只读")
     private Integer totalExpense;
 
+    @ApiModelProperty(value = "是否已经interviewed, 是外界只读的字段")
+    private boolean interviewed = false;
+
     @ApiModelProperty(value = "是否已付款, 是外界只读的字段")
     private boolean paid = false;
     /**
@@ -74,4 +77,11 @@ public class VisitDoctor {
      */
     @ApiModelProperty(value = "随访表, 可以为null")
     private Long followupId;
+
+    public static VisitDoctor takeTheNumber(long patientId, long medicalProviderId) {
+        VisitDoctor obj = new VisitDoctor();
+        obj.setPatientId(patientId);
+        obj.setMedicalProviderId(medicalProviderId);
+        return obj;
+    }
 }

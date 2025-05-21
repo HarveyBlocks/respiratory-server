@@ -7,19 +7,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 充值
+ * 付费
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2025-05-14 23:54
+ * @date 2025-05-21 23:13
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @ApiModel("充值")
-public class RechargeDto {
+public class PayDto {
     @ApiModelProperty("充值的查询依据")
     private QueryBalanceDto queryBalanceDto;
-    @ApiModelProperty(value = "充值金额, 单位, 分, 必正", required = true)
-    private Integer amount;
+    @ApiModelProperty(value = "需要被付款的就诊id", required = true)
+    private Long visitId;
 }

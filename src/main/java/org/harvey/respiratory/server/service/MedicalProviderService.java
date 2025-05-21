@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 
@@ -19,7 +20,7 @@ public interface MedicalProviderService extends IService<MedicalProvider> {
 
     void update(MedicalProvider medicalProvider);
 
-    void delete(Long id);
+    void delete(long id);
 
     MedicalProvider selectByUser(long userId);
 
@@ -31,7 +32,13 @@ public interface MedicalProviderService extends IService<MedicalProvider> {
     /**
      * @param name 空字符和null将退化为全查
      */
-    List<MedicalProvider> selectByAny(String name, Integer formId, int page, int limit);
+    List<MedicalProvider> selectByAny(String name, Integer formId, Page<MedicalProvider> page);
 
 
+    boolean samePeople(long id, String identityCardId);
+
+    /**
+     * 依据 id 查询
+     */
+    MedicalProvider queryById(long medicalProviderId);
 }

@@ -30,6 +30,9 @@ public enum Role implements IEnum<String> {
 
     public static Role create(Integer roleId) {
         // roleId从一开始
+        if (roleId == null) {
+            return Role.UNKNOWN;
+        }
         return Role.values()[roleId - 1];
     }
 

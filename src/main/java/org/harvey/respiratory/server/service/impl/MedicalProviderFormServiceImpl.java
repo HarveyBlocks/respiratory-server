@@ -75,8 +75,8 @@ public class MedicalProviderFormServiceImpl extends
     }
 
     @Override
-    public List<MedicalProviderForm> queryAny(int page, int limit) {
-        Page<MedicalProviderForm> formPage = super.lambdaQuery().page(new Page<>(page, limit));
+    public List<MedicalProviderForm> queryAny(Page<MedicalProviderForm> page) {
+        Page<MedicalProviderForm> formPage = super.lambdaQuery().page(page);
         return formPage.getRecords();
     }
 

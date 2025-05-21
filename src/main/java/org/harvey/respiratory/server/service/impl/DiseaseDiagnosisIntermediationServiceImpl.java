@@ -1,10 +1,14 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.DiseaseDiagnosisIntermediationMapper;
 import org.harvey.respiratory.server.pojo.entity.DiseaseDiagnosisIntermediation;
 import org.harvey.respiratory.server.service.DiseaseDiagnosisIntermediationService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 疾病诊断中间表
@@ -14,8 +18,34 @@ import org.springframework.stereotype.Service;
  * @date 2025-05-15 12:21
  */
 @Service
+@Slf4j
 public class DiseaseDiagnosisIntermediationServiceImpl extends
         ServiceImpl<DiseaseDiagnosisIntermediationMapper, DiseaseDiagnosisIntermediation> implements
         DiseaseDiagnosisIntermediationService {
+
+    @Override
+    public List<Integer> selectDiseaseByVisit(long visitId) {
+        return super.lambdaQuery()
+                .select(DiseaseDiagnosisIntermediation::getDiseaseId)
+                .eq(DiseaseDiagnosisIntermediation::getVisitDoctorId, visitId)
+                .list()
+                .stream()
+                .map(DiseaseDiagnosisIntermediation::getDiseaseId)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void saveOnInterview(long visitDoctorId, List<Integer> diseaseIds) {
+        List<DiseaseDiagnosisIntermediation> diagnosisList = diseaseIds.stream()
+                .map(id -> new DiseaseDiagnosisIntermediation(visitDoctorId, id))
+                .collect(Collectors.toList());
+        boolean saved = super.saveBatch(diagnosisList);
+        if (saved) {
+            log.debug("成功保存{}诊断的疾病", visitDoctorId);
+        } else {
+            log.debug("保存{}诊断的疾病失败", visitDoctorId);
+        }
+    }
+
 
 }

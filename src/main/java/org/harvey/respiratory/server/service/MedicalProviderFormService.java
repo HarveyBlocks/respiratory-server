@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 
@@ -35,7 +36,7 @@ public interface MedicalProviderFormService extends IService<MedicalProviderForm
      */
     MedicalProviderForm querySelf(long userId);
 
-    List<MedicalProviderForm> queryAny(int page, int limit);
+    List<MedicalProviderForm> queryAny(Page<MedicalProviderForm> page);
 
     MedicalProviderForm queryById(int formId);
 

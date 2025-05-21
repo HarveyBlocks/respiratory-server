@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.pojo.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.harvey.respiratory.server.pojo.enums.Sex;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 患者表(既往用药史查询特定药品使用方式中间表)
@@ -81,6 +82,7 @@ public class Patient {
     private Sex sex;
 
     @ApiModelProperty(value = "出生日期, 不可为null", required = true)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date birthDate;
 
     @ApiModelProperty(value = "家庭住址(varchar(255)), 不可为null", required = true)

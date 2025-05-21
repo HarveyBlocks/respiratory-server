@@ -35,7 +35,7 @@ public class MedicalProviderJob {
     @ApiModelProperty("职位名")
     private String name;
 
-    @ApiModelProperty(value = "职位可以持有的权限", hidden = true)
+    @ApiModelProperty(value = "职位可以持有的权限")
     private Integer roleId;
     /**
      * 单位, 分

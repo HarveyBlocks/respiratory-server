@@ -4,6 +4,8 @@ package org.harvey.respiratory.server.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.ExpenseRecord;
 
+import java.util.List;
+
 /**
  * 费用记录
  *
@@ -13,4 +15,5 @@ import org.harvey.respiratory.server.pojo.entity.ExpenseRecord;
  */
 
 public interface ExpenseRecordService extends IService<ExpenseRecord> {
+    void saveOnInterview(List<ExpenseRecord> expenseRecordList);
 }

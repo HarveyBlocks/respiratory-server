@@ -1,4 +1,4 @@
-create table tb_disease
+create table if not exists tb_disease
 (
     id          int auto_increment comment '名字id'
         primary key,
@@ -7,21 +7,21 @@ create table tb_disease
 )
     comment '疾病表';
 
-create table tb_drug
+create table if not exists tb_drug
 (
-    id                   int          not null comment '药品id'
+    id                    int          not null comment '药品id'
         primary key,
-    name                 varchar(63)  not null comment '药物名称',
-    expenseEach          int          not null comment '药物单价, 单位, 分',
-    specification        varchar(63)  not null comment '药物规格',
-    administrationRoute  varchar(63)  not null comment '给药途径',
-    medicationSite       varchar(63)  not null comment '用药部位',
-    medicationPrecaution varchar(255) not null comment '用药注意事项',
-    guidance             text         not null comment '用药指导'
+    name                  varchar(63)  not null comment '药物名称',
+    expense_each          int          not null comment '药物单价, 单位, 分',
+    specification         varchar(63)  not null comment '药物规格',
+    administration_route  varchar(63)  not null comment '给药途径',
+    medication_site       varchar(63)  not null comment '用药部位',
+    medication_precaution varchar(255) not null comment '用药注意事项',
+    guidance              text         not null comment '用药指导'
 )
     comment '药品具体信息';
 
-create table tb_family_relationship
+create table if not exists tb_family_relationship
 (
     id          int auto_increment comment '主键id'
         primary key,
@@ -29,9 +29,9 @@ create table tb_family_relationship
     description varchar(255) not null comment '描述',
     close_level tinyint(1)   not null comment '是否是一级亲属, true for 一级, false for 二级'
 )
-    comment '权限表';
+    comment '家族关系';
 
-create table tb_follow_up
+create table if not exists tb_follow_up
 (
     id                         bigint       not null comment '随访表id'
         primary key,
@@ -45,7 +45,7 @@ create table tb_follow_up
 )
     comment '随访表';
 
-create table tb_healthcare
+create table if not exists tb_healthcare
 (
     healthcare_id   bigint        not null comment '主键id'
         primary key,
@@ -57,7 +57,7 @@ create table tb_healthcare
 )
     comment '权限表';
 
-create table tb_medical_department
+create table if not exists tb_medical_department
 (
     id                  int auto_increment comment '主键id'
         primary key,
@@ -70,7 +70,7 @@ create table tb_medical_department
 )
     comment '权限表';
 
-create table tb_medical_provider_form
+create table if not exists tb_medical_provider_form
 (
     id      int auto_increment comment '主键id'
         primary key,
@@ -79,7 +79,7 @@ create table tb_medical_provider_form
 )
     comment '医疗提供机构表';
 
-create table tb_patient
+create table if not exists tb_patient
 (
     id               bigint                  not null comment '患者id'
         primary key,
@@ -101,13 +101,15 @@ create table tb_patient
 )
     comment '患者表';
 
-create table tb_family_history
+create table if not exists tb_family_history
 (
-    id                     bigint not null comment '主键id'
+    id                               bigint     not null comment '主键id'
         primary key,
-    patient_Id             bigint not null comment '病患, 关系的基',
-    family_relationship_id int    not null comment '关系表id',
-    disease_id             int    not null comment '病症id',
+    patient_Id                       bigint     not null comment '病患, 关系的基',
+    family_relationship_id           int        not null comment '关系表id',
+    disease_id                       int        not null comment '病症id',
+    living_environment_common_factor char(255)  not null comment '家族居住环境共同暴露因素',
+    living_in_smoking_environment    tinyint(1) not null comment '居住在吸烟环境',
     constraint tb_family_history_disease_id_tb_disease_fk
         foreign key (disease_id) references tb_disease (id),
     constraint tb_family_history_patient_id_tb_patient_id_fk
@@ -121,7 +123,7 @@ create index tb_family_history_patient_id_index
     on tb_family_history (patient_Id)
     comment '常常依据patientc';
 
-create table tb_role
+create table if not exists tb_role
 (
     id          int auto_increment comment '主键id'
         primary key,
@@ -130,7 +132,7 @@ create table tb_role
 )
     comment '权限表';
 
-create table tb_medical_provider_job
+create table if not exists tb_medical_provider_job
 (
     id                  int auto_increment comment '主键id'
         primary key,
@@ -142,13 +144,12 @@ create table tb_medical_provider_job
 )
     comment '医生职务表';
 
-create table tb_medical_provider
+create table if not exists tb_medical_provider
 (
     id               bigint auto_increment comment '主键id'
         primary key,
     name             varchar(63) not null comment '姓名',
     identity_card_id varchar(18) not null comment '身份证号',
-    role_id          int         not null comment '权限',
     form_id          int         not null comment '机构id',
     department_id    int         not null comment '科室id',
     job_id           int         not null comment '职位id',
@@ -157,13 +158,11 @@ create table tb_medical_provider
     constraint tb_medical_provider_tb_medical_provider_form_fk
         foreign key (form_id) references tb_medical_provider_form (id),
     constraint tb_medical_provider_tb_medical_provider_job_fk
-        foreign key (job_id) references tb_medical_provider_job (id),
-    constraint tb_medical_provider_tb_role_fk
-        foreign key (role_id) references tb_role (id)
+        foreign key (job_id) references tb_medical_provider_job (id)
 )
     comment '医疗提供者表, 考虑到业务比较复杂,现阶段无法 故在出现慢查询之后再进行索引建立';
 
-create table tb_visit_doctor
+create table if not exists tb_visit_doctor
 (
     id                     bigint               not null comment '就诊号'
         primary key,
@@ -184,7 +183,7 @@ create table tb_visit_doctor
 )
     comment '问诊表';
 
-create table tb_disease_diagnosis_intermediation
+create table if not exists tb_disease_diagnosis_intermediation
 (
     visit_doctor_id bigint not null comment '会诊id',
     disease_id      int    not null comment '病症id',
@@ -196,7 +195,7 @@ create table tb_disease_diagnosis_intermediation
 )
     comment '疾病诊断中间表';
 
-create table tb_expenses_record
+create table if not exists tb_expenses_record
 (
     id              bigint       not null comment '费用表主键id'
         primary key,
@@ -213,7 +212,7 @@ alter table tb_follow_up
     add constraint tb_follow_up_tb_visit_doctor_fk
         foreign key (visit_doctor_id) references tb_visit_doctor (id);
 
-create table tb_specific_using_drug_record
+create table if not exists tb_specific_using_drug_record
 (
     visit_doctor_id           bigint               not null comment '就诊号/就诊表id, 和 drug id 一起是联合主键',
     drug_id                   int                  not null comment '药品表id, 和 visit doctor id 一起是联合主键',
@@ -250,7 +249,7 @@ create index tb_specific_using_drug_record_treat_start_index
 create index tb_specific_using_drug_record_visit_doctor_id_index
     on tb_specific_using_drug_record (visit_doctor_id);
 
-create table tb_symptomatic_presentation
+create table if not exists tb_symptomatic_presentation
 (
     id                   bigint                                not null comment '症状id'
         primary key,
@@ -264,6 +263,10 @@ create table tb_symptomatic_presentation
     sign_description     varchar(63)                           not null comment '体征描述',
     description          text                                  not null comment '描述',
     deleted              tinyint(1) default 0                  not null comment '逻辑删除',
+    create_time          datetime   default CURRENT_TIMESTAMP  not null on update CURRENT_TIMESTAMP comment '由于使用逻辑删除, 所以是逻辑上的更新/创建时间, 物理上的插入时间',
+    old_version_id       bigint                                null comment '由于使用逻辑删除, 而且要保留每一版本的信息, 故使用此. null for 初版',
+    constraint tb_symptomatic_presentation_old_version_fk
+        foreign key (old_version_id) references tb_symptomatic_presentation (id),
     constraint tb_symptomatic_presentation_tb_visit_doctor_fk
         foreign key (visit_doctor_id) references tb_visit_doctor (id)
 )
@@ -272,22 +275,6 @@ create table tb_symptomatic_presentation
 create index tb_symptomatic_presentation_visit_doctor_id_index
     on tb_symptomatic_presentation (visit_doctor_id)
     comment '依据问诊查有关症状';
-
-create table tb_user_patient_intermediation
-(
-    user_id    bigint not null,
-    patient_id bigint not null,
-    primary key (user_id, patient_id),
-    constraint tb_user_patient_intermediation_tb_patient_fk
-        foreign key (patient_id) references tb_patient (id),
-    constraint tb_user_patient_intermediation_tb_visit_doctor_fk
-        foreign key (user_id) references tb_visit_doctor (id)
-)
-    comment '用户和病患id的中间表, 用户可以持有多个病患, bing''hua';
-
-create index tb_user_patient_intermediation_user_id_index
-    on tb_user_patient_intermediation (user_id)
-    comment '依据user_id查询可优化';
 
 create index tb_visit_doctor_medical_provider_id_index
     on tb_visit_doctor (medical_provider_id)
@@ -301,24 +288,34 @@ create index tb_visit_doctor_visit_time_index
     on tb_visit_doctor (visit_time)
     comment '用于时间范围的查询';
 
-create table user_security
+create table if not exists user_security
 (
-    id                 bigint                             not null comment '用户id'
+    id               bigint                             not null comment '用户id'
         primary key,
-    role_id            int                                not null comment '权限',
-    phone              char(11)                           not null comment '电话号码, +86 only',
-    password           char(60)                           not null comment '密码',
-    name               varchar(63)                        not null comment '密码',
-    create_time        datetime default CURRENT_TIMESTAMP not null,
-    update_time        datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP invisible,
-    identifier_card_id int                                null,
-    constraint identifier_card_id
-        unique (identifier_card_id),
+    phone            char(11)                           not null comment '电话号码, +86 only',
+    password         char(60)                           not null comment '密码',
+    name             varchar(63)                        not null comment '密码',
+    create_time      datetime default CURRENT_TIMESTAMP not null,
+    update_time      datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP invisible,
+    identity_card_id char(18)                           null,
     constraint user_security_phone
-        unique (phone),
-    constraint user_security_tb_role_fk
-        foreign key (role_id) references tb_role (id)
+        unique (phone)
 )
     comment '用户鉴权表';
 
+create table if not exists tb_user_patient_intermediation
+(
+    user_id    bigint not null,
+    patient_id bigint not null,
+    primary key (user_id, patient_id),
+    constraint tb_user_patient_intermediation_tb_patient_fk
+        foreign key (patient_id) references tb_patient (id),
+    constraint tb_user_patient_intermediation_user_security_fk
+        foreign key (user_id) references user_security (id)
+)
+    comment '用户和病患id的中间表, 用户可以持有多个病患, bing''hua';
+
+create index tb_user_patient_intermediation_user_id_index
+    on tb_user_patient_intermediation (user_id)
+    comment '依据user_id查询可优化';
 

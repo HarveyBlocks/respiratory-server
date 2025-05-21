@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.RoleEntity;
+import org.harvey.respiratory.server.pojo.enums.Role;
 
 /**
  * 疾病
@@ -13,4 +14,15 @@ import org.harvey.respiratory.server.pojo.entity.RoleEntity;
  */
 
 public interface RoleService extends IService<RoleEntity> {
+    /**
+     * 只有服务器内部调用
+     * 1. 先依据身份证, 如果是未实名, 就是Unknown, 否则进入2
+     * 2. medicalProvider查询, 如果有, 则从job中取出role
+     * 3. 其他权限表, 给开发者用的, 暂且没有这一选项
+     */
+    Role queryRole(String identityCardId);
+
+    Role getMedicalProviderRole(int jobId);
+
+    Role selectRole(int roleId);
 }

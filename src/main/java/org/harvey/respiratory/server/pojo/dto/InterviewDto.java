@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server.pojo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -7,10 +8,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
 import org.harvey.respiratory.server.pojo.entity.SymptomaticPresentation;
+import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.pojo.enums.Severity;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,19 +34,34 @@ import java.util.List;
 public class InterviewDto {
 
     @ApiModelProperty(value = "就诊号/就诊表id", required = true)
-    private long visitDoctorId;
-
-    @ApiModelProperty(value = "症状表, 可以为empty, 不可为null", required = true)
-    private List<SymptomaticPresentation> symptomaticPresentationList;
-
-    @ApiModelProperty(value = "药物具体使用表, 可以为empty, 不可为null", required = true)
-    private List<SpecificUsingDrugsIntermediationDto> specificUsingDrugsIntermediations;
-    @ApiModelProperty(value = "疾病诊断, 可以为empty, 不可为null", required = true)
-    private List<Long> diseaseIds;
+    private Long visitDoctorId;
     @ApiModelProperty("简要介绍(varchar(255)), 如果医生不提供, 就是病症名的list")
     private String briefDescription;
     @ApiModelProperty("其他辅助治疗")
     private String otherAdjuvantTherapy;
+
+    @ApiModelProperty(value = "症状表, 可以为empty, 不可为null", required = true)
+    private List<SymptomaticPresentationDto> symptomaticPresentationList;
+
+    @ApiModelProperty(value = "药物具体使用表, 可以为empty, 不可为null", required = true)
+    private List<SpecificUsingDrugRecordDto> specificUsingDrugRecordDtoList;
+
+    @ApiModelProperty(value = "疾病诊断, 可以为empty, 不可为null", required = true)
+    private List<Integer> diseaseIds;
+
+    /**
+     * 生成visit doctor 实体
+     */
+    public VisitDoctor buildVisitDoctor(String briefDescription, int totalPrice) {
+        // 已知总费用, 就诊时间就是执行当前业务的时间
+        return new VisitDoctor(visitDoctorId, null, null, briefDescription, otherAdjuvantTherapy, LocalDateTime.now(),
+                totalPrice, true, false, null
+        );
+    }
+
+    public static String joinBriefDescription(List<String> diseaseNames) {
+        return String.join(",", diseaseNames);
+    }
 
 
     @Data
@@ -50,10 +70,9 @@ public class InterviewDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @ApiModel(description = "药物具体使用")
-    public static class SpecificUsingDrugsIntermediationDto {
-
+    public static class SpecificUsingDrugRecordDto {
         @ApiModelProperty("药品表id, 指向药品表中的药品")
-        private long drugId;
+        private Integer drugId;
 
         @ApiModelProperty("药品数量, 和费用计算相关")
         private Integer count;
@@ -68,14 +87,22 @@ public class InterviewDto {
         private String frequencyUsed;
 
         @ApiModelProperty("治疗开始时间(date)")
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         private Date treatStart;
 
         @ApiModelProperty("治疗结束时间(date)")
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         private Date treatEnd;
 
 
         @ApiModelProperty("其他用药指导(TEXT)")
         private String otherMedicationGuidance;
+
+        public SpecificUsingDrugRecord buildSpecificUsingDrugRecord(long visitDoctorId, long patientId) {
+            return new SpecificUsingDrugRecord(null, visitDoctorId, drugId, count, patientId, dosageUsed, dayTimeUsed,
+                    frequencyUsed, treatStart, treatEnd, otherMedicationGuidance, false, null
+            );
+        }
     }
 
     @Data
@@ -85,7 +112,6 @@ public class InterviewDto {
     @AllArgsConstructor
     @ApiModel(description = "症状")
     public static class SymptomaticPresentationDto {
-
         @ApiModelProperty("名称(varchar(63))")
         private String name;
 
@@ -96,6 +122,7 @@ public class InterviewDto {
         private String frequency;
 
         @ApiModelProperty("开始时间(date)")
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         private Date startTime;
 
         @ApiModelProperty("诱因(varchar(63))")
@@ -109,5 +136,12 @@ public class InterviewDto {
 
         @ApiModelProperty("描述(TEXT)")
         private String description;
+
+        public SymptomaticPresentation buildSymptomaticPresentation(long visitDoctorId) {
+            return new SymptomaticPresentation(null, visitDoctorId, name, severity, frequency, startTime, incentive,
+                    environmentalFactor, signDescription, description,
+                    ConstantsInitializer.nowDateTime(), false, null
+            );
+        }
     }
 }

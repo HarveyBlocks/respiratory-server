@@ -14,6 +14,8 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.MedicalProviderService;
+import org.harvey.respiratory.server.service.RoleService;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.RoleConstant;
 import org.harvey.respiratory.server.util.RoleUtil;
 import org.harvey.respiratory.server.util.UserHolder;
@@ -36,6 +38,8 @@ import java.util.List;
 public class MedicalProviderController {
     @Resource
     private MedicalProviderService medicalProviderService;
+    @Resource
+    private RoleService roleService;
 
     @PostMapping("/register")
     @ApiOperation("登记医疗提供者信息")
@@ -47,7 +51,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         return Result.success(medicalProviderService.register(medicalProvider));
     }
 
@@ -61,7 +65,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderService.update(medicalProvider);
         return Result.ok();
     }
@@ -74,7 +78,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderService.delete(id);
         return Result.ok();
     }
@@ -88,7 +92,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_READ);
         MedicalProvider medicalProvider = medicalProviderService.selectByUser(user.getId());
         if (medicalProvider == null) {
             throw new ResourceNotFountException("不能通过当前用户的身份证查询到医疗提供者信息");
@@ -121,13 +125,8 @@ public class MedicalProviderController {
             @PathVariable(value = "page", required = false) @ApiParam("页码, 从1开始, 缺省则是1") Integer page,
             @PathVariable(value = "limit", required = false)
             @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
-        if (page == null) {
-            page = 1;
-        }
-        if (limit == null) {
-            limit = Constants.DEFAULT_PAGE_SIZE;
-        }
-        return Result.success(medicalProviderService.selectByAny(name, form, page, limit));
+        return Result.success(
+                medicalProviderService.selectByAny(name, form, ConstantsInitializer.initPage(page, limit)));
     }
 
 

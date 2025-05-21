@@ -1,8 +1,8 @@
 package org.harvey.respiratory.server.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public interface MedicalProviderJobService extends IService<MedicalProviderJob> 
      */
     MedicalProviderJob querySelf(long userId);
 
-    List<MedicalProviderJob> queryAny(int page, int limit);
+    List<MedicalProviderJob> queryAny(Page<MedicalProviderJob> page);
 
     MedicalProviderJob queryById(int jobId);
 

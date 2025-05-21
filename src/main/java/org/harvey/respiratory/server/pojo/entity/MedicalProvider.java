@@ -36,8 +36,6 @@ public class MedicalProvider {
     private String identityCardId;
     @ApiModelProperty(value = "名称(varchar(63))")
     private String name;
-    @ApiModelProperty(value = "有关权限,冗余,但是为了提高效率,read only")
-    private Integer roleId;
     @ApiModelProperty(value = "医疗服务机构表id, 不可以为null")
     private Integer formId;
     @ApiModelProperty(value = "科室的id, 不可以为null")

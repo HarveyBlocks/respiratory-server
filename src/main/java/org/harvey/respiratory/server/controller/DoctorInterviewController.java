@@ -4,14 +4,28 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.harvey.respiratory.server.exception.UnfinishedException;
+import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.ServerException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.InterviewDto;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
+import org.harvey.respiratory.server.pojo.entity.*;
+import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
+import org.harvey.respiratory.server.service.*;
+import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 医生问诊
@@ -26,23 +40,24 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = {"医生问诊"})
 @RequestMapping("/interview")
 public class DoctorInterviewController {
+    @Resource
+    private DoctorInterviewService doctorInterviewService;
+
     @PostMapping("/execute")
     @ApiOperation(
             "问诊. 1. 更新就诊信息 2. 生成多条费用单 3. 计算费用价格 4. 插入多条具体药物使用 5. 插入多个症状的一系列操作具有原子性")
     public Result<NullPlaceholder> interview(
-            @RequestBody @ApiParam("interview")
-            InterviewDto interviewDto) {
-        // 1. 获取就诊信息id
-        // 3.
-        // 4. 获取数据库中病患id和医生id
-        // 5. 依据医生id 查询医生职位和所在科室, 计算此次问诊费用, 并生成费用记录
-        // 6. 依次插入症状信息
-        // 7. 插入疾病-就诊中间表
-        // 7. 从药物使用中取出药物id, 查询出药物单价, 与药物数量相乘, 并生成费用记录
-        // 8. 将所有费用记录相加, 获取总费用, 更新
-        // 9. 已知总费用, 就诊时间就是执行当前业务的时间
-        // 10. 依据id更新数据库就诊信息
-        throw new UnfinishedException(interviewDto);
+            @RequestBody @ApiParam("interview") InterviewDto interviewDto) {
+        UserDto currentUser = UserHolder.getUser();
+        if (currentUser == null) {
+            throw new UnauthorizedException("未登录, 无权限");
+        }
+        String identityCardId = currentUser.getIdentityCardId();
+        if (identityCardId == null || identityCardId.isEmpty()) {
+            throw new UnauthorizedException("未实名, 无权限");
+        }
+        doctorInterviewService.interview(interviewDto, identityCardId);
+        return Result.ok();
     }
 
 }

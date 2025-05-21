@@ -2,7 +2,6 @@ package org.harvey.respiratory.server.interceptor;
 
 
 import org.harvey.respiratory.server.Constants;
-import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -24,7 +23,8 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
             HttpServletResponse response,
             Object handler) {
         if (Constants.ROOT_AUTH_URI.contains(request.getRequestURI())) {
-            if (UserHolder.getUser().getRole() != Role.DATABASE_ADMINISTRATOR) {
+            String identityCardId = UserHolder.getUser().getIdentityCardId();
+            if (identityCardId == null || identityCardId.isEmpty()) {
                 response.setStatus(401);
                 return false;
             }

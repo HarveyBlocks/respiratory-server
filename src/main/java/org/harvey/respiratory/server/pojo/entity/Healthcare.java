@@ -37,4 +37,6 @@ public class Healthcare {
 
     @ApiModelProperty(value = "医保余额,单位, 分, 不可以为null, 全部是null", hidden = true)
     private Integer balance;
+
+
 }

@@ -20,9 +20,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ApiModel(description = "简单的用户信息")
 public class UserDto implements Serializable {
-    @ApiModelProperty(value = "用户权限")
-    private Role role;
-    @ApiModelProperty("用户主键")
+    @ApiModelProperty("用户主键. 对于更新, 用户只能更新自己. 所以更新的业务上这个字段没有意义")
     private Long id;
     @ApiModelProperty("姓名")
     private String name;
@@ -32,7 +30,6 @@ public class UserDto implements Serializable {
     }
 
     public UserDto(UserSecurity userSecurity) {
-        this.role = Role.create(userSecurity.getRoleId());
         this.id = userSecurity.getId();
         this.name = userSecurity.getName();
         this.identityCardId = userSecurity.getIdentityCardId();

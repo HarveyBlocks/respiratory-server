@@ -75,8 +75,8 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
     }
 
     @Override
-    public List<MedicalProviderJob> queryAny(int page, int limit) {
-        Page<MedicalProviderJob> jobPage = super.lambdaQuery().page(new Page<>(page, limit));
+    public List<MedicalProviderJob> queryAny(Page<MedicalProviderJob> page) {
+        Page<MedicalProviderJob> jobPage = super.lambdaQuery().page(page);
         return jobPage.getRecords();
     }
 

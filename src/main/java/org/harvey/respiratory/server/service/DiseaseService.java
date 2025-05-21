@@ -1,8 +1,12 @@
 package org.harvey.respiratory.server.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.Disease;
+import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
+
+import java.util.List;
 
 /**
  * 疾病
@@ -13,4 +17,17 @@ import org.harvey.respiratory.server.pojo.entity.Disease;
  */
 
 public interface DiseaseService extends IService<Disease> {
+    void deleteById(int id);
+
+    List<Disease> selectByVisitDoctor(long visitId);
+
+    Disease selectById(int id);
+
+    List<Disease> selectByPage(Page<Disease> page);
+
+    List<Disease> selectByName(String name, Page<Disease> page);
+
+    List<Integer> queryIdsByName(String diseaseName);
+
+    List<String> queryDiseaseNameByIds(List<Integer> diseaseIds);
 }

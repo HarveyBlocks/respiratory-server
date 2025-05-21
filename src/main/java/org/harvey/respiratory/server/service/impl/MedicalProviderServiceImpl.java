@@ -9,6 +9,7 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
 import org.harvey.respiratory.server.service.MedicalProviderService;
 import org.harvey.respiratory.server.service.UserSecurityService;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -51,7 +52,7 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         boolean removed = super.removeById(id);
         if (removed) {
             log.debug("删除医疗提供者成功");
@@ -60,14 +61,18 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
         }
     }
 
+    private static MedicalProvider currentProxy() {
+        return (MedicalProvider) AopContext.currentProxy();
+    }
+
+
     @Override
     public MedicalProvider selectByUser(long userId) {
         UserSecurity userSecurity = userSecurityService.selectById(userId);
         if (userSecurity.getIdentityCardId() == null) {
             throw new UnauthorizedException("不能查询医疗提供者信息");
         }
-        return super.lambdaQuery()
-                .eq(MedicalProvider::getIdentityCardId, userSecurity.getIdentityCardId()).one();
+        return super.lambdaQuery().eq(MedicalProvider::getIdentityCardId, userSecurity.getIdentityCardId()).one();
     }
 
     @Override
@@ -87,11 +92,24 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     }
 
     @Override
-    public List<MedicalProvider> selectByAny(String name, Integer formId, int page, int limit) {
+    public List<MedicalProvider> selectByAny(String name, Integer formId, Page<MedicalProvider> page) {
         return super.lambdaQuery()
                 .eq(formId != null, MedicalProvider::getFormId, formId)
                 .like(name == null || name.isEmpty(), MedicalProvider::getName, name)
-                .page(new Page<>(page, limit))
+                .page(page)
                 .getRecords();
+    }
+
+    @Override
+    public boolean samePeople(long id, String identityCardId) {
+        return super.lambdaQuery()
+                .eq(MedicalProvider::getId, id)
+                .eq(MedicalProvider::getIdentityCardId, identityCardId)
+                .oneOpt().isPresent();
+    }
+
+    @Override
+    public MedicalProvider queryById(long medicalProviderId) {
+        return super.lambdaQuery().eq(MedicalProvider::getId, medicalProviderId).one();
     }
 }

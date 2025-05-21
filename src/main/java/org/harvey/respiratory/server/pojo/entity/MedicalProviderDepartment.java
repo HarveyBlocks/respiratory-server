@@ -42,4 +42,8 @@ public class MedicalProviderDepartment {
      */
     @ApiModelProperty(value = "单位, 分, 不能为null")
     private Integer expenseEveryVisit;
+
+    @ApiModelProperty(value = "描述, varchar(255)")
+    private String description;
+
 }

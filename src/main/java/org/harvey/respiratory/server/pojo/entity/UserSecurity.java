@@ -68,8 +68,4 @@ public class UserSecurity implements Serializable {
      */
     private LocalDateTime updateTime;
 
-    /**
-     * 角色,权限
-     */
-    private Integer roleId;
 }

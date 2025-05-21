@@ -26,5 +26,5 @@ public class DiseaseDiagnosisIntermediation {
     /**
      * 疾病表id
      */
-    private Long diseaseId;
+    private Integer diseaseId;
 }

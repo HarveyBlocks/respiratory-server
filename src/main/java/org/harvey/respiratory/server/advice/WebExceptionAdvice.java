@@ -5,9 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.exception.*;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.sql.SQLException;
 
 /**
  * 异常处理增强
@@ -70,4 +74,23 @@ public class WebExceptionAdvice {
         return new Result<>(401, e.getMessage());
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public Result<NullPlaceholder> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        Throwable t = e;
+        while (t != null && !(t instanceof SQLException)) {
+            t = t.getCause();
+        }
+        if (t == null) {
+            t = e;
+        }
+        log.error("SQL错误, 依赖错误(外键)? 完整性异常(没给完整值)?: " + t.getMessage(), t);
+        return new Result<>(403, t.getMessage());
+
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Result<NullPlaceholder> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("Json格式错误: " + e.toString(), e);
+        return new Result<>(403, e.getMessage());
+    }
 }

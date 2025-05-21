@@ -61,7 +61,11 @@ public class ExpenseRecord {
      */
     @ApiModelProperty(value = "金额/分(int)")
     private Integer amount;
-
+    /**
+     * 数量(int)
+     */
+    @ApiModelProperty(value = "数量(int)")
+    private Integer count;
     /**
      * 描述(varchar(255))
      */

@@ -67,16 +67,15 @@ public class MedicalProviderDepartmentServiceImpl extends
     public MedicalProviderDepartment querySelf(long userId) {
         MedicalProvider medicalProvider = medicalProviderService.selectByUser(userId);
         if (medicalProvider == null) {
-            throw new ResourceNotFountException(
-                    "不能" + userId + "通过的身份证查询到医疗提供者信息");
+            throw new ResourceNotFountException("不能" + userId + "通过的身份证查询到医疗提供者信息");
         }
         Integer departmentId = medicalProvider.getDepartmentId();
         return queryById(departmentId);
     }
 
     @Override
-    public List<MedicalProviderDepartment> queryAny(int page, int limit) {
-        Page<MedicalProviderDepartment> departmentPage = super.lambdaQuery().page(new Page<>(page, limit));
+    public List<MedicalProviderDepartment> queryAny(Page<MedicalProviderDepartment> page) {
+        Page<MedicalProviderDepartment> departmentPage = super.lambdaQuery().page(page);
         return departmentPage.getRecords();
     }
 

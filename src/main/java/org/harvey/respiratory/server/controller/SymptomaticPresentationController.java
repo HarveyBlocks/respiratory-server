@@ -3,17 +3,19 @@ package org.harvey.respiratory.server.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.Data;
+import io.swagger.annotations.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.harvey.respiratory.server.exception.UnfinishedException;
-import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
+import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.SymptomaticPresentation;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
+import org.harvey.respiratory.server.service.SymptomaticPresentationService;
+import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -28,43 +30,54 @@ import java.util.List;
 @Api(tags = "症状")
 @RequestMapping("/symptomatic-presentation")
 public class SymptomaticPresentationController {
+    @Resource
+    private SymptomaticPresentationService symptomaticPresentationService;
+
     @DeleteMapping("/{id}")
     @ApiOperation("删除某一问诊的某一具体用药")
     public Result<NullPlaceholder> del(
             @PathVariable("id") @ApiParam(value = "症状id", required = true) Long id) {
         // 由于症状留证据, 所以是逻辑删除
         // 依据id删除
-        throw new UnfinishedException();
+        // 只有这次问诊的执行的医生有权限删除
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("未登录, 无权限");
+        }
+        String currentUserIdentityCardId = user.getIdentityCardId();
+        symptomaticPresentationService.logicDelete(id, currentUserIdentityCardId);
+        return Result.ok();
     }
+
 
     @PutMapping("/")
     @ApiOperation("更新症状")
-    public Result<NullPlaceholder> updatePatientDrugHistory(
+    @ApiResponse(code = 200, message = "对症状更新后的新ID")
+    public Result<Long> updatePatientDrugHistory(
             @RequestBody @ApiParam("symptomaticPresentation") SymptomaticPresentation symptomaticPresentation) {
         // 更新
-        throw new UnfinishedException();
+        UserDto user = UserHolder.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("未登录, 无权限");
+        }
+        String currentUserIdentityCardId = user.getIdentityCardId();
+        Long oldVersionId = symptomaticPresentation.getId();
+        if (oldVersionId == null) {
+            throw new BadRequestException("缺少更新的目标id");
+        }
+        symptomaticPresentation.setId(null);
+        return Result.success(symptomaticPresentationService.updateRetainTrace(currentUserIdentityCardId, oldVersionId,
+                symptomaticPresentation
+        ));
     }
 
-
-    @GetMapping(value = {"history/patient/{id}/{name}", "history/patient/{id}"})
-    @ApiOperation("查询病人既往用药史")
-    public Result<List<SpecificUsingDrugRecord>> queryPatientDrugHistoryByDrug(
-            @PathVariable("id") @ApiParam(value = "病患id", required = true) Long patientId,
-            @PathVariable(value = "name", required = false) @ApiParam(value = "药品名") Long name) {
-        // 病人可以查, 医生可以查
-        throw new UnfinishedException();
+    @GetMapping("visit/{id}")
+    @ApiOperation("查询该问诊的有关症状")
+    public Result<List<SymptomaticPresentation>> queryVisitDrug(
+            @PathVariable("id") @ApiParam(value = "问诊号", required = true) Long visitId) {
+        // 查询未逻辑删除的
+        return Result.success(symptomaticPresentationService.selectByVisitId(visitId));
     }
 
-    @GetMapping(value = {"history/patient/{id}/{start}/{end}", "history/patient/{id}/{start}", "history/patient/{id}"})
-    @ApiOperation("查询病人既往用药史")
-    public Result<List<SpecificUsingDrugRecord>> queryPatientDrugHistoryByDate(
-            @PathVariable("id") @ApiParam(value = "病患id", required = true) Long patientId,
-            @PathVariable(value = "start", required = false) @ApiParam(value = "yyyy-MM-dd, 0补前") String startDate,
-            @PathVariable(value = "end", required = false) @ApiParam(value = "yyyy-MM-dd, 0补前, 如果不给出, 则是当前日期") String endDate) {
-        // 病人可以查自己登记过的病人, 医生可以查自己问诊的病人, 主管医生可以查任何病人
-        LocalDate now = LocalDate.now();
-        // param.startDate<drug.end or drug.start < param.endDate, 表示在时间范围内的用药
-        throw new UnfinishedException();
-    }
 
 }

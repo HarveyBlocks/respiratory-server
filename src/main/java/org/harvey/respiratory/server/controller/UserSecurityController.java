@@ -13,7 +13,6 @@ import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
 import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
-import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.UserSecurityService;
@@ -164,7 +163,7 @@ public class UserSecurityController {
             stringRedisTemplate.opsForHash().putAll(key, map);
         }
         return new Result<>(
-                new UserDto(Role.UNKNOWN, 1L, "name", "350121200410080032"/*TODO 测试数据不好, 因为验证位没有被验证*/));
+                new UserDto(1L, "name", "350121200410080032"));
     }
 
     @ApiOperation(value = "更新用户信息, 也是用身份证实名, 实名之后可确认权限-病人/医生",
@@ -178,14 +177,17 @@ public class UserSecurityController {
         if (user == null) {
             throw new UnauthorizedException("未知的角色");
         }
-        Role role = user.getRole();
+        // 只能设置自己
+        userDTO.setId(user.getId());
+        String identityCardId = user.getIdentityCardId();
 
         // 怎么查询权限有没有呢? 当前用户是不是TODO
-        if (role.ordinal() >= Role.CHARGE_DOCTOR.ordinal()) {
-            throw new UnauthorizedException("没有更新的权限");
+        if (identityCardId == null || identityCardId.isEmpty()) {
+            throw new UnauthorizedException("没实名就没有更新的权限");
         }
 
-        userSecurityService.updateUser(userDTO, request.getHeader(Constants.AUTHORIZATION_HEADER));
+        String token = request.getHeader(Constants.AUTHORIZATION_HEADER);
+        userSecurityService.updateUser(userDTO, token);
         return Result.ok();
     }
 

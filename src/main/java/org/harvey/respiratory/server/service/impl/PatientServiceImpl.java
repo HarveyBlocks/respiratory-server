@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.PatientMapper;
@@ -12,8 +13,10 @@ import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
+import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.HealthcareService;
 import org.harvey.respiratory.server.service.PatientService;
+import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.service.UserPatientIntermediationService;
 import org.harvey.respiratory.server.util.RegexUtils;
 import org.harvey.respiratory.server.util.identifier.IdentifierCardId;
@@ -83,7 +86,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
             Patient patientFromDb, Healthcare healthcare, long currentUserId) {
         // 查询是否user-patient建立关系
         Long patientId = patientFromDb.getId();
-        if (!userPatientIntermediationService.exist(currentUserId, patientId)) {
+        if (!userPatientIntermediationService.existRelation(currentUserId, patientId)) {
             // 如果没有建立关系, 需要建立关系
             userPatientIntermediationService.register(currentUserId, patientId);
         }
@@ -157,7 +160,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
 
     @Override
     public void updatePatient(Patient patient, long currentUserId) {
-        boolean exist = userPatientIntermediationService.exist(currentUserId, patient.getId());
+        boolean exist = userPatientIntermediationService.existRelation(currentUserId, patient.getId());
         if (!exist) {
             throw new UnauthorizedException("不能更新无关患者的信息");
         }
@@ -177,10 +180,10 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     private PatientMapper patientMapper;
 
     @Override
-    public List<PatientDto> querySelfPatients(long currentUserId, int page, int limit) {
+    public List<PatientDto> querySelfPatients(long currentUserId, Page<Patient> page) {
         log.debug("准备查询当前用户的有关患者");
-        int start = (page - 1) * limit;
-        List<PatientDto> results = patientMapper.queryByRegisterUser(currentUserId, start, limit);
+        int start = (int) ((page.getCurrent() - 1) * page.maxLimit());
+        List<PatientDto> results = patientMapper.queryByRegisterUser(currentUserId, start, page.maxLimit().intValue());
         log.debug("查询当前用户的有关患者成功!, 有记录: {} 条", results.size());
         return results;
     }
@@ -220,7 +223,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         if (patient == null) {
             throw new ResourceNotFountException("依据身份证号" + cardId + "未找到患者");
         }
-        boolean exist = userPatientIntermediationService.exist(currentUserId, patient.getId());
+        // 用身份证查询完毕之后, 就绑定了这个用户和这个病患的关系是吧...
+        boolean exist = userPatientIntermediationService.existRelation(currentUserId, patient.getId());
         if (!exist) {
             // 注册
             userPatientIntermediationService.register(currentUserId, patient.getId());
@@ -232,6 +236,12 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         return PatientDto.union(patient, healthcare);
     }
 
+    @Override
+    public void deletePatient(long patientId, long currentUserId) {
+        this.userPatientIntermediationService.delete(patientId, currentUserId);
+    }
+
+
     private Patient queryById0(long patientId) {
         Patient patient = super.getById(patientId);
         if (patient == null) {
@@ -240,29 +250,34 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         return patient;
     }
 
+    @Resource
+    private RoleService roleService;
+
     /**
      * 是否有查询任意病患的权限
      */
     private void validRoleOnQueryAny(UserDto user, Patient patient) {
-        switch (user.getRole()) {
+        Role role = roleService.queryRole(user.getIdentityCardId());
+        switch (role) {
+            case UNKNOWN:
+                throw new UnauthorizedException("没有获取其他病患的权限");
             case PATIENT:
                 Long userId = user.getId();
                 Long patientId = patient.getId();
-                boolean exist = userPatientIntermediationService.exist(userId, patientId);
+                boolean exist = userPatientIntermediationService.existRelation(userId, patientId);
                 if (!exist) {
                     log.warn("用户{}由于权限不能获取患者{}", userId, patientId);
                     throw new UnauthorizedException("没有获取其他病患的权限");
                 }
-            case UNKNOWN:
-                throw new UnauthorizedException("没有获取其他病患的权限");
             case NORMAL_DOCTOR:
             case CHARGE_DOCTOR:
             case MEDICATION_DOCTOR:
             case DEVELOPER:
             case DATABASE_ADMINISTRATOR:
+                // 直接过
                 break;
             default:
-                throw new ServerException("Unexpected role value: " + user.getRole());
+                throw new ServerException("Unexpected role value: " + role);
         }
     }
 
@@ -272,5 +287,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
             log.warn("依据医保id{}未找到患者", healthcare);
         }
         return patient;
+    }
+
+
+    @Override
+    public Patient queryByIdSimply(long patientId) {
+        return super.lambdaQuery().eq(Patient::getId, patientId).one();
+    }
+
+    @Override
+    public Patient queryByCardIdSimply(String identifierCardId) {
+        return super.lambdaQuery().eq(Patient::getIdentityCardId, identifierCardId).one();
     }
 }

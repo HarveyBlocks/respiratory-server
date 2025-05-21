@@ -12,6 +12,8 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.MedicalProviderFormService;
+import org.harvey.respiratory.server.service.RoleService;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.RoleConstant;
 import org.harvey.respiratory.server.util.RoleUtil;
 import org.harvey.respiratory.server.util.UserHolder;
@@ -34,6 +36,8 @@ import java.util.List;
 public class MedicalProviderFormController {
     @Resource
     private MedicalProviderFormService medicalProviderFormService;
+    @Resource
+    private RoleService roleService;
 
     @PostMapping("/register")
     @ApiOperation("登记医疗提供机构信息")
@@ -44,7 +48,7 @@ public class MedicalProviderFormController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         return Result.success(medicalProviderFormService.register(form));
     }
 
@@ -59,7 +63,7 @@ public class MedicalProviderFormController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderFormService.update(form);
         return Result.ok();
     }
@@ -72,7 +76,7 @@ public class MedicalProviderFormController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderFormService.delete(id);
         return Result.ok();
     }
@@ -86,7 +90,7 @@ public class MedicalProviderFormController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_READ);
         return Result.success(medicalProviderFormService.querySelf(user.getId()));
     }
 
@@ -98,13 +102,7 @@ public class MedicalProviderFormController {
             Integer page,
             @PathVariable(value = "limit", required = false)
             @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
-        if (page == null) {
-            page = 1;
-        }
-        if (limit == null) {
-            limit = Constants.DEFAULT_PAGE_SIZE;
-        }
-        return Result.success(medicalProviderFormService.queryAny(page, limit));
+        return Result.success(medicalProviderFormService.queryAny(ConstantsInitializer.initPage(page, limit)));
     }
 
 
@@ -118,8 +116,7 @@ public class MedicalProviderFormController {
     @GetMapping("/name/{name}")
     @ApiOperation("依据名字查询医疗提供机构信息")
     public Result<List<MedicalProviderForm>> queryByName(
-            @PathVariable(value = "name") @ApiParam(value = "依据姓名模糊查询医疗提供机构")
-            String name) {
+            @PathVariable(value = "name") @ApiParam(value = "依据姓名模糊查询医疗提供机构") String name) {
         if (name.isEmpty()) {
             throw new BadRequestException("name can not be empty");
         }
@@ -129,8 +126,7 @@ public class MedicalProviderFormController {
     @GetMapping("/address/{address}")
     @ApiOperation("依据地址查询医疗提供机构信息")
     public Result<List<MedicalProviderForm>> queryByAddress(
-            @PathVariable(value = "address") @ApiParam(value = "依据地址模糊查询医疗提供机构")
-            String address) {
+            @PathVariable(value = "address") @ApiParam(value = "依据地址模糊查询医疗提供机构") String address) {
         if (address.isEmpty()) {
             throw new BadRequestException("address can not be empty");
         }

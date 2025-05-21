@@ -20,8 +20,8 @@ import lombok.NoArgsConstructor;
 public class TakeVisitNumberDto {
 
     @ApiModelProperty(value = "患者id, 不可以null,让用户在自己的系统上选择自己注册的几位病人", required = true)
-    private long patientId;
+    private Long patientId;
 
     @ApiModelProperty(value = "医疗服务者id, 不可以null,让用户在自己的系统上选择中意的医疗提供者", required = true)
-    private long medicalProviderId;
+    private Long medicalProviderId;
 }

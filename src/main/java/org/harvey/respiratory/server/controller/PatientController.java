@@ -7,13 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
-import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.dto.PatientDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.PatientService;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +47,18 @@ public class PatientController {
         return Result.success(patientService.registerPatientInformation(patientDto, currentUserId));
     }
 
+    @DeleteMapping("/{id}")
+    @ApiOperation("删除Patient, 实际上是删除这个用户和patient的联系")
+    public Result<NullPlaceholder> registerPatientInformation(
+            @PathVariable("id") @ApiParam("patient id") Long patientId) {
+        Long currentUserId = UserHolder.currentUserId();
+        if (currentUserId == null) {
+            throw new UnauthorizedException("登录后可使用");
+        }
+        patientService.deletePatient(patientId, currentUserId);
+        return Result.ok();
+    }
+
     @PutMapping("/")
     @ApiOperation("更新患者信息, 不会更新医保信息")
     public Result<NullPlaceholder> update(
@@ -77,29 +89,24 @@ public class PatientController {
             @PathVariable(value = "page", required = false) @ApiParam(value = "查询页码", defaultValue = "1")
             Integer page,
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "查询页长", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit
-    ) {
+            @ApiParam(value = "查询页长", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
         Long currentUserId = UserHolder.currentUserId();
         if (currentUserId == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        if (page == null) {
-            page = 1;
-        }
-        if (limit == null) {
-            limit = Constants.DEFAULT_PAGE_SIZE;
-        }
-        return Result.success(patientService.querySelfPatients(currentUserId, page, limit));
+        return Result.success(
+                patientService.querySelfPatients(currentUserId, ConstantsInitializer.initPage(page, limit)));
     }
 
     @GetMapping("/healthcare/{code}")
     @ApiOperation("依据医保号查询")
-    public Result<PatientDto> queryPatientByHealthcareId(@PathVariable("code") @ApiParam("医保号") Long healthcareCode) {
+    public Result<PatientDto> queryPatientByHealthcareId(
+            @PathVariable("code") @ApiParam("医保号") Long healthcareCode) {
         UserDto user = UserHolder.getUser();
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        if(healthcareCode==null){
+        if (healthcareCode == null) {
             throw new UnauthorizedException("需要医保");
         }
         return Result.success(patientService.queryByHealthcare(user, healthcareCode));

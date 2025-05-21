@@ -1,15 +1,20 @@
 package org.harvey.respiratory.server.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.UnfinishedException;
-import org.harvey.respiratory.server.pojo.dto.FillDrugDto;
 import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
+import org.harvey.respiratory.server.service.DrugService;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
+import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -24,21 +29,20 @@ import java.util.List;
 @Api(tags = {"具体药物"})
 @RequestMapping("/drug")
 public class DrugController {
+    @Resource
+    private DrugService drugService;
+
     @DeleteMapping("/{id}")
     @ApiOperation("删除某一药品")
     public Result<NullPlaceholder> del(
             @PathVariable("id") @ApiParam(value = "药品id", required = true) Long drugId) {
-        throw new UnfinishedException();
+        // 必须要有主管医生权限
+        drugService.writeValid(UserHolder.getUser());
+        drugService.deleteById(drugId);
+        return Result.ok();
     }
 
-    @GetMapping("/visit/{id}")
-    @ApiOperation(value = "查询抓药信息")
-    @ApiResponses({@ApiResponse(code = 200, message = "ok")})
-    public Result<List<FillDrugDto>> queryDrugForFill(
-            @PathVariable("id") @ApiParam(value = "问诊号", required = true) Long visitId) {
-        // 病人可以查, 医生可以查
-        throw new UnfinishedException();
-    }
+
 
 
     @GetMapping("/{id}")
@@ -46,7 +50,7 @@ public class DrugController {
     public Result<Drug> queryById(
             @PathVariable("id") @ApiParam(value = "药物id", required = true) Long id) {
         // 病人可以查, 医生可以查, 费用可以查吗?
-        throw new UnfinishedException();
+        return Result.success(drugService.queryById(id));
     }
 
     @GetMapping(value = {"/name/{name}/{page}/{limit}", "/name/{name}/{page}", "/name/{name}"})
@@ -55,11 +59,9 @@ public class DrugController {
             @PathVariable("name") @ApiParam(value = "药物名", required = true) String name,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
-            @PathVariable(value = "limit", required = false) @ApiParam(value = "页长",
-                    defaultValue =  Constants.DEFAULT_PAGE_SIZE_MSG)
-            Integer limit
-    ) {
+            @PathVariable(value = "limit", required = false)
+            @ApiParam(value = "页长", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
         // 用药物名模糊查询药物
-        throw new UnfinishedException();
+        return Result.success(drugService.queryByName(name, ConstantsInitializer.initPage(page, limit)));
     }
 }

@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -12,6 +13,8 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.MedicalProviderJobService;
+import org.harvey.respiratory.server.service.RoleService;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.RoleConstant;
 import org.harvey.respiratory.server.util.RoleUtil;
 import org.harvey.respiratory.server.util.UserHolder;
@@ -34,9 +37,12 @@ import java.util.List;
 public class MedicalProviderJobController {
     @Resource
     private MedicalProviderJobService medicalProviderJobService;
+    @Resource
+    private RoleService roleService;
 
     @PostMapping("/register")
     @ApiOperation("登记医生职业信息")
+    @ApiResponse(code = 200, message = "回复新增后的职业id")
     public Result<Integer> register(
             @RequestBody @ApiParam("新增时, 除id, 和医保相关外, 字段都不得为null.") MedicalProviderJob job) {
         // 当前用户必须是主管/开发者
@@ -44,7 +50,7 @@ public class MedicalProviderJobController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         return Result.success(medicalProviderJobService.register(job));
     }
 
@@ -59,7 +65,7 @@ public class MedicalProviderJobController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderJobService.update(job);
         return Result.ok();
     }
@@ -72,7 +78,7 @@ public class MedicalProviderJobController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderJobService.delete(id);
         return Result.ok();
     }
@@ -86,7 +92,7 @@ public class MedicalProviderJobController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
+        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_READ);
         return Result.success(medicalProviderJobService.querySelf(user.getId()));
     }
 
@@ -98,13 +104,7 @@ public class MedicalProviderJobController {
             Integer page,
             @PathVariable(value = "limit", required = false)
             @ApiParam(value = "页面长度", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
-        if (page == null) {
-            page = 1;
-        }
-        if (limit == null) {
-            limit = Constants.DEFAULT_PAGE_SIZE;
-        }
-        return Result.success(medicalProviderJobService.queryAny(page, limit));
+        return Result.success(medicalProviderJobService.queryAny(ConstantsInitializer.initPage(page, limit)));
     }
 
 

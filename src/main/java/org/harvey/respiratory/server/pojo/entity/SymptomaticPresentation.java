@@ -3,6 +3,8 @@ package org.harvey.respiratory.server.pojo.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.harvey.respiratory.server.pojo.enums.Severity;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 症状表现表
@@ -69,7 +71,8 @@ public class SymptomaticPresentation {
     /**
      * 开始时间(date)
      */
-    @ApiModelProperty(value = "开始时间(date)")
+    @ApiModelProperty(value = "症状开始时间(date)")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date startTime;
     /**
      * 诱因(varchar(63))
@@ -86,14 +89,62 @@ public class SymptomaticPresentation {
      */
     @ApiModelProperty(value = "体征描述(varchar(63))")
     private String signDescription;
+
+
     /**
      * 描述(TEXT)
      */
     @ApiModelProperty(value = "描述(TEXT)")
     private String description;
+
+    @ApiModelProperty(value = "创建/更新时间,服务器会给出, readonly")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    private Date createTime;
+
     /**
      * 逻辑删除
      */
     @ApiModelProperty(value = "逻辑删除", hidden = true)
+    @JsonIgnore
     private Boolean deleted;
+
+    @ApiModelProperty(value = "指向老版本, 默认为null, 表示不指向, 初版", hidden = true)
+    @JsonIgnore
+    private Long oldVersionId;
+
+    public void resetForNewInsert() {
+        this.deleted = false;
+        this.id = null;
+        this.oldVersionId = null;
+        this.createTime = null;
+    }
+
+    public void updateFromOldVersionIgnoreNull(SymptomaticPresentation old) {
+        if (this.getName() == null) {
+            this.setName(old.getName());
+        }
+        if (this.getSeverity() == null) {
+            this.setSeverity(old.getSeverity());
+        }
+        if (this.getFrequency() == null) {
+            this.setFrequency(old.getFrequency());
+        }
+        if (this.getStartTime() == null) {
+            this.setStartTime(old.getStartTime());
+        }
+        if (this.getIncentive() == null) {
+            this.setIncentive(old.getIncentive());
+        }
+        if (this.getEnvironmentalFactor() == null) {
+            this.setEnvironmentalFactor(old.getEnvironmentalFactor());
+        }
+        if (this.getSignDescription() == null) {
+            this.setSignDescription(old.getSignDescription());
+        }
+        if (this.getDescription() == null) {
+            this.setDescription(old.getDescription());
+        }
+        resetForNewInsert();
+        this.setOldVersionId(old.getId());
+    }
 }

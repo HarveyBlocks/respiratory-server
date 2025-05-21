@@ -13,7 +13,7 @@ import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.Patient;
 import org.harvey.respiratory.server.pojo.enums.Sex;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -46,7 +46,7 @@ public class PatientDto {
     private Sex sex;
 
     @ApiModelProperty(value = "出生日期, 不可为null", required = true)
-    @JsonFormat(pattern = "yyyyMMdd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date birthDate;
 
     @ApiModelProperty(value = "家庭住址(varchar(255)), 不可为null", required = true)

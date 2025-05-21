@@ -4,6 +4,8 @@ package org.harvey.respiratory.server.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.DiseaseDiagnosisIntermediation;
 
+import java.util.List;
+
 /**
  * 疾病
  *
@@ -13,4 +15,11 @@ import org.harvey.respiratory.server.pojo.entity.DiseaseDiagnosisIntermediation;
  */
 
 public interface DiseaseDiagnosisIntermediationService extends IService<DiseaseDiagnosisIntermediation> {
+    List<Integer> selectDiseaseByVisit(long visitId);
+
+    /**
+     * 校验由外界决定
+     */
+    void saveOnInterview(long visitDoctorId, List<Integer> diseaseIds);
+
 }

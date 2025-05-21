@@ -1,8 +1,8 @@
 package org.harvey.respiratory.server.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public interface MedicalProviderDepartmentService extends IService<MedicalProvid
      */
     MedicalProviderDepartment querySelf(long userId);
 
-    List<MedicalProviderDepartment> queryAny(int page, int limit);
+    List<MedicalProviderDepartment> queryAny(Page<MedicalProviderDepartment> page);
 
     MedicalProviderDepartment queryById(int departmentId);
 

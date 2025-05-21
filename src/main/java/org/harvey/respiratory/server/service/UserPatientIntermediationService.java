@@ -4,6 +4,8 @@ package org.harvey.respiratory.server.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
 
+import java.util.List;
+
 /**
  * 用户患者中间表
  *
@@ -13,6 +15,10 @@ import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
  */
 
 public interface UserPatientIntermediationService extends IService<UserPatientIntermediation> {
-    boolean exist(long userId, long patientId);
+    boolean existRelation(long userId, long patientId);
     boolean register(long userId, long patientId);
+
+    boolean delete(long patientId, long userId);
+
+    List<Long> queryPatientOnUser(long userId);
 }
