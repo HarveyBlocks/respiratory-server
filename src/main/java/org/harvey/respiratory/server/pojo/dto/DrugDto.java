@@ -1,15 +1,17 @@
 package org.harvey.respiratory.server.pojo.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
 
 /**
- * TODO
+ * 药品信息
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0

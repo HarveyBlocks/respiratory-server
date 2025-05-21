@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 /**
- * TODO
+ * 身份证的解析对象
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0

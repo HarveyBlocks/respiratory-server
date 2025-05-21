@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 /**
- * TODO
+ * 依据常量的初始化工具
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0

@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * TODO
+ * 问诊一次会上传的信息
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0

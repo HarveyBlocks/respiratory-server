@@ -54,7 +54,7 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
         if (deleted) {
             log.debug("删除职业成功");
         } else {
-            // TODO 其实可能是因为并发环境下同时删除产生的重复删的问题
+            //  其实可能是因为并发环境下同时删除产生的重复删的问题
             throw new DaoException(DaoException.Operation.DELETE_FAIL, "未能删除职业, 未知原因");
         }
     }

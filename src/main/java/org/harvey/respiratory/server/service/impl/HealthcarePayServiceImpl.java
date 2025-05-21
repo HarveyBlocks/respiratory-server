@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 /**
- * TODO
- *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-21 23:11
@@ -45,7 +43,6 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
 
     @Override
     public int recharge(RechargeDto rechargeDto) {
-        // TODO 查询的时候没有上锁
         Integer amount = rechargeDto.getAmount();
         if (amount == null || amount <= 0) {
             throw new ResourceNotFountException("充值的金额必须是正数");

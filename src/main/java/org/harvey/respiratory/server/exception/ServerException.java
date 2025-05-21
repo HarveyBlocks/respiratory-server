@@ -1,7 +1,7 @@
 package org.harvey.respiratory.server.exception;
 
 /**
- * TODO  ServerException的异常
+ *   ServerException的异常
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
