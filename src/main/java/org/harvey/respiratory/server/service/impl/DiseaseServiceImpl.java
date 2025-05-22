@@ -4,9 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.DiseaseMapper;
+import org.harvey.respiratory.server.exception.ServerException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Disease;
+import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.DiseaseDiagnosisIntermediationService;
 import org.harvey.respiratory.server.service.DiseaseService;
+import org.harvey.respiratory.server.service.RoleService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,6 +31,8 @@ import java.util.stream.Collectors;
 public class DiseaseServiceImpl extends ServiceImpl<DiseaseMapper, Disease> implements DiseaseService {
     @Resource
     private DiseaseDiagnosisIntermediationService diseaseDiagnosisIntermediationService;
+    @Resource
+    private RoleService roleService;
 
     @Override
     public void deleteById(int id) {
@@ -75,5 +82,37 @@ public class DiseaseServiceImpl extends ServiceImpl<DiseaseMapper, Disease> impl
                 .stream()
                 .map(Disease::getName)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void validOnWrite(UserDto user) {
+        if (user == null) {
+            throw new UnauthorizedException("未登录不能执行");
+        }
+        String identityCardId = user.getIdentityCardId();
+        if (identityCardId == null) {
+            throw new UnauthorizedException("未实名不能执行");
+        }
+        Role role = roleService.queryRole(identityCardId);
+        switch (role) {
+            case UNKNOWN:
+            case PATIENT:
+            case NORMAL_DOCTOR:
+            case MEDICATION_DOCTOR:
+                throw new UnauthorizedException("权限不足");
+            case CHARGE_DOCTOR:
+            case DEVELOPER:
+            case DATABASE_ADMINISTRATOR:
+                break;
+            default:
+                throw new ServerException("Unexpected role value: " + role);
+        }
+    }
+
+    @Override
+    public Integer register(Disease disease) {
+        disease.setId(null);
+        super.save(disease);
+        return disease.getId();
     }
 }

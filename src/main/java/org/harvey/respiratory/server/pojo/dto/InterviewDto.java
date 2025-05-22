@@ -49,6 +49,10 @@ public class InterviewDto {
     @ApiModelProperty(value = "疾病诊断, 可以为empty, 不可为null", required = true)
     private List<Integer> diseaseIds;
 
+    public static String joinBriefDescription(List<String> diseaseNames) {
+        return String.join(",", diseaseNames);
+    }
+
     /**
      * 生成visit doctor 实体
      */
@@ -58,11 +62,6 @@ public class InterviewDto {
                 totalPrice, true, false, null
         );
     }
-
-    public static String joinBriefDescription(List<String> diseaseNames) {
-        return String.join(",", diseaseNames);
-    }
-
 
     @Data
     @EqualsAndHashCode(callSuper = false)

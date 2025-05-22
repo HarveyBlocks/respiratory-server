@@ -61,11 +61,6 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
         }
     }
 
-    private static MedicalProvider currentProxy() {
-        return (MedicalProvider) AopContext.currentProxy();
-    }
-
-
     @Override
     public MedicalProvider selectByUser(long userId) {
         UserSecurity userSecurity = userSecurityService.selectById(userId);

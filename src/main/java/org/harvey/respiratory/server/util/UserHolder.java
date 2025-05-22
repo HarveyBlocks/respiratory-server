@@ -29,7 +29,7 @@ public class UserHolder {
     public static Long currentUserId() {
 
         UserDto user = getUser();
-        if (user==null){
+        if (user == null) {
             throw new UnauthorizedException("未登录");
         }
         return user.getId();

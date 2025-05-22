@@ -4,7 +4,6 @@ package org.harvey.respiratory.server.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
-import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 
 /**
  * 医院科室

@@ -28,6 +28,9 @@ import java.util.List;
 public class MedicalProviderFormServiceImpl extends
         ServiceImpl<MedicalProviderFormMapper, MedicalProviderForm> implements MedicalProviderFormService {
 
+    @Resource
+    private MedicalProviderService medicalProviderService;
+
     @Override
     public Integer register(MedicalProviderForm form) {
         boolean saved = super.save(form);
@@ -58,10 +61,6 @@ public class MedicalProviderFormServiceImpl extends
             throw new DaoException(DaoException.Operation.DELETE_FAIL, "未能删除机构, 未知原因");
         }
     }
-
-
-    @Resource
-    private MedicalProviderService medicalProviderService;
 
     @Override
     public MedicalProviderForm querySelf(long userId) {
@@ -94,7 +93,6 @@ public class MedicalProviderFormServiceImpl extends
         if (name.isEmpty()) {
             throw new BadRequestException("机构退化成全查, 这不好");
         }
-        // TODO 还得是倒排索引
         return super.lambdaQuery().like(MedicalProviderForm::getName, name).list();
     }
 
@@ -103,7 +101,6 @@ public class MedicalProviderFormServiceImpl extends
         if (address.isEmpty()) {
             throw new BadRequestException("机构退化成全查, 这不好");
         }
-        // TODO 还得是倒排索引
         return super.lambdaQuery().like(MedicalProviderForm::getAddress, address).list();
     }
 }

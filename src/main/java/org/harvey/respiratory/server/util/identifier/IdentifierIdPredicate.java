@@ -28,6 +28,11 @@ public class IdentifierIdPredicate implements Predicate<String> {
         this.openCheckCode = openCheckCode;
     }
 
+    public static void main(String[] args) {
+        IdentifierIdPredicate identifierIdPredicate = new IdentifierIdPredicate(true);
+        System.out.println(identifierIdPredicate.test("330282200410080030"));
+    }
+
     @Override
     public boolean test(String sequence) {
         if (sequence == null) {
@@ -94,10 +99,5 @@ public class IdentifierIdPredicate implements Predicate<String> {
             sum += Integer.parseInt(sequence.substring(i, i + 1)) * FACTOR[i];
         }
         return PARITY[sum % 11] == Character.toUpperCase(code);
-    }
-
-    public static void main(String[] args) {
-        IdentifierIdPredicate identifierIdPredicate = new IdentifierIdPredicate(true);
-        System.out.println(identifierIdPredicate.test("330282200410080030"));
     }
 }

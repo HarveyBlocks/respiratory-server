@@ -62,6 +62,38 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         return (DoctorInterviewService) AopContext.currentProxy();
     }
 
+    /**
+     * 映射症状dto->entity
+     */
+    private static List<SymptomaticPresentation> getSymptomaticPresentationList(
+            List<InterviewDto.SymptomaticPresentationDto> symptomaticPresentationDtoList, Long visitDoctorId) {
+        if (symptomaticPresentationDtoList == null) {
+            throw new BadRequestException("symptomaticPresentationList 不能为null");
+        }
+        return symptomaticPresentationDtoList.stream()
+                .map(sp -> sp.buildSymptomaticPresentation(visitDoctorId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 生成药物具体使用的记录, 数据库entity
+     */
+    private static List<SpecificUsingDrugRecord> getSpecificUsingDrugRecords(
+            List<InterviewDto.SpecificUsingDrugRecordDto> usingDrugDto, Long visitDoctorId, Long patientId) {
+        return usingDrugDto.stream()
+                .map(dto -> dto.buildSpecificUsingDrugRecord(visitDoctorId, patientId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 将所有费用记录相加, 获取总费用
+     */
+    private static int summarizeExpense(List<ExpenseRecord> expenseRecordList) {
+        return (int) expenseRecordList.stream()
+                .collect(Collectors.summarizingInt(r -> r.getAmount() * r.getCount()))
+                .getSum();
+    }
+
     @Override
     public void interview(InterviewDto interviewDto, String identityCardId) {
         Long visitDoctorId = interviewDto.getVisitDoctorId();
@@ -109,7 +141,6 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
                 visitDoctor.getId(), expenseRecordList, usingDrugRecords, symptomaticPresentationList, diseaseIds);
     }
 
-
     /**
      * 这个工作一定要问诊的这个医生做
      */
@@ -134,7 +165,6 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         }
     }
 
-
     /**
      * 添加医生的有关的费用
      */
@@ -154,20 +184,6 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         );
         expenseRecordList.add(expenseRecordOnDepartment);
     }
-
-    /**
-     * 映射症状dto->entity
-     */
-    private static List<SymptomaticPresentation> getSymptomaticPresentationList(
-            List<InterviewDto.SymptomaticPresentationDto> symptomaticPresentationDtos, Long visitDoctorId) {
-        if (symptomaticPresentationDtos == null) {
-            throw new BadRequestException("symptomaticPresentationList 不能为null");
-        }
-        return symptomaticPresentationDtos.stream()
-                .map(sp -> sp.buildSymptomaticPresentation(visitDoctorId))
-                .collect(Collectors.toList());
-    }
-
 
     /**
      * 从药物使用中取出药物id,查询出药物单价, 与药物数量相乘, 并生成费用记录
@@ -190,27 +206,6 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
             );
             expenseRecordList.add(expenseRecordOnDrug);
         }
-    }
-
-
-    /**
-     * 生成药物具体使用的记录, 数据库entity
-     */
-    private static List<SpecificUsingDrugRecord> getSpecificUsingDrugRecords(
-            List<InterviewDto.SpecificUsingDrugRecordDto> usingDrugDto, Long visitDoctorId, Long patientId) {
-        return usingDrugDto.stream()
-                .map(dto -> dto.buildSpecificUsingDrugRecord(visitDoctorId, patientId))
-                .collect(Collectors.toList());
-    }
-
-
-    /**
-     * 将所有费用记录相加, 获取总费用
-     */
-    private static int summarizeExpense(List<ExpenseRecord> expenseRecordList) {
-        return (int) expenseRecordList.stream()
-                .collect(Collectors.summarizingInt(r -> r.getAmount() * r.getCount()))
-                .getSum();
     }
 
     /**

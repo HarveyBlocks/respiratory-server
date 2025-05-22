@@ -5,14 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.dto.PayDto;
 import org.harvey.respiratory.server.pojo.dto.QueryBalanceDto;
 import org.harvey.respiratory.server.pojo.dto.RechargeDto;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.HealthcarePayService;
-import org.harvey.respiratory.server.service.HealthcareService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -65,7 +63,8 @@ public class HealthcarePayController {
     @PutMapping("balance/healthcare/{healthcareId}")
     @ApiResponse(code = 200, message = "返回余额")
     public Result<Integer> queryBalance(
-            @PathVariable("healthcareId") @ApiParam(value = "医保号id", required = true) QueryBalanceDto queryBalanceDto) {
+            @PathVariable("healthcareId") @ApiParam(value = "医保号id", required = true)
+            QueryBalanceDto queryBalanceDto) {
         // 找不到医保, 抛出异常, 让用户重新创建医保
         return Result.success(healthcarePayService.queryBalance(queryBalanceDto));
     }

@@ -39,9 +39,6 @@ public class RestfulResponseAdvice implements ResponseBodyAdvice<Object> {
             MediaType selectedContentType,
             Class selectedConverterType,
             ServerHttpRequest request, ServerHttpResponse response) {
-//        System.out.println("-----------------beforeBodyWrite-----------------");
-//        System.out.println(body);
-//        if (response.setStatusCode());
         return new Result<>(body);
     }
 }

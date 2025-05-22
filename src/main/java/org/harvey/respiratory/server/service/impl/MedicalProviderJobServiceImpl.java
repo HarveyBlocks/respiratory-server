@@ -27,6 +27,9 @@ import java.util.List;
 @Service
 public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJobMapper, MedicalProviderJob> implements
         MedicalProviderJobService {
+    @Resource
+    private MedicalProviderService medicalProviderService;
+
     @Override
     public Integer register(MedicalProviderJob job) {
         boolean saved = super.save(job);
@@ -59,10 +62,6 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
         }
     }
 
-
-    @Resource
-    private MedicalProviderService medicalProviderService;
-
     @Override
     public MedicalProviderJob querySelf(long userId) {
         MedicalProvider medicalProvider = medicalProviderService.selectByUser(userId);
@@ -94,7 +93,6 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
         if (name.isEmpty()) {
             throw new BadRequestException("职业退化成全查, 这不好");
         }
-        // TODO 还得是倒排索引
         return super.lambdaQuery().like(MedicalProviderJob::getName, name).list();
     }
 

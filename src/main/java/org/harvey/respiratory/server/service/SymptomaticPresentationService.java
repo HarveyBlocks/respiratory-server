@@ -2,7 +2,6 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
 import org.harvey.respiratory.server.pojo.entity.SymptomaticPresentation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +34,12 @@ public interface SymptomaticPresentationService extends IService<SymptomaticPres
     /**
      * 只允许服务器内调用, 只有医生用户可调用
      * 外部进行校验
+     *
      * @return 插入后的多个症状的id
      */
     @Transactional
     List<Long> saveSymptomaticPresentationBatch(List<SymptomaticPresentation> presentationList);
+
     /**
      * 读不出已经逻辑删除的
      */

@@ -30,7 +30,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @ApiModel(description = "患者信息")
 public class PatientDto {
-    @ApiModelProperty(value = "患者的id, 服务端生成, 只可读", required = false)
+    @ApiModelProperty(value = "患者的id, 服务端生成, 只可读")
     private Long id;
     @ApiModelProperty(value = "手机号码(unique, char(11)), 监护人电话, 不可为null", required = true)
     private String phone;
@@ -68,8 +68,7 @@ public class PatientDto {
     private Integer balance;
 
     /**
-     *
-     * @param patient not null
+     * @param patient    not null
      * @param healthcare not null
      */
     public static PatientDto union(Patient patient, Healthcare healthcare) {

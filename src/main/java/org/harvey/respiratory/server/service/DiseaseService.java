@@ -3,8 +3,8 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Disease;
-import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 
 import java.util.List;
 
@@ -30,4 +30,8 @@ public interface DiseaseService extends IService<Disease> {
     List<Integer> queryIdsByName(String diseaseName);
 
     List<String> queryDiseaseNameByIds(List<Integer> diseaseIds);
+
+    void validOnWrite(UserDto user);
+
+    Integer register(Disease disease);
 }

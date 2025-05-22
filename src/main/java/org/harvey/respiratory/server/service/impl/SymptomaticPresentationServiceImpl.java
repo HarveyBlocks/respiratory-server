@@ -44,6 +44,9 @@ public class SymptomaticPresentationServiceImpl extends
     @Resource
     private UserSecurityService userSecurityService;
 
+    private static SymptomaticPresentationService currentProxy() {
+        return (SymptomaticPresentationService) AopContext.currentProxy();
+    }
 
     @Override
     public void logicDelete(Long targetId, String currentUserIdentityCardId) {
@@ -148,11 +151,6 @@ public class SymptomaticPresentationServiceImpl extends
             throw new UnauthorizedException("不是本症状的提交者, 无权限");
         }
     }
-
-    private static SymptomaticPresentationService currentProxy() {
-        return (SymptomaticPresentationService) AopContext.currentProxy();
-    }
-
 
     @Override
     @Transactional

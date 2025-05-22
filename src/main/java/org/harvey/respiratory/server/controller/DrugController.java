@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
-import org.harvey.respiratory.server.exception.UnfinishedException;
 import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
@@ -41,8 +40,6 @@ public class DrugController {
         drugService.deleteById(drugId);
         return Result.ok();
     }
-
-
 
 
     @GetMapping("/{id}")

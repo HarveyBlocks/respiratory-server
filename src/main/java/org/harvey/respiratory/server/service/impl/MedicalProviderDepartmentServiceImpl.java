@@ -28,6 +28,9 @@ import java.util.List;
 public class MedicalProviderDepartmentServiceImpl extends
         ServiceImpl<MedicalProviderDepartmentMapper, MedicalProviderDepartment> implements
         MedicalProviderDepartmentService {
+    @Resource
+    private MedicalProviderService medicalProviderService;
+
     @Override
     public Integer register(MedicalProviderDepartment department) {
         boolean saved = super.save(department);
@@ -58,10 +61,6 @@ public class MedicalProviderDepartmentServiceImpl extends
             throw new DaoException(DaoException.Operation.DELETE_FAIL, "未能删除科室, 未知原因");
         }
     }
-
-
-    @Resource
-    private MedicalProviderService medicalProviderService;
 
     @Override
     public MedicalProviderDepartment querySelf(long userId) {

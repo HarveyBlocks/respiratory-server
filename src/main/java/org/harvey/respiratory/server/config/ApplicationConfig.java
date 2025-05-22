@@ -52,4 +52,5 @@ public class ApplicationConfig {
     public IdentifierIdPredicate identifierIdPredicate() {
         return new IdentifierIdPredicate(constantsProperties.getOpenIdentityCodeVerify());
     }
+
 }

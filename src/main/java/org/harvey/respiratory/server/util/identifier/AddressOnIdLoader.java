@@ -19,6 +19,19 @@ import java.util.Map;
 public class AddressOnIdLoader {
     private volatile Map<String, ProvinceIdMessage> dict;
 
+    /**
+     * 高性能损耗
+     */
+    private static Map<String, ProvinceIdMessage> load() {
+        try (JSONReader jsonReader = new JSONReader(new FileReader("src/main/resources/address_on_id.json"))) {
+            jsonReader.config(Feature.SupportNonPublicField, true);
+            return jsonReader.readObject(new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Map<String, ProvinceIdMessage> get() {
         if (dict != null) {
             return dict;
@@ -30,19 +43,6 @@ public class AddressOnIdLoader {
             dict = load();
         }
         return dict;
-    }
-
-    /**
-     * 高性能损耗
-     */
-    private static Map<String, ProvinceIdMessage> load() {
-        try (JSONReader jsonReader = new JSONReader(new FileReader("src/main/resources/address_on_id.json"));) {
-            jsonReader.config(Feature.SupportNonPublicField, true);
-            return jsonReader.readObject(new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

@@ -4,16 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.harvey.respiratory.server.exception.BadRequestException;
-import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.InterviewDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
-import org.harvey.respiratory.server.pojo.entity.*;
-import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
-import org.harvey.respiratory.server.service.*;
+import org.harvey.respiratory.server.service.DoctorInterviewService;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,11 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 医生问诊

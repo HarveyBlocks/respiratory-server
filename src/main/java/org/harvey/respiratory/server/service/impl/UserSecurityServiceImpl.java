@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.dao.UserSecurityMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -16,7 +17,6 @@ import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
 import org.harvey.respiratory.server.properties.JwtProperties;
-import org.harvey.respiratory.server.service.MedicalProviderService;
 import org.harvey.respiratory.server.service.UserSecurityService;
 import org.harvey.respiratory.server.util.*;
 import org.harvey.respiratory.server.util.identifier.IdentifierIdPredicate;
@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  * @date 2025-06-01 14:10
  */
+@Slf4j
 @Service
 public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, UserSecurity> implements
         UserSecurityService {
@@ -49,17 +50,16 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     private JwtProperties jwtProperties;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private IdentifierIdPredicate identifierIdPredicate;
 
     public UserSecurityServiceImpl(RedissonLock<UserDto> redissonLock) {
         this.redissonLock = redissonLock;
     }
 
     private static Map<String, String> user2Map(UserDto user) {
-        return Map.of(
-                ID_FIELD, user.getId().toString(),
-                NAME_FIELD, user.getName(),
-                "identityCardId", String.valueOf(user.getIdentityCardId()),
-                TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES
+        return Map.of(ID_FIELD, user.getId().toString(), NAME_FIELD, user.getName(), "identityCardId",
+                String.valueOf(user.getIdentityCardId()), TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES
         );
     }
 
@@ -209,11 +209,6 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         return token;
     }
 
-    @Resource
-    private IdentifierIdPredicate identifierIdPredicate;
-    @Resource
-    private MedicalProviderService medicalProviderService;
-
     @Override
     @Transactional
     public void updateUser(UserDto newUser, String token) {
@@ -231,16 +226,6 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
             // 更新身份证
             // 算作实名了
             user.setIdentityCardId(identityCardId);
-            /*
-            MedicalProvider // 不再往user_security表中更改权限
-                medicalProvider = medicalProviderService.selectByIdentityCardId(identityCardId);
-            if (medicalProvider == null) {
-                // 可能是患者了
-                user.setRoleId(Constants.DEFAULT_USER_ROLE_AFTER_REAL_NAME);
-            } else {
-                // 医疗的id
-                user.setRoleId(medicalProvider.getRoleId());
-            }*/
             log.debug("user_security表不再存储role权限, 这里至少简单的实名");
         } else {
             log.debug("无效的身份证, 实名失败, 如果之前有实名, 保留之前的权限, 否则,权限不变 ");
@@ -283,28 +268,35 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
 
     @Override
     public UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException {
-        log.debug("queryMutexFixByLock");
+        // Redis里没有数据
+
         String key = RedisConstants.QUERY_USER_KEY + userId;
+        String lockKey = RedisConstants.USER_LOCK_KEY + UserHolder.currentUserId();
+        return redissonLock.asynchronousLock(
+                lockKey, () -> fastQueryUserByIdWithRedisson(key, userId), () -> getFromDbAndWriteToCache(key, userId));
+    }
+
+    private UserDto fastQueryUserByIdWithRedisson(String key, Long userId) {
+        log.debug("queryMutexFixByLock");
+
         // 从缓存查
         log.debug("用户:" + userId + "从缓存查");
         Map<Object, Object> userFieldMap = stringRedisTemplate.opsForHash().entries(key);
         if (userFieldMap.isEmpty()) {
-            // Redis里没有数据
-            log.debug("缓存不存在用户:" + userId);
-            String lockKey = RedisConstants.USER_LOCK_KEY + UserHolder.currentUserId();
-            return redissonLock.asynchronousLock(lockKey, () -> getFromDbAndWriteToCache(userId, key));
+            throw RedissonLock.haveToExecuteSlowException();
         } else if (((String) userFieldMap.get("id")).isEmpty()) {
             log.warn("Redis中存在的假数据" + userId);
             return null;
-        }
-        // 在Redis中有正常的数据
-        // 第三个参数: 是否忽略转换过程中产生的异常
-        userFieldMap.remove(UserSecurityService.TIME_FIELD);
-        try {
-            return BeanUtil.fillBeanWithMap(userFieldMap, new UserDto(), false);
-        } catch (Exception e) {
-            log.error("在转化UserFieldMap时出现错误错误" + userFieldMap);
-            throw new RuntimeException(e);
+        } else {
+            // 在Redis中有正常的数据
+            // 第三个参数: 是否忽略转换过程中产生的异常
+            userFieldMap.remove(UserSecurityService.TIME_FIELD);
+            try {
+                return BeanUtil.fillBeanWithMap(userFieldMap, new UserDto(), false);
+            } catch (Exception e) {
+                log.error("在转化UserFieldMap时出现错误错误" + userFieldMap);
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -324,10 +316,10 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
      * @param key key
      * @return shop
      */
-    private UserDto getFromDbAndWriteToCache(Long id, String key) {
+    private UserDto getFromDbAndWriteToCache(String key, Long id) {
         // 缓存不存在
         // 使用缓存空对象的逻辑
-        log.debug("getFromDbAndWriteToCache");
+        log.debug("缓存不存在用户"+id+", 只能在数据库中查");
         UserDto userDTO = null;
         Long ttl = RedisConstants.CACHE_NULL_TTL;
         Map<String, String> userFieldMap = Map.of("id", "");

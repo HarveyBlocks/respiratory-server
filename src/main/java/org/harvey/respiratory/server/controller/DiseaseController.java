@@ -6,11 +6,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Disease;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.DiseaseService;
 import org.harvey.respiratory.server.util.ConstantsInitializer;
+import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -31,11 +33,22 @@ public class DiseaseController {
     @Resource
     private DiseaseService diseaseService;
 
+    @PostMapping("/{id}")
+    @ApiOperation("添加某一疾病")
+    public Result<Integer> register(
+            @PathVariable("id") @ApiParam(value = "疾病", required = true) Disease disease) {
+        UserDto user = UserHolder.getUser();
+        diseaseService.validOnWrite(user);
+        return Result.success(diseaseService.register(disease));
+    }
+
     @DeleteMapping("/{id}")
     @ApiOperation("删除某一疾病")
     public Result<NullPlaceholder> del(
             @PathVariable("id") @ApiParam(value = "疾病id", required = true) Integer diseaseId) {
         // 逻辑删除
+        UserDto user = UserHolder.getUser();
+        diseaseService.validOnWrite(user);
         diseaseService.deleteById(diseaseId);
         return Result.ok();
     }
@@ -45,6 +58,8 @@ public class DiseaseController {
     public Result<List<Disease>> queryDrugForFill(
             @PathVariable("id") @ApiParam(value = "问诊号", required = true) Long visitId) {
         // 病人可以查, 医生可以查
+        UserDto user = UserHolder.getUser();
+        diseaseService.validOnWrite(user);
         return Result.success(diseaseService.selectByVisitDoctor(visitId));
     }
 

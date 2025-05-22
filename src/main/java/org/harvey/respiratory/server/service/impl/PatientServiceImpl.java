@@ -44,12 +44,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     private UserPatientIntermediationService userPatientIntermediationService;
     @Resource
     private HealthcareService healthcareService;
-
+    @Resource
+    private PatientMapper patientMapper;
+    @Resource
+    private IdentifierIdPredicate identifierIdPredicate;
+    @Resource
+    private RoleService roleService;
 
     private static PatientService currentProxy() {
         return (PatientService) AopContext.currentProxy();
     }
-
 
     @Override
     public long registerPatientInformation(PatientDto patientDto, long currentUserId) {
@@ -108,7 +112,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         return patientId;
     }
 
-
     private void updateHealthcare(Long healthcareId, Long patientId) {
         boolean update = super.lambdaUpdate()
                 .set(Patient::getHealthcareId, healthcareId)
@@ -120,7 +123,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
             log.error("添加患者{}医保号{}失败, 患者可能不存在. ", patientId, healthcareId);
         }
     }
-
 
     @Override
     @Transactional
@@ -176,9 +178,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
     }
 
-    @Resource
-    private PatientMapper patientMapper;
-
     @Override
     public List<PatientDto> querySelfPatients(long currentUserId, Page<Patient> page) {
         log.debug("准备查询当前用户的有关患者");
@@ -211,9 +210,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
     }
 
-    @Resource
-    private IdentifierIdPredicate identifierIdPredicate;
-
     @Override
     public PatientDto queryByIdentity(long currentUserId, String cardId) {
         if (!identifierIdPredicate.test(cardId)) {
@@ -241,7 +237,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         this.userPatientIntermediationService.delete(patientId, currentUserId);
     }
 
-
     private Patient queryById0(long patientId) {
         Patient patient = super.getById(patientId);
         if (patient == null) {
@@ -249,9 +244,6 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
         return patient;
     }
-
-    @Resource
-    private RoleService roleService;
 
     /**
      * 是否有查询任意病患的权限

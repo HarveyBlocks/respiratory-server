@@ -107,9 +107,9 @@ public class RawAddressOnId {
                 throw new RuntimeException("重复的" + addressOnId.address);
             }
             provinceIdMessage.address = addressOnId.address;
-            provinceIdMessage.code = String.format("%06d",addressOnId.code);
+            provinceIdMessage.code = String.format("%06d", addressOnId.code);
         } else {
-            map.put(key, new ProvinceIdMessage(String.format("%06d",addressOnId.code), addressOnId.address));
+            map.put(key, new ProvinceIdMessage(String.format("%06d", addressOnId.code), addressOnId.address));
         }
     }
 }

@@ -60,10 +60,10 @@
         h.healthcare_code,
         h.balance as healthcare_balance
         from (
-            select patient_id
-            from tb_user_patient_intermediation
-            where u.id = #{userId}
-            limit ${start},${len}
+        select patient_id
+        from tb_user_patient_intermediation
+        where u.id = #{userId}
+        limit ${start},${len}
         ) AS i
         INNER JOIN tb_patient p
         on i.patient_id = p.id

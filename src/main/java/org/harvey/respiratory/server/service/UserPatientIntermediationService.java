@@ -16,6 +16,7 @@ import java.util.List;
 
 public interface UserPatientIntermediationService extends IService<UserPatientIntermediation> {
     boolean existRelation(long userId, long patientId);
+
     boolean register(long userId, long patientId);
 
     boolean delete(long patientId, long userId);

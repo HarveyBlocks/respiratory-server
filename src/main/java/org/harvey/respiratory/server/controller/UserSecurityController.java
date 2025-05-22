@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.ResourceNotFountException;
+import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
 import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
@@ -141,7 +142,7 @@ public class UserSecurityController {
         try {
             userDTO = userSecurityService.queryUserByIdWithRedisson(userId);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ServerException("redisson锁被中断",e);
         }
         if (userDTO == null) {
             throw new ResourceNotFountException("用户" + userId + "不存在");

@@ -40,4 +40,8 @@ public class ConstantsInitializer {
     public static Date nowDateTime() {
         return new Date(System.currentTimeMillis());
     }
+
+    public static long random(Long cacheNullTtl) {
+        return 0;
+    }
 }

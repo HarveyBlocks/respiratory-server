@@ -54,6 +54,16 @@ public class SpecificUsingDrugRecordServiceImpl extends
         return (SpecificUsingDrugRecordService) AopContext.currentProxy();
     }
 
+    private static Set<Integer> mapDrugIds(List<SpecificUsingDrugRecord> records) {
+        return records.stream().map(SpecificUsingDrugRecord::getDrugId).collect(Collectors.toSet());
+    }
+
+    private static List<DrugDto> setDto(List<SpecificUsingDrugRecord> records, Map<Integer, Drug> drugMap) {
+        return records.stream()
+                .map(record -> new DrugDto(record, drugMap.get(record.getDrugId())))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void validOnWrite(UserDto user, long visitDoctorId) {
         Role role = preCheckThenGetRole(user);
@@ -295,17 +305,6 @@ public class SpecificUsingDrugRecordServiceImpl extends
             log.warn("新增药品使用失败");
         }
         return recordList.stream().map(SpecificUsingDrugRecord::getId).collect(Collectors.toList());
-    }
-
-
-    private static Set<Integer> mapDrugIds(List<SpecificUsingDrugRecord> records) {
-        return records.stream().map(SpecificUsingDrugRecord::getDrugId).collect(Collectors.toSet());
-    }
-
-    private static List<DrugDto> setDto(List<SpecificUsingDrugRecord> records, Map<Integer, Drug> drugMap) {
-        return records.stream()
-                .map(record -> new DrugDto(record, drugMap.get(record.getDrugId())))
-                .collect(Collectors.toList());
     }
 
 }

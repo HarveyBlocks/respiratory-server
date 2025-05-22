@@ -28,6 +28,10 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
     @Resource
     private VisitDoctorService visitDoctorService;
 
+    private static HealthcarePayService currentProxy() {
+        return (HealthcarePayService) AopContext.currentProxy();
+    }
+
     @Override
     public int queryBalance(QueryBalanceDto queryBalanceDto) {
         Healthcare healthcare = healthcareService.query(queryBalanceDto);
@@ -35,10 +39,6 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
             throw new ResourceNotFountException("未能找到医保资源");
         }
         return healthcare.getBalance();
-    }
-
-    private static HealthcarePayService currentProxy() {
-        return (HealthcarePayService) AopContext.currentProxy();
     }
 
     @Override

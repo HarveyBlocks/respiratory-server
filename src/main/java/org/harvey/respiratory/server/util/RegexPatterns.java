@@ -1,7 +1,5 @@
 package org.harvey.respiratory.server.util;
 
-import org.harvey.respiratory.server.util.identifier.IdentifierIdPredicate;
-
 import java.util.regex.Pattern;
 
 /**

@@ -3,7 +3,7 @@ package org.harvey.respiratory.server.exception;
 import lombok.Getter;
 
 /**
- *  Dao的异常
+ * Dao的异常
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -12,10 +12,6 @@ import lombok.Getter;
 @Getter
 public class DaoException extends ServerException {
     private final Operation operation;
-
-    public static enum Operation {
-        SELECT_NOTING, SAVE_FAIL, UPDATE_FAIL, DELETE_FAIL
-    }
 
     public DaoException(Operation operation) {
         super();
@@ -45,5 +41,9 @@ public class DaoException extends ServerException {
             boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.operation = operation;
+    }
+
+    public enum Operation {
+        SELECT_NOTING, SAVE_FAIL, UPDATE_FAIL, DELETE_FAIL
     }
 }

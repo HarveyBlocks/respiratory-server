@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
-import org.harvey.respiratory.server.pojo.enums.Role;
 
 import java.io.Serializable;
 
@@ -26,6 +25,7 @@ public class UserDto implements Serializable {
     private String name;
     @ApiModelProperty("用户身份证")
     private String identityCardId;
+
     public UserDto() {
     }
 

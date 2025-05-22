@@ -13,6 +13,7 @@ import lombok.Getter;
 public class DistrictIdMessage {
     String code;
     String address;
+
     public DistrictIdMessage(String code, String address) {
         this.code = code;
         this.address = address;
