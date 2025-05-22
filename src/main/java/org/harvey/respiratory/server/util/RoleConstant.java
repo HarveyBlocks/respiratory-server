@@ -16,5 +16,6 @@ public class RoleConstant {
      */
     public static final Role[] MEDICAL_PROVIDER_UPDATE = {Role.CHARGE_DOCTOR, Role.DEVELOPER,
             Role.DATABASE_ADMINISTRATOR};
-    public static final Role[] MEDICAL_PROVIDER_READ = {Role.NORMAL_DOCTOR, Role.MEDICATION_DOCTOR, Role.CHARGE_DOCTOR};
+    public static final Role[] MEDICAL_PROVIDER_READ = {Role.NORMAL_DOCTOR, Role.MEDICATION_DOCTOR, Role.CHARGE_DOCTOR,
+            Role.DEVELOPER, Role.DATABASE_ADMINISTRATOR};
 }

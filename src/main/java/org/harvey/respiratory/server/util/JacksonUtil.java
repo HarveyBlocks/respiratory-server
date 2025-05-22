@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,8 @@ import java.util.Map;
  */
 public class JacksonUtil {
     public static final ObjectMapper MAPPER = new ObjectMapper();
+    public static final PrintStream OUT = System.out;
+
     /**
      * 对所有调用次方法之后的转化都生效, 不会报错了
      */
@@ -27,6 +29,7 @@ public class JacksonUtil {
         // 对于Json中的未知字段选择忽略
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
+
     /**
      * 对所有调用次方法之后的转化都生效, 继续报错
      */
@@ -34,6 +37,7 @@ public class JacksonUtil {
         // 对于Json中的未知字段选择重视
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
     }
+
     public static String toJsonStr(Object bean) {
         try {
             return MAPPER.writeValueAsString(bean);
@@ -85,6 +89,7 @@ public class JacksonUtil {
             throw new RuntimeException(e);
         }
     }
+
     public static Map<String, String> toStringMap(String json) {
         try {
             return MAPPER.readValue(json, new TypeReference<Map<String, String>>() {
@@ -93,7 +98,8 @@ public class JacksonUtil {
             throw new RuntimeException(e);
         }
     }
-    public static <T> Map<?,?> toMap(Object bean) {
+
+    public static <T> Map<?, ?> toMap(Object bean) {
         return MAPPER.convertValue(bean, Map.class);
     }
 
@@ -107,5 +113,9 @@ public class JacksonUtil {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void printPretty(Object bean) {
+        OUT.println(pretty(bean));
     }
 }

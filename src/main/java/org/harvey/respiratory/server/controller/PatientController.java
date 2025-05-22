@@ -49,13 +49,13 @@ public class PatientController {
 
     @DeleteMapping("/{id}")
     @ApiOperation("删除Patient, 实际上是删除这个用户和patient的联系")
-    public Result<NullPlaceholder> registerPatientInformation(
+    public Result<NullPlaceholder> delPatientInformation(
             @PathVariable("id") @ApiParam("patient id") Long patientId) {
         Long currentUserId = UserHolder.currentUserId();
         if (currentUserId == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        patientService.deletePatient(patientId, currentUserId);
+        patientService.deletePatientRecord(patientId, currentUserId);
         return Result.ok();
     }
 

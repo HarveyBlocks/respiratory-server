@@ -51,7 +51,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         return Result.success(medicalProviderService.register(medicalProvider));
     }
 
@@ -65,7 +65,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderService.update(medicalProvider);
         return Result.ok();
     }
@@ -78,7 +78,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderService.delete(id);
         return Result.ok();
     }
@@ -92,7 +92,7 @@ public class MedicalProviderController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_READ);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
         MedicalProvider medicalProvider = medicalProviderService.selectByUser(user.getId());
         if (medicalProvider == null) {
             throw new ResourceNotFountException("不能通过当前用户的身份证查询到医疗提供者信息");

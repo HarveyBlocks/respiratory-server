@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.controller;
 
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Disease;
+import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.util.JacksonUtil;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +22,7 @@ class DiseaseControllerTest {
 
     @BeforeAll
     static void addUser() {
-        UserHolder.saveUser(new UserDto(1923431434245177346L, "", "330282200410080030"));
+        UserHolder.saveUser(new UserDto(1923431434245177346L, "", Role.DATABASE_ADMINISTRATOR, "330282200410080030"));
     }
 
     @Resource
@@ -40,28 +41,29 @@ class DiseaseControllerTest {
 
     @Test
     void queryByName() {
-        System.out.println(JacksonUtil.pretty(diseaseController.queryByName("", 1, 10)));
-        System.out.println(JacksonUtil.pretty(diseaseController.queryByName("", 2, 10)));
-        System.out.println(JacksonUtil.pretty(diseaseController.queryByName("", null, null)));
-        System.out.println(JacksonUtil.pretty(diseaseController.queryByName("C", null, null)));
+        JacksonUtil.printPretty(diseaseController.queryByName("", 1, 10));
+        JacksonUtil.printPretty(diseaseController.queryByName("", 2, 10));
+        JacksonUtil.printPretty(diseaseController.queryByName("", null, null));
+        JacksonUtil.printPretty(diseaseController.queryByName("C", null, null));
     }
 
     @Test
     void queryById() {
-        System.out.println(JacksonUtil.pretty(diseaseController.queryById(1)));
-        System.out.println(JacksonUtil.pretty(diseaseController.queryById(2)));
-        System.out.println(JacksonUtil.pretty(diseaseController.queryById(3)));
-        System.out.println(JacksonUtil.pretty(diseaseController.queryById(4)));
+        JacksonUtil.printPretty(diseaseController.queryById(1));
+        JacksonUtil.printPretty(diseaseController.queryById(2));
+        JacksonUtil.printPretty(diseaseController.queryById(3));
+        JacksonUtil.printPretty(diseaseController.queryById(4));
     }
+
     @Test
     void del() {
         if (!OPEN_NON_IDEMPOTENT_TEST) {
             return;
         }
-        System.out.println(JacksonUtil.pretty(diseaseController.del(1)));
-        System.out.println(JacksonUtil.pretty(diseaseController.del(2)));
-        System.out.println(JacksonUtil.pretty(diseaseController.del(3)));
-        System.out.println(JacksonUtil.pretty(diseaseController.del(4)));
+        JacksonUtil.printPretty(diseaseController.del(1));
+        JacksonUtil.printPretty(diseaseController.del(2));
+        JacksonUtil.printPretty(diseaseController.del(3));
+        JacksonUtil.printPretty(diseaseController.del(4));
     }
 
 }

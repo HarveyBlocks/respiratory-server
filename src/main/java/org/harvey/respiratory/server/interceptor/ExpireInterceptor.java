@@ -5,6 +5,8 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
+import org.harvey.respiratory.server.pojo.enums.Role;
+import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.util.IpTool;
 import org.harvey.respiratory.server.util.JwtTool;
 import org.harvey.respiratory.server.util.RedisConstants;
@@ -32,21 +34,20 @@ public class ExpireInterceptor implements HandlerInterceptor {
 
     private final StringRedisTemplate stringRedisTemplate;
     private final JwtTool jwtTool;
+    private final RoleService roleService;
 
-    public ExpireInterceptor(StringRedisTemplate stringRedisTemplate, JwtTool jwtTool) {
+
+    public ExpireInterceptor(StringRedisTemplate stringRedisTemplate, JwtTool jwtTool, RoleService roleService) {
         this.stringRedisTemplate = stringRedisTemplate;
         this.jwtTool = jwtTool;
+        this.roleService = roleService;
     }
 
     @Override
     public boolean preHandle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler) {
+            HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         // 进入controller之前进行登录校验
-
-//        System.err.println("1");
         String token = request.getHeader(Constants.AUTHORIZATION_HEADER);//依据前端的信息
 
         // 获取请求头中的token
@@ -70,6 +71,8 @@ public class ExpireInterceptor implements HandlerInterceptor {
         } else {
             if (userDto.getId() != null) {
                 // 保存到ThreadLocal
+                Role role = roleService.queryRole(userDto.getIdentityCardId());
+                userDto.setRole(role);
                 UserHolder.saveUser(userDto);
             }
             return true;
@@ -77,8 +80,6 @@ public class ExpireInterceptor implements HandlerInterceptor {
     }
 
     public UserDto doPreHandle(String id) {
-        //        System.err.println("2");
-
         // 获取user数据
         String tokenKey = RedisConstants.QUERY_USER_KEY + id;
         Map<Object, Object> userFieldMap = stringRedisTemplate.opsForHash().entries(tokenKey);
@@ -89,15 +90,10 @@ public class ExpireInterceptor implements HandlerInterceptor {
             stringRedisTemplate.opsForHash().put(tokenKey, TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES);
             userFieldMap.put(TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES);
         }
-
-//        System.err.println("3");
-
         // 更新时间
         if (RedisConstants.QUERY_USER_TTL != -1L) {
-            stringRedisTemplate
-                    .expire(tokenKey, RedisConstants.QUERY_USER_TTL, TimeUnit.MINUTES);
+            stringRedisTemplate.expire(tokenKey, RedisConstants.QUERY_USER_TTL, TimeUnit.MINUTES);
         }
-
         String time = (String) userFieldMap.get(TIME_FIELD);
         if ("0".equals(time) || time.startsWith("-")) {
             log.error("访问次数太多了");
@@ -105,8 +101,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
             // 这种肯定是开挂了, 要不要加黑名单到里去?
             return null;
         } else {
-            stringRedisTemplate.opsForHash()
-                    .increment(tokenKey, TIME_FIELD, -1);
+            stringRedisTemplate.opsForHash().increment(tokenKey, TIME_FIELD, -1);
         }
         userFieldMap.remove(TIME_FIELD);
         if (userFieldMap.isEmpty()) {
@@ -114,21 +109,13 @@ public class ExpireInterceptor implements HandlerInterceptor {
             return new UserDto();
         }
         // 第三个参数: 是否忽略转换过程中产生的异常
-
-
-//        System.err.println("4");
-
-
         return BeanUtil.fillBeanWithMap(userFieldMap, new UserDto(), false);
     }
 
 
     @Override
     public void afterCompletion(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler,
-            Exception ex) {
+            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         doAfter(request.getRemoteAddr());
     }
 

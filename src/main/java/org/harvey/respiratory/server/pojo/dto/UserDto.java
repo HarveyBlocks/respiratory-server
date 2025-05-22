@@ -1,10 +1,12 @@
 package org.harvey.respiratory.server.pojo.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
+import org.harvey.respiratory.server.pojo.enums.Role;
 
 import java.io.Serializable;
 
@@ -23,6 +25,9 @@ public class UserDto implements Serializable {
     private Long id;
     @ApiModelProperty("姓名")
     private String name;
+    @ApiModelProperty(value = "权限",hidden = true)
+    @JsonIgnore
+    private Role role;
     @ApiModelProperty("用户身份证")
     private String identityCardId;
 

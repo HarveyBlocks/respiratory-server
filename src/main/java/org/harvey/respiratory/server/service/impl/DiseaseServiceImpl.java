@@ -93,7 +93,7 @@ public class DiseaseServiceImpl extends ServiceImpl<DiseaseMapper, Disease> impl
         if (identityCardId == null) {
             throw new UnauthorizedException("未实名不能执行");
         }
-        Role role = roleService.queryRole(identityCardId);
+        Role role = user.getRole();
         switch (role) {
             case UNKNOWN:
             case PATIENT:

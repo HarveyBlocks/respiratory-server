@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.interceptor.ExpireInterceptor;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
+import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.util.JwtTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -26,17 +27,22 @@ import javax.websocket.server.ServerEndpointConfig;
 public class GetHttpSessionConfig extends ServerEndpointConfig.Configurator {
 
     public static final String SESSION_USER_KEY = "user";
-    private static StringRedisTemplate stringRedisTemplate;
-    private static JwtTool jwtTool;
+    private StringRedisTemplate stringRedisTemplate;
+    private JwtTool jwtTool;
+    private RoleService roleService;
 
     @Autowired
     public void setJwtTool(JwtTool jwtTool) {
-        GetHttpSessionConfig.jwtTool = jwtTool;
+        this.jwtTool = jwtTool;
+    }
+    @Autowired
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
     }
 
     @Autowired
     public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
-        GetHttpSessionConfig.stringRedisTemplate = stringRedisTemplate;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     /**
@@ -51,7 +57,6 @@ public class GetHttpSessionConfig extends ServerEndpointConfig.Configurator {
             ServerEndpointConfig sec,
             HandshakeRequest request,
             HandshakeResponse response) {
-
         // 获取HttpSession
         String token = request.getHeaders().get(Constants.AUTHORIZATION_HEADER).get(0);
 
@@ -65,7 +70,7 @@ public class GetHttpSessionConfig extends ServerEndpointConfig.Configurator {
             log.warn(e.getMessage());
             return;
         }
-        UserDto userDto = new ExpireInterceptor(stringRedisTemplate, jwtTool).doPreHandle(id);
+        UserDto userDto = new ExpireInterceptor(stringRedisTemplate, jwtTool, roleService).doPreHandle(id);
         if (userDto == null || userDto.getId() == null) {
             return;
         }

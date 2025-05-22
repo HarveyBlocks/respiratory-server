@@ -14,6 +14,7 @@ import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
 import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
+import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.UserSecurityService;
@@ -142,7 +143,7 @@ public class UserSecurityController {
         try {
             userDTO = userSecurityService.queryUserByIdWithRedisson(userId);
         } catch (InterruptedException e) {
-            throw new ServerException("redisson锁被中断",e);
+            throw new ServerException("redisson锁被中断", e);
         }
         if (userDTO == null) {
             throw new ResourceNotFountException("用户" + userId + "不存在");
@@ -157,14 +158,14 @@ public class UserSecurityController {
         for (int i = 0; i < 1; i++) {
             Map<String, String> map = new HashMap<>();
             int token = i + 10000;
-            System.out.println(token);
+            log.debug("{}", token);
             String key = RedisConstants.QUERY_USER_KEY + token;
             map.put(UserSecurityService.ID_FIELD, String.valueOf(token));
             map.put(UserSecurityService.NAME_FIELD, UserSecurity.DEFAULT_NAME);
             stringRedisTemplate.opsForHash().putAll(key, map);
         }
         return new Result<>(
-                new UserDto(1L, "name", "350121200410080032"));
+                new UserDto(1L, "name", Role.PATIENT, "350121200410080032"));
     }
 
     @ApiOperation(value = "更新用户信息, 也是用身份证实名, 实名之后可确认权限-病人/医生",

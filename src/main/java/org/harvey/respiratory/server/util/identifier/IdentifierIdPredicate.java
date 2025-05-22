@@ -28,10 +28,6 @@ public class IdentifierIdPredicate implements Predicate<String> {
         this.openCheckCode = openCheckCode;
     }
 
-    public static void main(String[] args) {
-        IdentifierIdPredicate identifierIdPredicate = new IdentifierIdPredicate(true);
-        System.out.println(identifierIdPredicate.test("330282200410080030"));
-    }
 
     @Override
     public boolean test(String sequence) {

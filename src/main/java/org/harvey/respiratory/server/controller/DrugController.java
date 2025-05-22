@@ -31,6 +31,16 @@ public class DrugController {
     @Resource
     private DrugService drugService;
 
+    @PostMapping("/")
+    @ApiOperation("增加某一药品")
+    public Result<NullPlaceholder> register(
+            @RequestBody @ApiParam(value = "药品", required = true) Drug drug) {
+        // 必须要有主管医生权限
+        drugService.writeValid(UserHolder.getUser());
+        drugService.saveDrug(drug);
+        return Result.ok();
+    }
+
     @DeleteMapping("/{id}")
     @ApiOperation("删除某一药品")
     public Result<NullPlaceholder> del(

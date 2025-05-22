@@ -48,7 +48,7 @@ public class MedicalProviderDepartmentServiceImpl extends
         if (updated) {
             log.debug("更新科室成功");
         } else {
-            throw new DaoException(DaoException.Operation.UPDATE_FAIL, "未能更新, 未知原因");
+            throw new DaoException(DaoException.Operation.UPDATE_FAIL, "未能更新, 未找到目标科室");
         }
     }
 
@@ -58,7 +58,7 @@ public class MedicalProviderDepartmentServiceImpl extends
         if (deleted) {
             log.debug("删除科室成功");
         } else {
-            throw new DaoException(DaoException.Operation.DELETE_FAIL, "未能删除科室, 未知原因");
+            throw new DaoException(DaoException.Operation.DELETE_FAIL, "未能删除科室, 未找到目标科室");
         }
     }
 

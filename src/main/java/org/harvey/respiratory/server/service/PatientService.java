@@ -68,7 +68,7 @@ public interface PatientService extends IService<Patient> {
      */
     PatientDto queryByIdentity(long currentUserId, String cardId);
 
-    void deletePatient(long patientId, long currentUserId);
+    void deletePatientRecord(long patientId, long currentUserId);
 
     Patient queryByIdSimply(long patientId);
 

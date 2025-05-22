@@ -54,7 +54,7 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
         if (patientId == null) {
             throw new BadRequestException("需要有关病患id");
         }
-        Role role = roleService.queryRole(currentUser.getIdentityCardId());
+        Role role = currentUser.getRole();
         // 病患只能添加自己的
         // 医生可以都过
         switch (role) {

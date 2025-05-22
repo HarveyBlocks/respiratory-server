@@ -36,7 +36,7 @@ public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements Dr
         if (user == null) {
             throw new UnauthorizedException("请先登录");
         }
-        Role role = roleService.queryRole(user.getIdentityCardId());
+        Role role = user.getRole();
         switch (role) {
             case UNKNOWN:
             case PATIENT:
@@ -56,7 +56,15 @@ public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements Dr
     public void deleteById(long drugId) {
         super.removeById(drugId);
     }
-
+    @Override
+    public void saveDrug(Drug drug) {
+        boolean saved = super.save(drug);
+        if (saved){
+            log.debug("新增药物成功");
+        }else{
+            log.debug("新增药物失败");
+        }
+    }
     @Override
     public Drug queryById(long id) {
         return super.getById(id);
@@ -89,4 +97,6 @@ public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements Dr
         }
         return resultMap;
     }
+
+
 }

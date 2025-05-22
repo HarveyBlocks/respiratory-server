@@ -31,4 +31,6 @@ public interface DrugService extends IService<Drug> {
     Map<Integer, Drug> queryByIds(Collection<Integer> drugIds);
 
     Map<Integer, Drug> queryByIdsFilterName(Set<Integer> drugIds, String name);
+
+    void saveDrug(Drug drug);
 }

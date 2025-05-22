@@ -4,6 +4,7 @@ import org.harvey.respiratory.server.interceptor.AuthorizeInterceptor;
 import org.harvey.respiratory.server.interceptor.ExpireInterceptor;
 import org.harvey.respiratory.server.interceptor.LoginInterceptor;
 import org.harvey.respiratory.server.properties.AuthProperties;
+import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.util.JwtTool;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,12 +36,14 @@ public class MvcConfig implements WebMvcConfigurer {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private JwtTool jwtTool;
+    @Resource
+    private RoleService roleService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
         registry.addInterceptor(
-                new ExpireInterceptor(stringRedisTemplate, jwtTool));
+                new ExpireInterceptor(stringRedisTemplate, jwtTool, roleService));
 
 
         List<String> excludePaths = authProperties.getExcludePaths();

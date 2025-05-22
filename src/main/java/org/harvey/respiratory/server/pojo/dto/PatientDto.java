@@ -39,6 +39,7 @@ public class PatientDto {
     private String identityCardId;
 
 
+
     @ApiModelProperty(value = "名称(varchar(63)), 不可为null", required = true)
     private String name;
 

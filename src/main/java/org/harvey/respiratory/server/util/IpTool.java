@@ -25,7 +25,7 @@ public class IpTool {
         try {
             vIndex = Searcher.loadVectorIndexFromFile(dbPath);
         } catch (Exception e) {
-            System.out.printf("failed to load vector index from `%s`: %s", dbPath, e);
+            log.error(String.format("failed to load vector index from `%s`: %s", dbPath, e));
         }
 
         // 2、使用全局的 vIndex 创建带 VectorIndex 缓存的查询对象。

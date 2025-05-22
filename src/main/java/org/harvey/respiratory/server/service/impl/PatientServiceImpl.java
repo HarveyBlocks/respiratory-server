@@ -233,7 +233,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     }
 
     @Override
-    public void deletePatient(long patientId, long currentUserId) {
+    public void deletePatientRecord(long patientId, long currentUserId) {
         this.userPatientIntermediationService.delete(patientId, currentUserId);
     }
 
@@ -249,7 +249,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
      * 是否有查询任意病患的权限
      */
     private void validRoleOnQueryAny(UserDto user, Patient patient) {
-        Role role = roleService.queryRole(user.getIdentityCardId());
+        Role role = user.getRole();
         switch (role) {
             case UNKNOWN:
                 throw new UnauthorizedException("没有获取其他病患的权限");

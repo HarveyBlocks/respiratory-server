@@ -24,6 +24,9 @@ public class Constants {
 
     public static final long CHAT_RECORD_TIME_INTERVAL = 60 * 60 * 1000; // 一小时
     public static final String DEFAULT_DATE_FORMAT_STRING = "yyyy-MM-dd";
+    /**
+     * yyyy-MM-dd
+     */
     public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat(DEFAULT_DATE_FORMAT_STRING);
     public static final Integer DEFAULT_USER_ROLE_AFTER_REAL_NAME = Role.PATIENT.getRoleId();
 }

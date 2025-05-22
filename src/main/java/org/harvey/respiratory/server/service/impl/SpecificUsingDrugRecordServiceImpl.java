@@ -176,7 +176,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
         if (identityCardId == null) {
             throw new UnauthorizedException("未实名无权限使用此功能");
         }
-        return roleService.queryRole(identityCardId);
+        return user.getRole();
     }
 
     @Override

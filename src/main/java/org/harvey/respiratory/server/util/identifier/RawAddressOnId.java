@@ -19,10 +19,6 @@ public class RawAddressOnId {
     public int code;
     public String address;
 
-    public static void main(String[] args) {
-        Map<String, ProvinceIdMessage> dict = loadRaw();
-        System.out.println(JSON.toJSONString(dict));
-    }
 
     public static Map<String, ProvinceIdMessage> loadRaw() {
         RawAddressOnId[] arr;

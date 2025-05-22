@@ -49,7 +49,7 @@ public class MedicalProviderDepartmentController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         return Result.success(medicalProviderDepartmentService.register(department));
     }
 
@@ -64,7 +64,7 @@ public class MedicalProviderDepartmentController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderDepartmentService.update(department);
         return Result.ok();
     }
@@ -77,7 +77,7 @@ public class MedicalProviderDepartmentController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_UPDATE);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_UPDATE);
         medicalProviderDepartmentService.delete(id);
         return Result.ok();
     }
@@ -91,7 +91,7 @@ public class MedicalProviderDepartmentController {
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
         }
-        RoleUtil.validOnRole(roleService.queryRole(user.getIdentityCardId()), RoleConstant.MEDICAL_PROVIDER_READ);
+        RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
         return Result.success(medicalProviderDepartmentService.querySelf(user.getId()));
     }
 

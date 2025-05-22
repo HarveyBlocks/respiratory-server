@@ -9,7 +9,6 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
 import org.harvey.respiratory.server.service.MedicalProviderService;
 import org.harvey.respiratory.server.service.UserSecurityService;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -57,7 +56,7 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
         if (removed) {
             log.debug("删除医疗提供者成功");
         } else {
-            throw new DaoException(DaoException.Operation.UPDATE_FAIL, "删除医疗提供者失败, 未知原因");
+            throw new DaoException(DaoException.Operation.UPDATE_FAIL, "删除医疗提供者失败, 不存在的id");
         }
     }
 
@@ -78,6 +77,10 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     @Override
     public MedicalProvider selectByPhone(String phoneNumber) {
         UserSecurity userSecurity = userSecurityService.selectByPhone(phoneNumber);
+        if (userSecurity == null) {
+            // 没有这个用户...?
+            return null;
+        }
         String identityCardId = userSecurity.getIdentityCardId();
         if (identityCardId == null) {
             // 没有被实名的用户, 其实一定不是医生了
@@ -90,7 +93,7 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     public List<MedicalProvider> selectByAny(String name, Integer formId, Page<MedicalProvider> page) {
         return super.lambdaQuery()
                 .eq(formId != null, MedicalProvider::getFormId, formId)
-                .like(name == null || name.isEmpty(), MedicalProvider::getName, name)
+                .like(name != null && !name.isEmpty(), MedicalProvider::getName, name)
                 .page(page)
                 .getRecords();
     }
