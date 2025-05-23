@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.DiseaseDiagnosisIntermediationMapper;
 import org.harvey.respiratory.server.pojo.entity.DiseaseDiagnosisIntermediation;
@@ -24,6 +25,7 @@ public class DiseaseDiagnosisIntermediationServiceImpl extends
         DiseaseDiagnosisIntermediationService {
 
     @Override
+    @NonNull
     public List<Integer> selectDiseaseByVisit(long visitId) {
         return super.lambdaQuery()
                 .select(DiseaseDiagnosisIntermediation::getDiseaseId)

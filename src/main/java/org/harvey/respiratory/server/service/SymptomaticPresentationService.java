@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.SymptomaticPresentation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +22,13 @@ public interface SymptomaticPresentationService extends IService<SymptomaticPres
     /**
      * @return 更新后的新记录的字敦啊
      */
+    @NonNull
     Long updateRetainTrace(String currentUserIdentityCardId, Long oldVersionId, SymptomaticPresentation newData);
 
+    @NonNull
     SymptomaticPresentation queryByIdIgnoreDeleted(Long oldVersionId);
 
+    @NonNull
     SymptomaticPresentation queryById(Long oldVersionId);
 
     @Transactional
@@ -38,11 +42,13 @@ public interface SymptomaticPresentationService extends IService<SymptomaticPres
      * @return 插入后的多个症状的id
      */
     @Transactional
+    @NonNull
     List<Long> saveSymptomaticPresentationBatch(List<SymptomaticPresentation> presentationList);
 
     /**
      * 读不出已经逻辑删除的
      */
+    @NonNull
     List<SymptomaticPresentation> selectByVisitId(long visitId);
 
 }

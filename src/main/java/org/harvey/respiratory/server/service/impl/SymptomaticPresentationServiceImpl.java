@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.SymptomaticPresentationMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -50,8 +51,12 @@ public class SymptomaticPresentationServiceImpl extends
 
     @Override
     public void logicDelete(Long targetId, String currentUserIdentityCardId) {
-        SymptomaticPresentation symptomaticPresentation = queryByIdIgnoreDeleted(targetId);
-        if (symptomaticPresentation == null) {
+        SymptomaticPresentation symptomaticPresentation;
+        try {
+
+
+            symptomaticPresentation = queryByIdIgnoreDeleted(targetId);
+        }catch (ResourceNotFountException e){
             log.warn("用户{}想删除不存在的{}", currentUserIdentityCardId, targetId);
             return;
         }
@@ -94,18 +99,21 @@ public class SymptomaticPresentationServiceImpl extends
     private void saveNewData(SymptomaticPresentation newData) {
         boolean saved = super.save(newData);
         if (saved) {
-            log.debug("新增症状失败");
-        } else {
             log.debug("新增症状成功");
+        } else {
+            log.warn("新增症状失败");
         }
     }
 
     @Override
+    @NonNull
     public Long updateRetainTrace(
             String currentUserIdentityCardId, Long oldVersionId, SymptomaticPresentation newData) {
-        SymptomaticPresentation old = queryById(oldVersionId);
-        if (old == null) {
-            throw new ResourceNotFountException("更新不存在的字段");
+        SymptomaticPresentation old;
+        try {
+            old = queryById(oldVersionId);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("更新不存在的字段", e.getCause());
         }
         if (old.getDeleted()) {
             throw new BadRequestException("更新已删除的字段");
@@ -125,16 +133,26 @@ public class SymptomaticPresentationServiceImpl extends
     }
 
     @Override
+    @NonNull
     public SymptomaticPresentation queryByIdIgnoreDeleted(Long oldVersionId) {
-        return super.getById(oldVersionId);
+        SymptomaticPresentation presentation = super.getById(oldVersionId);
+        if (presentation == null) {
+            throw new BadRequestException("symptomatic presentation by id");
+        }
+        return presentation;
     }
 
     @Override
-    public SymptomaticPresentation queryById(Long oldVersionId) {
-        return super.lambdaQuery()
-                .eq(SymptomaticPresentation::getId, oldVersionId)
+    @NonNull
+    public SymptomaticPresentation queryById(Long id) {
+        SymptomaticPresentation one = super.lambdaQuery()
+                .eq(SymptomaticPresentation::getId, id)
                 .eq(SymptomaticPresentation::getDeleted, false)
                 .one();
+        if (one == null) {
+            throw new BadRequestException("can not find symptomatic presentation by " + id);
+        }
+        return one;
     }
 
     /**
@@ -156,6 +174,7 @@ public class SymptomaticPresentationServiceImpl extends
     }
 
     @Override
+    @NonNull
     @Transactional
     public List<Long> saveSymptomaticPresentationBatch(List<SymptomaticPresentation> presentationList) {
         // 初始化一下, 防止奇奇怪怪的字段
@@ -171,6 +190,7 @@ public class SymptomaticPresentationServiceImpl extends
 
 
     @Override
+    @NonNull
     public List<SymptomaticPresentation> selectByVisitId(long visitId) {
         return super.lambdaQuery()
                 .eq(SymptomaticPresentation::getVisitDoctorId, visitId)

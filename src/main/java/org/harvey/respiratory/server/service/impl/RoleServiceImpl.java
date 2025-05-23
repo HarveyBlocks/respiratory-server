@@ -1,7 +1,9 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.RoleMapper;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
@@ -40,20 +42,24 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
      * 3. 其他权限表, 给开发者用的, 暂且没有这一选项
      */
     @Override
+    @NonNull
     public Role queryRole(String identityCardId) {
         // 1. 判断身份证有效
         if (identityCardId == null || !predicate.test(identityCardId)) {
             return Role.UNKNOWN;
         }
         // 2. 从医生处查询
-        MedicalProvider medicalProvider = medicalProviderService.selectByIdentityCardId(identityCardId);
-        if (medicalProvider != null) {
+        try {
+            MedicalProvider medicalProvider = medicalProviderService.selectByIdentityCardId(identityCardId);
             return getMedicalProviderRole(medicalProvider.getJobId());
+        }catch (ResourceNotFountException e){
+            return Role.PATIENT;
         }
-        return Role.PATIENT;
+
     }
 
     @Override
+    @NonNull
     public Role getMedicalProviderRole(int jobId) {
         MedicalProviderJob job = medicalProviderJobService.getById(jobId);
         if (job == null) {
@@ -64,6 +70,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
     }
 
     @Override
+    @NonNull
     public Role selectRole(int roleId) {
         // TODO
         return Role.create(roleId);

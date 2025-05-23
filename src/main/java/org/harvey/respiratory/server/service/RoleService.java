@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.RoleEntity;
 import org.harvey.respiratory.server.pojo.enums.Role;
 
@@ -20,9 +21,12 @@ public interface RoleService extends IService<RoleEntity> {
      * 2. medicalProvider查询, 如果有, 则从job中取出role
      * 3. 其他权限表, 给开发者用的, 暂且没有这一选项
      */
+    @NonNull
     Role queryRole(String identityCardId);
 
+    @NonNull
     Role getMedicalProviderRole(int jobId);
 
+    @NonNull
     Role selectRole(int roleId);
 }

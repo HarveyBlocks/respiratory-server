@@ -2,14 +2,12 @@ package org.harvey.respiratory.server.service.impl;
 
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.ResourceNotFountException;
-import org.harvey.respiratory.server.pojo.dto.PayDto;
 import org.harvey.respiratory.server.pojo.dto.QueryBalanceDto;
 import org.harvey.respiratory.server.pojo.dto.RechargeDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.service.HealthcarePayService;
 import org.harvey.respiratory.server.service.HealthcareService;
-import org.harvey.respiratory.server.service.PatientService;
 import org.harvey.respiratory.server.service.VisitDoctorService;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
@@ -35,9 +33,11 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
 
     @Override
     public int queryBalance(QueryBalanceDto queryBalanceDto) {
-        Healthcare healthcare = healthcareService.query(queryBalanceDto);
-        if (healthcare == null) {
-            throw new ResourceNotFountException("未能找到医保资源");
+        Healthcare healthcare;
+        try {
+            healthcare = healthcareService.query(queryBalanceDto);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("未能找到医保资源", e);
         }
         return healthcare.getBalance();
     }
@@ -54,9 +54,11 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
 
     @Override
     public void pay(long visitId) {
-        VisitDoctor visitDoctor = visitDoctorService.querySimplyById(visitId);
-        if (visitDoctor == null) {
-            throw new ResourceNotFountException("未能找到就诊单");
+        VisitDoctor visitDoctor;
+        try {
+            visitDoctor = visitDoctorService.querySimplyById(visitId);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("未能找到就诊单", e);
         }
         if (!visitDoctor.isInterviewed()) {
             throw new BadRequestException("目标就诊单还未完成就诊");

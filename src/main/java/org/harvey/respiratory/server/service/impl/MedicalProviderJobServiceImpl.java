@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.MedicalProviderJobMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.DaoException;
@@ -31,6 +32,7 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
     private MedicalProviderService medicalProviderService;
 
     @Override
+    @NonNull
     public Integer register(MedicalProviderJob job) {
         boolean saved = super.save(job);
         if (saved) {
@@ -63,23 +65,27 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
     }
 
     @Override
+    @NonNull
     public MedicalProviderJob querySelf(long userId) {
-        MedicalProvider medicalProvider = medicalProviderService.selectByUser(userId);
-        if (medicalProvider == null) {
-            throw new ResourceNotFountException(
-                    "不能" + userId + "通过的身份证查询到医疗提供者信息");
+        MedicalProvider medicalProvider;
+        try {
+            medicalProvider = medicalProviderService.selectByUser(userId);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("不能" + userId + "通过的身份证查询到医疗提供者信息");
         }
         Integer jobId = medicalProvider.getJobId();
         return queryById(jobId);
     }
 
     @Override
+    @NonNull
     public List<MedicalProviderJob> queryAny(Page<MedicalProviderJob> page) {
         Page<MedicalProviderJob> jobPage = super.lambdaQuery().page(page);
         return jobPage.getRecords();
     }
 
     @Override
+    @NonNull
     public MedicalProviderJob queryById(int jobId) {
         MedicalProviderJob one = super.getById(jobId);
         if (one == null) {
@@ -89,6 +95,7 @@ public class MedicalProviderJobServiceImpl extends ServiceImpl<MedicalProviderJo
     }
 
     @Override
+    @NonNull
     public List<MedicalProviderJob> queryByName(String name) {
         if (name.isEmpty()) {
             throw new BadRequestException("职业退化成全查, 这不好");

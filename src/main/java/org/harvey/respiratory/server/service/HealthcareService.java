@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.dto.QueryBalanceDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
 
@@ -18,11 +19,14 @@ public interface HealthcareService extends IService<Healthcare> {
      */
     void register(Healthcare healthcare);
 
+    @NonNull
     Healthcare queryByCode(String healthcareCode);
 
+    @NonNull
 
     Healthcare queryById(long healthcareId);
 
+    @NonNull
     Healthcare query(QueryBalanceDto queryBalanceDto);
 
     void updateBalance(long healthcareId, int newBalance);

@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Drug;
 
@@ -24,12 +25,16 @@ public interface DrugService extends IService<Drug> {
 
     void deleteById(long drugId);
 
+    @NonNull
     Drug queryById(long id);
 
+    @NonNull
     List<Drug> queryByName(String name, Page<Drug> page);
 
+    @NonNull
     Map<Integer, Drug> queryByIds(Collection<Integer> drugIds);
 
+    @NonNull
     Map<Integer, Drug> queryByIdsFilterName(Set<Integer> drugIds, String name);
 
     void saveDrug(Drug drug);

@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 
 import java.util.List;
@@ -16,22 +17,27 @@ import java.util.List;
  */
 
 public interface MedicalProviderService extends IService<MedicalProvider> {
+    @NonNull
     Long register(MedicalProvider medicalProvider);
 
     void update(MedicalProvider medicalProvider);
 
     void delete(long id);
 
+    @NonNull
     MedicalProvider selectByUser(long userId);
 
+    @NonNull
     MedicalProvider selectByIdentityCardId(String identityCardId);
 
+    @NonNull
 
     MedicalProvider selectByPhone(String phoneNumber);
 
     /**
      * @param name 空字符和null将退化为全查
      */
+    @NonNull
     List<MedicalProvider> selectByAny(String name, Integer formId, Page<MedicalProvider> page);
 
 
@@ -40,5 +46,6 @@ public interface MedicalProviderService extends IService<MedicalProvider> {
     /**
      * 依据 id 查询
      */
+    @NonNull
     MedicalProvider queryById(long medicalProviderId);
 }

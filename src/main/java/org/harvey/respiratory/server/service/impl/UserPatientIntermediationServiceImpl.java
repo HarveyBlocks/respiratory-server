@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.UserPatientIntermediationMapper;
 import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
@@ -60,6 +61,7 @@ public class UserPatientIntermediationServiceImpl extends
     }
 
     @Override
+    @NonNull
     public List<Long> queryPatientOnUser(long userId) {
         return super.lambdaQuery()
                 .select(UserPatientIntermediation::getPatientId)

@@ -2,8 +2,10 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.VisitDoctorMapper;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
@@ -11,7 +13,6 @@ import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.MedicalProviderService;
-import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.service.UserPatientIntermediationService;
 import org.harvey.respiratory.server.service.VisitDoctorService;
 import org.harvey.respiratory.server.util.RangeDate;
@@ -39,6 +40,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     private UserPatientIntermediationService userPatientIntermediationService;
 
     @Override
+    @NonNull
     public Long queryMedicalProviderId(long visitDoctorId) {
         return super.lambdaQuery()
                 .select(VisitDoctor::getMedicalProviderId)
@@ -48,6 +50,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     }
 
     @Override
+    @NonNull
     public VisitDoctor queryMedicalProviderAndPatientId(long visitId) {
         return super.lambdaQuery()
                 .select(VisitDoctor::getMedicalProviderId)
@@ -57,8 +60,13 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     }
 
     @Override
+    @NonNull
     public VisitDoctor querySimplyById(long visitDoctorId) {
-        return super.lambdaQuery().eq(VisitDoctor::getId, visitDoctorId).one();
+        VisitDoctor one = super.lambdaQuery().eq(VisitDoctor::getId, visitDoctorId).one();
+        if (one == null) {
+            throw new ResourceNotFountException("can not find visit doctor by: " + visitDoctorId);
+        }
+        return one;
     }
 
     @Override
@@ -72,6 +80,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     }
 
     @Override
+    @NonNull
     public Long createVisitDoctorId(long patientId, long medicalProviderId) {
         VisitDoctor takeTheNumber = VisitDoctor.takeTheNumber(patientId, medicalProviderId);
         takeTheNumber.setVisitTime(LocalDateTime.now());
@@ -80,6 +89,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     }
 
     @Override
+    @NonNull
     public List<VisitDoctor> doctorQuery(String identityCardId, RangeDate rangeDate, Page<VisitDoctor> page) {
         MedicalProvider medicalProvider = medicalProviderService.selectByIdentityCardId(identityCardId);
         return super.lambdaQuery()
@@ -91,6 +101,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     }
 
     @Override
+    @NonNull
     public List<VisitDoctor> patientQuery(long currentUserId, RangeDate rangeDate, Page<VisitDoctor> page) {
         List<Long> patientIds = userPatientIntermediationService.queryPatientOnUser(currentUserId);
         return super.lambdaQuery()
@@ -110,9 +121,10 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
             case PATIENT:
             case NORMAL_DOCTOR:
             case MEDICATION_DOCTOR:
-                VisitDoctor related = this.relatedOnPatient(currentUser.getId(), visitId);
-                if (related == null) {
-                    throw new UnauthorizedException("不能访问与自己无关的问诊信息");
+                try {
+                    this.relatedOnPatient(currentUser.getId(), visitId);
+                } catch (ResourceNotFountException e) {
+                    throw new UnauthorizedException("不能访问与自己无关的问诊信息", e);
                 }
                 break;
             case CHARGE_DOCTOR:
@@ -125,15 +137,20 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
         }
     }
 
+    @NonNull
     private VisitDoctor relatedOnPatient(long userId, long visitId) {
         List<Long> patientIds = userPatientIntermediationService.queryPatientOnUser(userId);
-        if (patientIds == null || patientIds.isEmpty()) {
-            return null;
+        if (patientIds.isEmpty()) {
+            throw new ResourceNotFountException("不能找到id信息");
         }
-        return super.lambdaQuery()
+        VisitDoctor one = super.lambdaQuery()
                 .eq(VisitDoctor::getId, visitId)
                 .in(VisitDoctor::getPatientId, patientIds)
                 .one();
+        if (one == null) {
+            throw new ResourceNotFountException("不能通过id " + visitId + " 和当前用户持有斌换找到信息");
+        }
+        return one;
     }
 
 

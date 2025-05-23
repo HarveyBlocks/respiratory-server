@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.SpecificUsingDrugRecordMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -50,14 +51,17 @@ public class SpecificUsingDrugRecordServiceImpl extends
     @Resource
     private UserPatientIntermediationService userPatientIntermediationService;
 
+    @NonNull
     private static SpecificUsingDrugRecordService currentProxy() {
         return (SpecificUsingDrugRecordService) AopContext.currentProxy();
     }
 
+    @NonNull
     private static Set<Integer> mapDrugIds(List<SpecificUsingDrugRecord> records) {
         return records.stream().map(SpecificUsingDrugRecord::getDrugId).collect(Collectors.toSet());
     }
 
+    @NonNull
     private static List<DrugDto> setDto(List<SpecificUsingDrugRecord> records, Map<Integer, Drug> drugMap) {
         return records.stream()
                 .map(record -> new DrugDto(record, drugMap.get(record.getDrugId())))
@@ -67,7 +71,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
     @Override
     public void validOnWrite(UserDto user, Long visitDoctorId) {
         Role role = preCheckThenGetRole(user);
-        if (visitDoctorId==null){
+        if (visitDoctorId == null) {
             throw new BadRequestException("需要问诊号");
         }
         switch (role) {
@@ -76,8 +80,10 @@ public class SpecificUsingDrugRecordServiceImpl extends
             case MEDICATION_DOCTOR:
                 throw new UnauthorizedException("无权限使用此功能");
             case NORMAL_DOCTOR:
-                Long medicalProviderId = visitDoctorService.queryMedicalProviderId(visitDoctorId);
-                if (medicalProviderId == null) {
+                long medicalProviderId;
+                try {
+                    medicalProviderId = visitDoctorService.queryMedicalProviderId(visitDoctorId);
+                } catch (ResourceNotFountException e) {
                     throw new ResourceNotFountException("不存在的visit doctor id");
                 }
                 boolean samePeople = medicalProviderService.samePeople(medicalProviderId, user.getIdentityCardId());
@@ -105,7 +111,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
         // 4. 用户和这次问诊的病患有关联->进入5, 否则进入6
         // 5. 可以查询
         // 5. 不可以查询
-        if (visitId==null){
+        if (visitId == null) {
             throw new BadRequestException("需要问诊号");
         }
         VisitDoctor visitDoctor = null;
@@ -113,8 +119,9 @@ public class SpecificUsingDrugRecordServiceImpl extends
             case UNKNOWN:
                 throw new UnauthorizedException("无权限使用此功能");
             case NORMAL_DOCTOR:
-                visitDoctor = visitDoctorService.queryMedicalProviderAndPatientId(visitId);
-                if (visitDoctor == null) {
+                try {
+                    visitDoctor = visitDoctorService.queryMedicalProviderAndPatientId(visitId);
+                } catch (ResourceNotFountException e) {
                     throw new ResourceNotFountException("不存在的visit doctor id");
                 }
                 boolean samePeople = medicalProviderService.samePeople(
@@ -126,10 +133,11 @@ public class SpecificUsingDrugRecordServiceImpl extends
             case MEDICATION_DOCTOR: // 医药医生在这个业务中不具备医生的权限, 退化成病人
             case PATIENT:
                 if (visitDoctor == null) {
-                    visitDoctor = visitDoctorService.queryMedicalProviderAndPatientId(visitId);
-                }
-                if (visitDoctor == null) {
-                    throw new ResourceNotFountException("不存在的visit doctor id");
+                    try {
+                        visitDoctor = visitDoctorService.queryMedicalProviderAndPatientId(visitId);
+                    } catch (ResourceNotFountException e) {
+                        throw new ResourceNotFountException("不存在的visit doctor id", e);
+                    }
                 }
                 boolean exist = userPatientIntermediationService.existRelation(
                         user.getId(), visitDoctor.getPatientId());
@@ -174,6 +182,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
         }
     }
 
+    @NonNull
     private Role preCheckThenGetRole(UserDto user) {
         if (user == null) {
             throw new UnauthorizedException("未登录无权限使用此功能");
@@ -253,19 +262,30 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
+    @NonNull
     public SpecificUsingDrugRecord queryByIdIgnoreDeleted(Long id) {
-        return super.getById(id);
+        SpecificUsingDrugRecord record = super.getById(id);
+        if (record == null) {
+            throw new ResourceNotFountException("specific using drug record by id: " + id);
+        }
+        return record;
     }
 
     @Override
+    @NonNull
     public SpecificUsingDrugRecord queryById(Long id) {
-        return super.lambdaQuery()
+        SpecificUsingDrugRecord one = super.lambdaQuery()
                 .eq(SpecificUsingDrugRecord::getId, id)
                 .eq(SpecificUsingDrugRecord::getDeleted, false)
                 .one();
+        if (one == null) {
+            throw new ResourceNotFountException("can not found by id: " + id);
+        }
+        return one;
     }
 
     @Override
+    @NonNull
     public List<DrugDto> queryDrugInVisit(long visitId) {
         List<SpecificUsingDrugRecord> records = super.lambdaQuery()
                 .eq(SpecificUsingDrugRecord::getVisitDoctorId, visitId)
@@ -277,6 +297,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
+    @NonNull
     public List<DrugDto> queryHistoryDrugUsingByName(long patientId, String name) {
         List<SpecificUsingDrugRecord> records = super.lambdaQuery()
                 .eq(SpecificUsingDrugRecord::getPatientId, patientId)
@@ -288,6 +309,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
+    @NonNull
     public List<DrugDto> queryHistoryDrugUsingByDate(long patientId, RangeDate rangeDate) {
         // record.start>rangeDate.start and record.end<rangeDate.end
         List<SpecificUsingDrugRecord> records = super.lambdaQuery()
@@ -302,6 +324,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
+    @NonNull
     public List<Long> saveSymptomaticPresentationBatch(List<SpecificUsingDrugRecord> recordList) {
         // 初始化一下, 防止奇奇怪怪的字段
         recordList.forEach(SpecificUsingDrugRecord::resetForNewInsert);

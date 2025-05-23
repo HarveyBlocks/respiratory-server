@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.DiseaseDiagnosisIntermediation;
 
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.List;
  */
 
 public interface DiseaseDiagnosisIntermediationService extends IService<DiseaseDiagnosisIntermediation> {
+
+    @NonNull
     List<Integer> selectDiseaseByVisit(long visitId);
 
     /**

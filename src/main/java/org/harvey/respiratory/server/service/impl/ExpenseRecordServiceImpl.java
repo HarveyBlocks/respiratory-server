@@ -1,12 +1,11 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.ExpenseRecordMapper;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.ExpenseRecord;
 import org.harvey.respiratory.server.service.ExpenseRecordService;
-import org.harvey.respiratory.server.service.RoleService;
-import org.harvey.respiratory.server.service.UserPatientIntermediationService;
 import org.harvey.respiratory.server.service.VisitDoctorService;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +39,7 @@ public class ExpenseRecordServiceImpl extends ServiceImpl<ExpenseRecordMapper, E
     private VisitDoctorService visitDoctorService;
 
     @Override
+    @NonNull
     public List<ExpenseRecord> querySelfExpenseRecord(UserDto currentUser, long visitId) {
         visitDoctorService.queryValid(currentUser, visitId);
         return super.lambdaQuery().eq(ExpenseRecord::getVisitDoctorId, visitId).list();

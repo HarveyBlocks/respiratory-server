@@ -100,16 +100,18 @@ public class UserSecurityController {
             HttpServletResponse response) {
 //        System.err.println("hi");
         //实现注册功能
-        UserSecurity user = userSecurityService.selectByPhone(registerForm.getPhone());
-        if (user != null) {
+        try {
+            UserSecurity user = userSecurityService.selectByPhone(registerForm.getPhone());
             return new Result<>(400, "用户已存在");
+        } catch (ResourceNotFountException e) {
+            try {
+                String token = userSecurityService.register(registerForm);
+                response.setHeader(Constants.AUTHORIZATION_HEADER, token);
+                return Result.ok();
+            } catch (ResourceNotFountException ie) {
+                return new Result<>(500, "保存失败");
+            }
         }
-        String token = userSecurityService.register(registerForm);
-        if (token == null) {
-            return new Result<>(500, "保存失败");
-        }
-        response.setHeader(Constants.AUTHORIZATION_HEADER, token);
-        return Result.ok();
     }
 
     /**
@@ -164,8 +166,7 @@ public class UserSecurityController {
             map.put(UserSecurityService.NAME_FIELD, UserSecurity.DEFAULT_NAME);
             stringRedisTemplate.opsForHash().putAll(key, map);
         }
-        return new Result<>(
-                new UserDto(1L, "name", Role.PATIENT, "350121200410080032"));
+        return new Result<>(new UserDto(1L, "name", Role.PATIENT, "350121200410080032"));
     }
 
     @ApiOperation(value = "更新用户信息, 也是用身份证实名, 实名之后可确认权限-病人/医生",

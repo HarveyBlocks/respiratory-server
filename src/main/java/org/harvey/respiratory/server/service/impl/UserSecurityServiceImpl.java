@@ -6,10 +6,12 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.dao.UserSecurityMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.DaoException;
 import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
@@ -25,6 +27,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.util.annotation.Nullable;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -57,6 +60,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         this.redissonLock = redissonLock;
     }
 
+    @NonNull
     private static Map<String, String> user2Map(UserDto user) {
         return Map.of(ID_FIELD, user.getId().toString(), NAME_FIELD, user.getName(), "identityCardId",
                 String.valueOf(user.getIdentityCardId()), TIME_FIELD, Constants.RESTRICT_REQUEST_TIMES
@@ -64,6 +68,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
+    @Nullable
     public String sendCode(String phone) {
         String code = null;
         if (RegexUtils.isPhoneEffective(phone)) {
@@ -76,19 +81,18 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
+    @NonNull
     public UserSecurity loginByCode(String codeCache, String phone, String code) {
         // code的长度已经正确,code不为null
         if (!code.equals(codeCache)) {
-            return null;
+            throw new BadRequestException("验证码不正确");
         }
 
         // 如果验证码手机号一致, 去数据库查找用户
-        UserSecurity user = selectByPhone(phone);
-
-        // 判断用户是否存在
-        if (user == null) {
-            // 不存在就创建新用户并保存
-            user = new UserSecurity();
+        try {
+            return selectByPhone(phone);
+        } catch (ResourceNotFountException e) {// 不存在就创建新用户并保存
+            UserSecurity user = new UserSecurity();
             user.setPhone(phone);
             //newUser.setId()主键会自增, 不必管他
             // user.setIcon(UserSecurity.DEFAULT_ICON);//头像使用默认的
@@ -101,25 +105,29 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
             baseMapper.insert(user);
             // user为null, user的id怎么确认? 再查一次? 太反人类了吧
             user = selectByPhone(phone);
+            // log.debug(String.valueOf(user));
+            // 返回user
+            return user;
+
         }
-        // log.debug(String.valueOf(user));
-        // 返回user
-        return user;
     }
 
     @Override
+    @NonNull
     public UserSecurity loginByPassword(String phone, String password) {
         if (!RegexUtils.isPasswordEffective(password)) {
             throw new BadRequestException("密码格式不正确,应是4~32位的字母、数字、下划线");
         }
         // 依据电话号码从service取数据
-        UserSecurity user = selectByPhone(phone);
-        // 取出来的数据和密码作比较
-        if (user == null) {
+        UserSecurity user;
+        try {
+            user = selectByPhone(phone);
+        } catch (ResourceNotFountException e) {
             UserSecurity nullUser = new UserSecurity();
             nullUser.setId(-1L);
             return nullUser;//用户名不存在
         }
+        // 取出来的数据和密码作比较
         if (!passwordEncoder.matches(password, user.getPassword())) {
             // password经过检验, 非null, 数据库里的password可能是null
             throw new BadRequestException("用户名或密码错误");
@@ -130,6 +138,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
+    @NonNull
     public String chooseLoginWay(LoginFormDto loginForm) {
         UserSecurity user /* = null*/;
         String phone = loginForm.getPhone();
@@ -154,18 +163,12 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
                 throw new BadRequestException("该手机未申请验证码, 请确认手机号或是否已经请求验证码");
             }
             user = this.loginByCode(codeCache, phone, code);
-            if (user == null) {
-                throw new BadRequestException("验证码不正确");
-            } else {
-                // 如果成功了, 就删除Redis缓存
-                stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + phone);
-                // 否则不删除会话,给用户一个再次输入验证码的机会
-            }
+            // 如果成功了, 就删除Redis缓存
+            stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + phone);
+            // 否则不删除会话,给用户一个再次输入验证码的机会
         } else /*if(password!=null&&!password.isEmpty())*/ {
             user = this.loginByPassword(phone, password);
-            if (user == null) {
-                throw new UnauthorizedException("密码不正确");
-            } else if (user.getId().equals(-1L)) {
+            if (user.getId().equals(-1L)) {
                 throw new UnauthorizedException("该用户不存在");
             }
         }
@@ -184,6 +187,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
 
     @Override
     @Transactional
+    @NonNull
     public String register(RegisterFormDto registerForm) {
         UserSecurity registerUser = new UserSecurity();
         String phone = registerForm.getPhone();
@@ -193,15 +197,16 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
         boolean saved = save(registerUser);
         if (!saved) {
             log.error("保存失败错误");
-            return null;
+            throw new DaoException(DaoException.Operation.SAVE_FAIL, "保存失败");
         }
         // 依据电话号码从service取数据
-        UserSecurity user = selectByPhone(registerUser.getPhone());
-
-        // 取出来的数据和密码作比较
-        if (user == null) {
-            return null;
+        UserSecurity user;
+        try {
+            user = selectByPhone(registerUser.getPhone());
+        }catch (ResourceNotFountException e){
+            throw new ResourceNotFountException("不能通过电话 " + registerUser.getPhone() + " 找到用户");
         }
+        // 取出来的数据和密码作比较
 
         // 将用户DTO存入Redis
         String token = jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
@@ -213,7 +218,11 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     @Transactional
     public void updateUser(UserDto newUser, String token) {
         // 更新实体数据
-        UserSecurity user = this.getById(UserHolder.currentUserId());
+        Long currentUserId = UserHolder.currentUserId();
+        UserSecurity user = super.getById(currentUserId);
+        if (user == null) {
+            throw new ResourceNotFountException("can not found: " + currentUserId);
+        }
         String name = newUser.getName();
         if (!StrUtil.isEmpty(name)) {
             user.setName(name);
@@ -253,20 +262,31 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
+    @NonNull
     public UserSecurity selectByPhone(String phone) {
         LambdaQueryWrapper<UserSecurity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select().eq(UserSecurity::getPhone, phone);
-        return baseMapper.selectOne(lambdaQueryWrapper);
+        UserSecurity userSecurity = baseMapper.selectOne(lambdaQueryWrapper);
+        if (userSecurity == null) {
+            throw new ResourceNotFountException("can not find by phone: " + phone);
+        }
+        return userSecurity;
     }
 
     @Override
+    @NonNull
     public UserSecurity selectByIdentityCardId(String identityCardId) {
         LambdaQueryWrapper<UserSecurity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select().eq(UserSecurity::getIdentityCardId, identityCardId);
-        return baseMapper.selectOne(lambdaQueryWrapper);
+        UserSecurity userSecurity = baseMapper.selectOne(lambdaQueryWrapper);
+        if (userSecurity == null) {
+            throw new ResourceNotFountException("can not find by phone: " + phone);
+        }
+        return userSecurity;
     }
 
     @Override
+    @Nullable
     public UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException {
         // Redis里没有数据
 
@@ -276,6 +296,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
                 lockKey, () -> fastQueryUserByIdWithRedisson(key, userId), () -> getFromDbAndWriteToCache(key, userId));
     }
 
+    @Nullable
     private UserDto fastQueryUserByIdWithRedisson(String key, Long userId) {
         log.debug("queryMutexFixByLock");
 
@@ -301,6 +322,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
     }
 
     @Override
+    @NonNull
     public UserSecurity selectById(long userId) {
         UserSecurity userSecurity = super.getById(userId);
         if (userSecurity == null) {
@@ -316,16 +338,17 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
      * @param key key
      * @return shop
      */
+    @Nullable
     private UserDto getFromDbAndWriteToCache(String key, Long id) {
         // 缓存不存在
         // 使用缓存空对象的逻辑
-        log.debug("缓存不存在用户"+id+", 只能在数据库中查");
+        log.debug("缓存不存在用户" + id + ", 只能在数据库中查");
         UserDto userDTO = null;
         Long ttl = RedisConstants.CACHE_NULL_TTL;
         Map<String, String> userFieldMap = Map.of("id", "");
         // 数据库查
         log.debug("从数据库查用户:" + id);
-        UserSecurity user = this.getById(id);
+        UserSecurity user = super.getById(id);
         if (user != null) {
             userDTO = new UserDto(user);
             // 存在,写入Cache,更改TTL
@@ -352,6 +375,7 @@ public class UserSecurityServiceImpl extends ServiceImpl<UserSecurityMapper, Use
      *
      * @return 增加了随机值的ttl
      */
+    @NonNull
     private Long plusRandomSec(Long ttl) {
         long random;
         if (ttl <= 10L) {

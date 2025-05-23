@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.dto.DrugDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.SpecificUsingDrugRecord;
@@ -37,23 +38,29 @@ public interface SpecificUsingDrugRecordService extends IService<SpecificUsingDr
     @Transactional
     void logicUpdate(long oldId, SpecificUsingDrugRecord newData);
 
+    @NonNull
     SpecificUsingDrugRecord queryByIdIgnoreDeleted(Long id);
 
+    @NonNull
     SpecificUsingDrugRecord queryById(Long id);
 
+    @NonNull
     List<DrugDto> queryDrugInVisit(long visitId);
 
+    @NonNull
     List<DrugDto> queryHistoryDrugUsingByName(long patientId, String name);
 
+    @NonNull
     List<DrugDto> queryHistoryDrugUsingByDate(long patientId, RangeDate rangeDate);
 
     /**
      * 只允许服务器内调用, 只有医生用户可调用
-     * 外部进行校验 {@link #validOnWrite(UserDto, long)}
+     * 外部进行校验 {@link #validOnWrite(UserDto, Long)}
      *
      * @return 插入后的多个症状的id
      */
     @Transactional
+    @NonNull
     List<Long> saveSymptomaticPresentationBatch(List<SpecificUsingDrugRecord> recordList);
 
 }

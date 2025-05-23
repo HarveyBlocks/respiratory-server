@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.interceptor;
 
 
+import lombok.NonNull;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -20,8 +21,8 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(
             HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler) {
+            @NonNull HttpServletResponse response,
+            @NonNull Object handler) {
         if (Constants.ROOT_AUTH_URI.contains(request.getRequestURI())) {
             String identityCardId = UserHolder.getUser().getIdentityCardId();
             if (identityCardId == null || identityCardId.isEmpty()) {

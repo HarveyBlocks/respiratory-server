@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.UserPatientIntermediation;
 
 import java.util.List;
@@ -21,5 +22,6 @@ public interface UserPatientIntermediationService extends IService<UserPatientIn
 
     boolean delete(long patientId, long userId);
 
+    @NonNull
     List<Long> queryPatientOnUser(long userId);
 }

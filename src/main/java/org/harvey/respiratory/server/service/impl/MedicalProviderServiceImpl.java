@@ -2,8 +2,10 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.MedicalProviderMapper;
 import org.harvey.respiratory.server.exception.DaoException;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
@@ -30,6 +32,7 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     private UserSecurityService userSecurityService;
 
     @Override
+    @NonNull
     public Long register(MedicalProvider medicalProvider) {
         boolean saved = super.save(medicalProvider);
         if (saved) {
@@ -61,35 +64,45 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     }
 
     @Override
+    @NonNull
     public MedicalProvider selectByUser(long userId) {
         UserSecurity userSecurity = userSecurityService.selectById(userId);
         if (userSecurity.getIdentityCardId() == null) {
             throw new UnauthorizedException("不能查询医疗提供者信息");
         }
-        return super.lambdaQuery().eq(MedicalProvider::getIdentityCardId, userSecurity.getIdentityCardId()).one();
+        MedicalProvider one = super.lambdaQuery()
+                .eq(MedicalProvider::getIdentityCardId, userSecurity.getIdentityCardId())
+                .one();
+        if (one == null) {
+            throw new ResourceNotFountException("not found medical provider: " + userId);
+        }
+        return one;
     }
 
     @Override
+    @NonNull
     public MedicalProvider selectByIdentityCardId(String identityCardId) {
-        return super.lambdaQuery().eq(MedicalProvider::getIdentityCardId, identityCardId).one();
+        MedicalProvider one = super.lambdaQuery().eq(MedicalProvider::getIdentityCardId, identityCardId).one();
+        if (one == null) {
+            throw new ResourceNotFountException("no medical provider of: " + identityCardId);
+        }
+        return one;
     }
 
     @Override
+    @NonNull
     public MedicalProvider selectByPhone(String phoneNumber) {
         UserSecurity userSecurity = userSecurityService.selectByPhone(phoneNumber);
-        if (userSecurity == null) {
-            // 没有这个用户...?
-            return null;
-        }
         String identityCardId = userSecurity.getIdentityCardId();
         if (identityCardId == null) {
             // 没有被实名的用户, 其实一定不是医生了
-            return null;
+            throw new UnauthorizedException("未实名一定不存在这位医生");
         }
         return this.selectByIdentityCardId(identityCardId);
     }
 
     @Override
+    @NonNull
     public List<MedicalProvider> selectByAny(String name, Integer formId, Page<MedicalProvider> page) {
         return super.lambdaQuery()
                 .eq(formId != null, MedicalProvider::getFormId, formId)
@@ -107,7 +120,12 @@ public class MedicalProviderServiceImpl extends ServiceImpl<MedicalProviderMappe
     }
 
     @Override
+    @NonNull
     public MedicalProvider queryById(long medicalProviderId) {
-        return super.lambdaQuery().eq(MedicalProvider::getId, medicalProviderId).one();
+        MedicalProvider one = super.lambdaQuery().eq(MedicalProvider::getId, medicalProviderId).one();
+        if (one == null) {
+            throw new ResourceNotFountException("no medical provider of: " + medicalProviderId);
+        }
+        return one;
     }
 }

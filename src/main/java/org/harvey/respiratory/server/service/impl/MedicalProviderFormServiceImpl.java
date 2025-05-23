@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.MedicalProviderFormMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.DaoException;
@@ -32,6 +33,7 @@ public class MedicalProviderFormServiceImpl extends
     private MedicalProviderService medicalProviderService;
 
     @Override
+    @NonNull
     public Integer register(MedicalProviderForm form) {
         boolean saved = super.save(form);
         if (saved) {
@@ -63,23 +65,27 @@ public class MedicalProviderFormServiceImpl extends
     }
 
     @Override
+    @NonNull
     public MedicalProviderForm querySelf(long userId) {
-        MedicalProvider medicalProvider = medicalProviderService.selectByUser(userId);
-        if (medicalProvider == null) {
-            throw new ResourceNotFountException(
-                    "不能" + userId + "通过的身份证查询到医疗提供者信息");
+        MedicalProvider medicalProvider;
+        try {
+            medicalProvider = medicalProviderService.selectByUser(userId);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("不能" + userId + "通过的身份证查询到医疗提供者信息", e);
         }
         Integer formId = medicalProvider.getFormId();
         return queryById(formId);
     }
 
     @Override
+    @NonNull
     public List<MedicalProviderForm> queryAny(Page<MedicalProviderForm> page) {
         Page<MedicalProviderForm> formPage = super.lambdaQuery().page(page);
         return formPage.getRecords();
     }
 
     @Override
+    @NonNull
     public MedicalProviderForm queryById(int formId) {
         MedicalProviderForm one = super.getById(formId);
         if (one == null) {
@@ -89,6 +95,7 @@ public class MedicalProviderFormServiceImpl extends
     }
 
     @Override
+    @NonNull
     public List<MedicalProviderForm> queryByName(String name) {
         if (name.isEmpty()) {
             throw new BadRequestException("机构退化成全查, 这不好");
@@ -97,6 +104,7 @@ public class MedicalProviderFormServiceImpl extends
     }
 
     @Override
+    @NonNull
     public List<MedicalProviderForm> queryByAddress(String address) {
         if (address.isEmpty()) {
             throw new BadRequestException("机构退化成全查, 这不好");

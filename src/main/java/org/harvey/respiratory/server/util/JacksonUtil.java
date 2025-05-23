@@ -96,7 +96,7 @@ public class JacksonUtil {
 
     public Map<String, String> toStringMap(String json) {
         try {
-            return mapper.readValue(json, new TypeReference<Map<String, String>>() {
+            return mapper.readValue(json, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new RuntimeException(e);

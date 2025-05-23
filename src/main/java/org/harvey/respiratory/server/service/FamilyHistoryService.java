@@ -3,11 +3,9 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.FamilyHistory;
-import org.harvey.respiratory.server.pojo.entity.FamilyRelationshipEntity;
-import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
-import org.harvey.respiratory.server.util.ConstantsInitializer;
 
 import java.util.List;
 
@@ -20,14 +18,22 @@ import java.util.List;
  */
 
 public interface FamilyHistoryService extends IService<FamilyHistory> {
+
+    @NonNull
     Long register(FamilyHistory familyHistory);
 
+
+    @NonNull
     List<FamilyHistory> queryByPatient(long patientId, Page<FamilyHistory> page);
 
+
+    @NonNull
     List<FamilyHistory> queryByDiseaseName(long patientId, String diseaseName, Page<FamilyHistory> page);
 
+    @NonNull
     List<FamilyHistory> queryByDisease(long patientId, int diseaseId, Page<FamilyHistory> page);
 
+    @NonNull
     List<FamilyHistory> queryByRelationship(
             long patientId, List<Integer> relationshipIds, Page<FamilyHistory> objectPage);
 

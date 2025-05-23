@@ -1,7 +1,6 @@
 package org.harvey.respiratory.server.service;
 
 
-import org.harvey.respiratory.server.pojo.dto.PayDto;
 import org.harvey.respiratory.server.pojo.dto.QueryBalanceDto;
 import org.harvey.respiratory.server.pojo.dto.RechargeDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;

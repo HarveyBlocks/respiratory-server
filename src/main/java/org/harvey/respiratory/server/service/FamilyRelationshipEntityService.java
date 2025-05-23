@@ -3,8 +3,8 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.FamilyRelationshipEntity;
-import org.harvey.respiratory.server.util.ConstantsInitializer;
 
 import java.util.List;
 
@@ -17,5 +17,6 @@ import java.util.List;
  */
 public interface FamilyRelationshipEntityService extends IService<FamilyRelationshipEntity> {
 
+    @NonNull
     List<FamilyRelationshipEntity> query(Page<FamilyRelationshipEntity> page);
 }

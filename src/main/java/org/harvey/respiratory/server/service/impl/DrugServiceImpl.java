@@ -2,15 +2,16 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.DrugMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
+import org.harvey.respiratory.server.exception.ResourceNotFountException;
 import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.DrugService;
-import org.harvey.respiratory.server.service.RoleService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,9 +28,6 @@ import java.util.*;
  */
 @Service
 public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements DrugService {
-
-    @Resource
-    private RoleService roleService;
 
     @Override
     public void writeValid(UserDto user) {
@@ -76,16 +74,24 @@ public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements Dr
     }
 
     @Override
+    @NonNull
     public Drug queryById(long id) {
-        return super.getById(id);
+        Drug drug = super.getById(id);
+        if (drug == null) {
+            throw new ResourceNotFountException("drug of id: " + id);
+        } else {
+            return drug;
+        }
     }
 
     @Override
+    @NonNull
     public List<Drug> queryByName(String name, Page<Drug> page) {
         return super.lambdaQuery().like(Drug::getName, name).page(page).getRecords();
     }
 
     @Override
+    @NonNull
     public Map<Integer, Drug> queryByIds(Collection<Integer> drugIds) {
         List<Drug> drugList = super.lambdaQuery().in(Drug::getId, drugIds).list();
         Map<Integer, Drug> resultMap = new HashMap<>();
@@ -96,6 +102,7 @@ public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements Dr
     }
 
     @Override
+    @NonNull
     public Map<Integer, Drug> queryByIdsFilterName(Set<Integer> drugIds, String name) {
         if (name == null || name.isEmpty()) {
             throw new BadRequestException("name 不得为空");

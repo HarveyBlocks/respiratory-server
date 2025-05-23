@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.FamilyHistoryMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -12,7 +13,6 @@ import org.harvey.respiratory.server.pojo.entity.FamilyHistory;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.DiseaseService;
 import org.harvey.respiratory.server.service.FamilyHistoryService;
-import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.service.UserPatientIntermediationService;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +35,6 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
 
     @Resource
     private UserPatientIntermediationService userPatientIntermediationService;
-    @Resource
-    private RoleService roleService;
     @Resource
     private DiseaseService diseaseService;
 
@@ -77,6 +75,7 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
     }
 
     @Override
+    @NonNull
     public Long register(FamilyHistory familyHistory) {
         Long patientId = familyHistory.getPatientId();
         if (patientId == null) {
@@ -94,11 +93,13 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
     }
 
     @Override
+    @NonNull
     public List<FamilyHistory> queryByPatient(long patientId, Page<FamilyHistory> page) {
         return super.lambdaQuery().eq(FamilyHistory::getPatientId, patientId).page(page).getRecords();
     }
 
     @Override
+    @NonNull
     public List<FamilyHistory> queryByDiseaseName(long patientId, String diseaseName, Page<FamilyHistory> page) {
         List<Integer> ids = diseaseService.queryIdsByName(diseaseName);
 
@@ -110,6 +111,7 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
     }
 
     @Override
+    @NonNull
     public List<FamilyHistory> queryByDisease(long patientId, int diseaseId, Page<FamilyHistory> page) {
         return super.lambdaQuery()
                 .eq(FamilyHistory::getPatientId, patientId)
@@ -119,6 +121,7 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
     }
 
     @Override
+    @NonNull
     public List<FamilyHistory> queryByRelationship(
             long patientId, List<Integer> relationshipIds, Page<FamilyHistory> page) {
         boolean relationshipIdsValid = relationshipIds != null && !relationshipIds.isEmpty();

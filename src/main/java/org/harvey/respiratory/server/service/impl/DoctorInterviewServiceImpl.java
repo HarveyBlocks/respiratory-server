@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server.service.impl;
 
+import lombok.NonNull;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
@@ -64,6 +65,7 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
     /**
      * 映射症状dto->entity
      */
+    @NonNull
     private static List<SymptomaticPresentation> getSymptomaticPresentationList(
             List<InterviewDto.SymptomaticPresentationDto> symptomaticPresentationDtoList, Long visitDoctorId) {
         if (symptomaticPresentationDtoList == null) {
@@ -77,6 +79,7 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
     /**
      * 生成药物具体使用的记录, 数据库entity
      */
+    @NonNull
     private static List<SpecificUsingDrugRecord> getSpecificUsingDrugRecords(
             List<InterviewDto.SpecificUsingDrugRecordDto> usingDrugDto, Long visitDoctorId, Long patientId) {
         return usingDrugDto.stream()
@@ -143,6 +146,7 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         );
     }
 
+    @NonNull
     private static Map<Integer, Integer> mapDrugIdToDepleteCount(List<SpecificUsingDrugRecord> usingDrugRecords) {
         // 完成从药品id到drug的消耗的映射
         return usingDrugRecords.stream()
@@ -222,6 +226,7 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
     /**
      * 如果没有概述, 就依据确证的病症生成概述
      */
+    @NonNull
     private String getBriefDescription(InterviewDto interviewDto) {
         String briefDescription = interviewDto.getBriefDescription();
         if (briefDescription != null) {

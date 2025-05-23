@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Disease;
 
@@ -19,19 +20,27 @@ import java.util.List;
 public interface DiseaseService extends IService<Disease> {
     void deleteById(int id);
 
+    @NonNull
+
     List<Disease> selectByVisitDoctor(long visitId);
 
+    @NonNull
     Disease selectById(int id);
 
+    @NonNull
     List<Disease> selectByPage(Page<Disease> page);
 
+    @NonNull
     List<Disease> selectByName(String name, Page<Disease> page);
 
+    @NonNull
     List<Integer> queryIdsByName(String diseaseName);
 
+    @NonNull
     List<String> queryDiseaseNameByIds(List<Integer> diseaseIds);
 
     void validOnWrite(UserDto user);
 
+    @NonNull
     Integer register(Disease disease);
 }

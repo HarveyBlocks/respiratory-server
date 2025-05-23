@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public interface MedicalProviderDepartmentService extends IService<MedicalProvid
     /**
      * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_UPDATE
      */
+    @NonNull
     Integer register(MedicalProviderDepartment department);
 
     /**
@@ -34,11 +36,15 @@ public interface MedicalProviderDepartmentService extends IService<MedicalProvid
     /**
      * @see org.harvey.respiratory.server.util.RoleConstant#MEDICAL_PROVIDER_READ
      */
+    @NonNull
     MedicalProviderDepartment querySelf(long userId);
 
+    @NonNull
     List<MedicalProviderDepartment> queryAny(Page<MedicalProviderDepartment> page);
 
+    @NonNull
     MedicalProviderDepartment queryById(int departmentId);
 
+    @NonNull
     List<MedicalProviderDepartment> queryByName(String name);
 }

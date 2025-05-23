@@ -40,8 +40,12 @@ public class SpecificUsingDrugController {
             @PathVariable("id") @ApiParam(value = "使用方法id", required = true) Long id) {
         // 由于药留证据, 所以是逻辑删除
         // 当亲visitDoctor的医生可以删除这个具体用药记录, 即使是主管医生/开发者直接过
-        SpecificUsingDrugRecord record = specificUsingDrugRecordService.queryById(id);
-        if (record == null) {
+        SpecificUsingDrugRecord record;
+
+
+        try {
+            record = specificUsingDrugRecordService.queryById(id);
+        } catch (ResourceNotFountException e) {
             throw new ResourceNotFountException("不存在的用药id");
         }
         specificUsingDrugRecordService.validOnWrite(UserHolder.getUser(), record.getVisitDoctorId());

@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.interceptor;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
@@ -45,7 +46,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler) {
+            HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
 
         // 进入controller之前进行登录校验
         String token = request.getHeader(Constants.AUTHORIZATION_HEADER);//依据前端的信息
@@ -115,7 +116,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(
-            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+            HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, Exception ex) {
         doAfter(request.getRemoteAddr());
     }
 

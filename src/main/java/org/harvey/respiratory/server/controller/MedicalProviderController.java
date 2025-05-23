@@ -93,9 +93,11 @@ public class MedicalProviderController {
             throw new UnauthorizedException("登录后可使用");
         }
         RoleUtil.validOnRole(user.getRole(), RoleConstant.MEDICAL_PROVIDER_READ);
-        MedicalProvider medicalProvider = medicalProviderService.selectByUser(user.getId());
-        if (medicalProvider == null) {
-            throw new ResourceNotFountException("不能通过当前用户的身份证查询到医疗提供者信息");
+        MedicalProvider medicalProvider;
+        try {
+            medicalProvider = medicalProviderService.selectByUser(user.getId());
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("不能通过当前用户的身份证查询到医疗提供者信息", e);
         }
         return Result.success(medicalProvider);
     }

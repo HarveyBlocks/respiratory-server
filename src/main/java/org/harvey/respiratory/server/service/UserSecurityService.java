@@ -2,12 +2,14 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.pojo.dto.LoginFormDto;
 import org.harvey.respiratory.server.pojo.dto.RegisterFormDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.UserSecurity;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.util.annotation.Nullable;
 
 /**
  * 用户业务的实现
@@ -27,8 +29,10 @@ public interface UserSecurityService extends IService<UserSecurity> {
      * @param phone 手机号
      * @return 校验码
      */
+    @Nullable
     String sendCode(String phone);
 
+    @NonNull
     UserSecurity selectByPhone(String phone);
 
     /**
@@ -39,6 +43,7 @@ public interface UserSecurityService extends IService<UserSecurity> {
      * @param code      新请求的验证码
      * @return 用户信息
      */
+    @NonNull
     UserSecurity loginByCode(String codeCache, String phone, String code);
 
     /**
@@ -50,20 +55,26 @@ public interface UserSecurityService extends IService<UserSecurity> {
      * 若返回null则为用户名密码错误,<br>
      * 否则返回正确查到的用户<br>
      */
+    @NonNull
     UserSecurity loginByPassword(String phone, String password);
 
 
+    @NonNull
     String chooseLoginWay(LoginFormDto loginForm);
 
+    @NonNull
     String register(RegisterFormDto registerForm);
 
     @Transactional
     void updateUser(UserDto userDTO, String token);
 
+    @NonNull
     UserSecurity selectByIdentityCardId(String identityCardId);
 
+    @Nullable
     UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException;
 
 
+    @NonNull
     UserSecurity selectById(long userId);
 }

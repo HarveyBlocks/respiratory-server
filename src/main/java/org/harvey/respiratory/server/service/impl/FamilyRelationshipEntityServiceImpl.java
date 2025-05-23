@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import org.harvey.respiratory.server.dao.FamilyRelationshipEntityMapper;
 import org.harvey.respiratory.server.pojo.entity.FamilyRelationshipEntity;
 import org.harvey.respiratory.server.service.FamilyRelationshipEntityService;
@@ -24,6 +25,7 @@ public class FamilyRelationshipEntityServiceImpl extends
         FamilyRelationshipEntityService {
 
     @Override
+    @NonNull
     public List<FamilyRelationshipEntity> query(Page<FamilyRelationshipEntity> page) {
         return super.lambdaQuery().page(page).getRecords();
     }

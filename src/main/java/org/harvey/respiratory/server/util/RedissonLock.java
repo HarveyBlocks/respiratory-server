@@ -5,6 +5,7 @@ import org.harvey.respiratory.server.exception.ServerException;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
+import reactor.util.annotation.Nullable;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,8 @@ public class RedissonLock<T> {
      * @param slowSupply 获取值的慢方法
      * @return id
      */
+
+    @Nullable
     public T asynchronousLock(
             String lockKey, Supplier<T> fastSupply, Supplier<T> slowSupply) throws InterruptedException {
         // 获取锁(可重入)

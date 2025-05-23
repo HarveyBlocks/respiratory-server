@@ -1,6 +1,5 @@
 package org.harvey.respiratory.server.util.identifier;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 
 import java.io.FileNotFoundException;

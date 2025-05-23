@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.advice;
 
 
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -21,7 +22,7 @@ import java.lang.reflect.Method;
 @Deprecated
 public class RestfulResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
-    public boolean supports(MethodParameter returnType, Class converterType) {
+    public boolean supports(MethodParameter returnType, @NonNull Class converterType) {
         // 过滤Controller
         Method method = returnType.getMethod();
         if (method == null) {
@@ -35,10 +36,12 @@ public class RestfulResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(
-            Object body, MethodParameter returnType,
-            MediaType selectedContentType,
-            Class selectedConverterType,
-            ServerHttpRequest request, ServerHttpResponse response) {
+            Object body,
+            @NonNull MethodParameter returnType,
+            @NonNull MediaType selectedContentType,
+            @NonNull Class selectedConverterType,
+            @NonNull ServerHttpRequest request,
+            @NonNull ServerHttpResponse response) {
         return new Result<>(body);
     }
 }

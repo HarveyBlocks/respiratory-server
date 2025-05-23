@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import lombok.NonNull;
 import org.harvey.respiratory.server.pojo.dto.PatientDto;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.Healthcare;
@@ -46,31 +47,38 @@ public interface PatientService extends IService<Patient> {
      * 登记用户-病患关系
      * 如果含有healthcare, 就加入healthcare
      */
+    @NonNull
     @Transactional
     Long registerForNotExistPatient(Patient patient, Healthcare healthcare, long currentUserId);
 
     /**
      * 最简单的查询, 不会做任何的校验
      */
+    @NonNull
     Patient selectByIdCard(String identityCardId);
 
     void updatePatient(Patient patient, long currentUserId);
 
-
+    @NonNull
     List<PatientDto> querySelfPatients(long currentUserId, Page<Patient> page);
 
+    @NonNull
     PatientDto queryByHealthcare(UserDto user, String healthcareCode);
 
+    @NonNull
     PatientDto queryById(UserDto user, long patientId);
 
     /**
      * 如果不存在则注册, 如果存在则返回
      */
+    @NonNull
     PatientDto queryByIdentity(long currentUserId, String cardId);
 
     void deletePatientRecord(long patientId, long currentUserId);
 
+    @NonNull
     Patient queryByIdSimply(long patientId);
 
+    @NonNull
     Patient queryByCardIdSimply(String identifierCardId);
 }

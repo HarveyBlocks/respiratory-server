@@ -9,7 +9,6 @@ import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.DrugService;
-import org.harvey.respiratory.server.service.SpecificUsingDrugRecordService;
 import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;

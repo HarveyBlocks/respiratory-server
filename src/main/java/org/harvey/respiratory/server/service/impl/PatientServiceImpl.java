@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.PatientMapper;
 import org.harvey.respiratory.server.exception.BadRequestException;
@@ -72,12 +73,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
             throw new BadRequestException("身份证号上的生日和提交的生日冲突");
         }
         // 查询是否存在记录
-        Patient patientFromDb = selectByIdCard(identityCardId);
         PatientService proxy = currentProxy();
-        if (patientFromDb != null) {
+
+        try {
+            Patient patientFromDb = selectByIdCard(identityCardId);
             // 存在则添加关系, 检查医保
             return proxy.registerForExistPatient(patientFromDb, patientDto.buildHealthcare(), currentUserId);
-        } else {
+        } catch (ResourceNotFountException e) {
             // 不存在就保存
             // insert patient
             return proxy.registerForNotExistPatient(
@@ -127,6 +129,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
 
     @Override
     @Transactional
+    @NonNull
     public Long registerForNotExistPatient(Patient patient, Healthcare healthcare, long currentUserId) {
         // 保存病患实体
         boolean savedPatient = super.save(patient);
@@ -156,9 +159,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         return patientId;
     }
 
+
     @Override
+    @NonNull
     public Patient selectByIdCard(String identityCardId) {
-        return super.lambdaQuery().eq(Patient::getIdentityCardId, identityCardId).one();
+        Patient one = super.lambdaQuery().eq(Patient::getIdentityCardId, identityCardId).one();
+        if (one == null) {
+            throw new BadRequestException("not null");
+        }
+        return one;
     }
 
     @Override
@@ -181,6 +190,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     }
 
     @Override
+    @NonNull
     public List<PatientDto> querySelfPatients(long currentUserId, Page<Patient> page) {
         log.debug("准备查询当前用户的有关患者");
         int start = (int) ((page.getCurrent() - 1) * page.getSize());
@@ -190,10 +200,13 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     }
 
     @Override
+    @NonNull
     public PatientDto queryByHealthcare(UserDto user, String healthcareCode) {
-        Healthcare healthcare = healthcareService.queryByCode(healthcareCode);
-        if (healthcare == null) {
-            throw new ResourceNotFountException("依据医保号 " + healthcareCode + " 未查询到医保");
+        Healthcare healthcare;
+        try {
+            healthcare = healthcareService.queryByCode(healthcareCode);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("依据医保号 " + healthcareCode + " 未查询到医保", e);
         }
         Patient patient = queryByHealthcare(healthcare.getHealthcareId());
         validRoleOnQueryAny(user, patient);
@@ -201,6 +214,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     }
 
     @Override
+    @NonNull
     public PatientDto queryById(UserDto user, long patientId) {
         Patient patient = queryById0(patientId);
         validRoleOnQueryAny(user, patient);
@@ -213,13 +227,16 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     }
 
     @Override
+    @NonNull
     public PatientDto queryByIdentity(long currentUserId, String cardId) {
         if (!identifierIdPredicate.test(cardId)) {
             throw new BadRequestException("不正确的身份证格式");
         }
-        Patient patient = selectByIdCard(cardId);
-        if (patient == null) {
-            throw new ResourceNotFountException("依据身份证号" + cardId + "未找到患者");
+        Patient patient;
+        try {
+            patient = selectByIdCard(cardId);
+        } catch (ResourceNotFountException e) {
+            throw new ResourceNotFountException("依据身份证号" + cardId + "未找到患者", e);
         }
         // 用身份证查询完毕之后, 就绑定了这个用户和这个病患的关系是吧...
         boolean exist = userPatientIntermediationService.existRelation(currentUserId, patient.getId());
@@ -239,6 +256,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         this.userPatientIntermediationService.delete(patientId, currentUserId);
     }
 
+    @NonNull
     private Patient queryById0(long patientId) {
         Patient patient = super.getById(patientId);
         if (patient == null) {
@@ -275,22 +293,33 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
     }
 
+    @NonNull
     private Patient queryByHealthcare(long healthcare) {
         Patient patient = super.lambdaQuery().eq(Patient::getHealthcareId, healthcare).one();
         if (patient == null) {
-            log.warn("依据医保id{}未找到患者", healthcare);
+            throw new BadRequestException("依据医保id{}未找到患者" + healthcare);
         }
         return patient;
     }
 
 
     @Override
+    @NonNull
     public Patient queryByIdSimply(long patientId) {
-        return super.lambdaQuery().eq(Patient::getId, patientId).one();
+        Patient one = super.lambdaQuery().eq(Patient::getId, patientId).one();
+        if (one == null) {
+            throw new ResourceNotFountException("can not find patient by id: " + patientId);
+        }
+        return one;
     }
 
     @Override
+    @NonNull
     public Patient queryByCardIdSimply(String identifierCardId) {
-        return super.lambdaQuery().eq(Patient::getIdentityCardId, identifierCardId).one();
+        Patient one = super.lambdaQuery().eq(Patient::getIdentityCardId, identifierCardId).one();
+        if (one == null) {
+            throw new ResourceNotFountException("can not find patient of identifier card id: " + identifierCardId);
+        }
+        return one;
     }
 }

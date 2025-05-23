@@ -1,6 +1,7 @@
 package org.harvey.respiratory.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.HealthcareMapper;
 import org.harvey.respiratory.server.exception.ResourceNotFountException;
@@ -41,11 +42,17 @@ public class HealthcareServiceImpl extends ServiceImpl<HealthcareMapper, Healthc
     }
 
     @Override
+    @NonNull
     public Healthcare queryByCode(String healthcareCode) {
-        return super.lambdaQuery().eq(Healthcare::getHealthcareCode, healthcareCode).one();
+        Healthcare one = super.lambdaQuery().eq(Healthcare::getHealthcareCode, healthcareCode).one();
+        if (one == null) {
+            throw new ResourceNotFountException("不能依据code找到: " + healthcareCode);
+        }
+        return one;
     }
 
     @Override
+    @NonNull
     public Healthcare queryById(long healthcareId) {
         Healthcare healthcare = super.getById(healthcareId);
         if (healthcare == null) {
@@ -55,6 +62,7 @@ public class HealthcareServiceImpl extends ServiceImpl<HealthcareMapper, Healthc
     }
 
     @Override
+    @NonNull
     public Healthcare query(QueryBalanceDto queryBalanceDto) {
         Long healthcareId = queryBalanceDto.getHealthcareId();
         if (healthcareId != null) {
@@ -72,25 +80,41 @@ public class HealthcareServiceImpl extends ServiceImpl<HealthcareMapper, Healthc
         }
         Long patientId = queryBalanceDto.getPatientId();
         if (patientId != null) {
-            Patient patient = patientService.queryByIdSimply(patientId);
+            Patient patient;
+            try {
+                patient = patientService.queryByIdSimply(patientId);
+            } catch (ResourceNotFountException e) {
+                patient = null;
+            }
             if (patient != null) {
                 if (patient.getHealthcareId() == null) {
-                    return null;
+                    throw new ResourceNotFountException("不能依据病人 " + patient.getId() + " 找到");
                 }
-                return super.lambdaQuery().eq(Healthcare::getHealthcareId, patient.getHealthcareId()).one();
+                Healthcare one = super.lambdaQuery().eq(Healthcare::getHealthcareId, patient.getHealthcareId()).one();
+                if (one == null) {
+                    throw new ResourceNotFountException("不能依据code找到: " + healthcareCode);
+                }
+                return one;
             }
         }
         String identifierCardId = queryBalanceDto.getIdentifierCardId();
-        if (identifierCardId != null && !identifierCardId.isEmpty()) {
-            Patient patient = patientService.queryByCardIdSimply(identifierCardId);
-            if (patient != null) {
-                if (patient.getHealthcareId() == null) {
-                    return null;
-                }
-                return super.lambdaQuery().eq(Healthcare::getHealthcareId, patient.getHealthcareId()).one();
-            }
+        if (identifierCardId == null || identifierCardId.isEmpty()) {
+            throw new ResourceNotFountException("不能找到");
         }
-        return null;
+        Patient patient;
+        try {
+            patient = patientService.queryByCardIdSimply(identifierCardId);
+        }catch (ResourceNotFountException e){
+            throw new ResourceNotFountException("不能找到",e);
+        }
+        if (patient.getHealthcareId() == null) {
+            throw new ResourceNotFountException("不能依据病人 " + patient.getId() + " 找到");
+        }
+        Healthcare one = super.lambdaQuery().eq(Healthcare::getHealthcareId, patient.getHealthcareId()).one();
+        if (one == null) {
+            throw new ResourceNotFountException("不能依据id找到: " + patient.getHealthcareId());
+        }
+        return one;
     }
 
     @Override
