@@ -41,7 +41,7 @@ public class HealthcareServiceImpl extends ServiceImpl<HealthcareMapper, Healthc
     }
 
     @Override
-    public Healthcare queryByCode(long healthcareCode) {
+    public Healthcare queryByCode(String healthcareCode) {
         return super.lambdaQuery().eq(Healthcare::getHealthcareCode, healthcareCode).one();
     }
 

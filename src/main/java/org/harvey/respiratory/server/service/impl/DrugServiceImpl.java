@@ -56,15 +56,25 @@ public class DrugServiceImpl extends ServiceImpl<DrugMapper, Drug> implements Dr
     public void deleteById(long drugId) {
         super.removeById(drugId);
     }
+
     @Override
     public void saveDrug(Drug drug) {
         boolean saved = super.save(drug);
-        if (saved){
+        if (saved) {
             log.debug("新增药物成功");
-        }else{
+        } else {
             log.debug("新增药物失败");
         }
     }
+
+    @Resource
+    private DrugMapper drugMapper;
+
+    @Override
+    public void deplete(Map<Integer, Integer> drugIdToDepleteCountMap) {
+        drugMapper.deplete(drugIdToDepleteCountMap);
+    }
+
     @Override
     public Drug queryById(long id) {
         return super.getById(id);

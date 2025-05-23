@@ -21,12 +21,12 @@ public enum FamilyRelationship {
     // 妹妹
     YOUNGER_SISTER,
     // 爷爷
-    GRANDFATHER,
+    FATHER_OF_FATHER,
     // 奶奶
-    GRANDMOTHER,
-    // 外婆?
-    FATHER_OF_MATHER,
+    MATHER_OF_FATHER,
     // 外公?
+    FATHER_OF_MATHER,
+    // 外婆?
     MATHER_OF_MATHER,
     // 叔叔
     YOUNGER_BROTHER_OF_FATHER,

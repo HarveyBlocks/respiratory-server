@@ -30,6 +30,8 @@ class DrugControllerTest {
     }
 
     @Resource
+    private JacksonUtil jacksonUtil;
+    @Resource
     private DrugController drugController;
     @Resource
     private RandomUtil randomUtil;
@@ -60,8 +62,9 @@ class DrugControllerTest {
             String medicationSite = randomUtil.randomString(5, 60);
             String medicationPrecaution = randomUtil.randomString(5, 250);
             String guidance = randomUtil.randomString(5, 250);
+            Integer storage = randomUtil.uniform(100, 550);
             list.add(new Drug(null, name, expenseEach, specification, administrationRoute, medicationSite,
-                    medicationPrecaution, guidance
+                    medicationPrecaution, guidance, storage
             ));
         }
         return list;
@@ -77,12 +80,12 @@ class DrugControllerTest {
 
     @Test
     void queryById() {
-        JacksonUtil.printPretty(drugController.queryById(1L));
+        jacksonUtil.printPretty(drugController.queryById(1L));
     }
 
     @Test
     void queryByName() {
-        JacksonUtil.printPretty(drugController.queryByName("A", 1, 2));
+        jacksonUtil.printPretty(drugController.queryByName("A", 1, 2));
     }
 
 }

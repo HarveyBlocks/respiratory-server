@@ -59,7 +59,7 @@ public interface PatientService extends IService<Patient> {
 
     List<PatientDto> querySelfPatients(long currentUserId, Page<Patient> page);
 
-    PatientDto queryByHealthcare(UserDto user, long healthcareCode);
+    PatientDto queryByHealthcare(UserDto user, String healthcareCode);
 
     PatientDto queryById(UserDto user, long patientId);
 

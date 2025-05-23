@@ -3,6 +3,7 @@ package org.harvey.respiratory.server.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.util.RangeDate;
 
@@ -17,11 +18,14 @@ import java.util.List;
  */
 
 public interface VisitDoctorService extends IService<VisitDoctor> {
+    /**
+     * 仅在服务器内部使用
+     */
     Long queryMedicalProviderId(long visitDoctorId);
 
     VisitDoctor queryMedicalProviderAndPatientId(long visitId);
 
-    VisitDoctor queryById(long visitDoctorId);
+    VisitDoctor querySimplyById(long visitDoctorId);
 
     void updateAfterInterview(VisitDoctor visitDoctor);
 
@@ -30,4 +34,6 @@ public interface VisitDoctorService extends IService<VisitDoctor> {
     List<VisitDoctor> doctorQuery(String identityCardId, RangeDate rangeDate, Page<VisitDoctor> page);
 
     List<VisitDoctor> patientQuery(long currentUserId, RangeDate rangeDate, Page<VisitDoctor> page);
+
+    void queryValid(UserDto currentUser, long visitId);
 }

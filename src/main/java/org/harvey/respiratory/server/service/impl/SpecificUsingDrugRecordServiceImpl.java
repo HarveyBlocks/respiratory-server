@@ -15,6 +15,7 @@ import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.*;
 import org.harvey.respiratory.server.util.RangeDate;
+import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +39,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SpecificUsingDrugRecordServiceImpl extends
         ServiceImpl<SpecificUsingDrugRecordMapper, SpecificUsingDrugRecord> implements SpecificUsingDrugRecordService {
-    @Resource
-    private RoleService roleService;
+
     @Resource
     private VisitDoctorService visitDoctorService;
     @Resource
@@ -65,8 +65,11 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
-    public void validOnWrite(UserDto user, long visitDoctorId) {
+    public void validOnWrite(UserDto user, Long visitDoctorId) {
         Role role = preCheckThenGetRole(user);
+        if (visitDoctorId==null){
+            throw new BadRequestException("需要问诊号");
+        }
         switch (role) {
             case UNKNOWN:
             case PATIENT:
@@ -93,7 +96,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
-    public void validOnVisitRead(UserDto user, long visitId) {
+    public void validOnVisitRead(UserDto user, Long visitId) {
         // 0. 高级用户直接过
         Role role = preCheckThenGetRole(user);
         // 1. 当前的用户是医生->是医生进入2, 否则进入4
@@ -102,6 +105,9 @@ public class SpecificUsingDrugRecordServiceImpl extends
         // 4. 用户和这次问诊的病患有关联->进入5, 否则进入6
         // 5. 可以查询
         // 5. 不可以查询
+        if (visitId==null){
+            throw new BadRequestException("需要问诊号");
+        }
         VisitDoctor visitDoctor = null;
         switch (role) {
             case UNKNOWN:
@@ -203,6 +209,7 @@ public class SpecificUsingDrugRecordServiceImpl extends
     @Override
     public long updateRetainTrace(long oldVersionId, SpecificUsingDrugRecord newData) {
         SpecificUsingDrugRecord old = queryById(oldVersionId);
+        validOnWrite(UserHolder.getUser(), old.getVisitDoctorId());
         newData.updateFromOldVersionIgnoreNull(old);
         currentProxy().logicUpdate(oldVersionId, newData);
         return newData.getId();
@@ -246,14 +253,14 @@ public class SpecificUsingDrugRecordServiceImpl extends
     }
 
     @Override
-    public SpecificUsingDrugRecord queryByIdIgnoreDeleted(Long oldVersionId) {
-        return super.getById(oldVersionId);
+    public SpecificUsingDrugRecord queryByIdIgnoreDeleted(Long id) {
+        return super.getById(id);
     }
 
     @Override
-    public SpecificUsingDrugRecord queryById(Long oldVersionId) {
+    public SpecificUsingDrugRecord queryById(Long id) {
         return super.lambdaQuery()
-                .eq(SpecificUsingDrugRecord::getId, oldVersionId)
+                .eq(SpecificUsingDrugRecord::getId, id)
                 .eq(SpecificUsingDrugRecord::getDeleted, false)
                 .one();
     }

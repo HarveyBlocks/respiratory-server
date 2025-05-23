@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -170,7 +171,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     }
 
     private void update0(Patient patient, long currentUserId) {
-        boolean update = super.lambdaUpdate().setEntity(patient).eq(Patient::getId, patient.getId()).update();
+        // ERROR boolean update = super.update(patient, super.lambdaUpdate().eq(Patient::getId, patient.getId()));
+        boolean update = super.update(patient, new LambdaUpdateWrapper<Patient>().eq(Patient::getId, patient.getId()));
         if (update) {
             log.debug("{}用户成功更新{}病患", currentUserId, patient.getId());
         } else {
@@ -181,14 +183,14 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     @Override
     public List<PatientDto> querySelfPatients(long currentUserId, Page<Patient> page) {
         log.debug("准备查询当前用户的有关患者");
-        int start = (int) ((page.getCurrent() - 1) * page.maxLimit());
-        List<PatientDto> results = patientMapper.queryByRegisterUser(currentUserId, start, page.maxLimit().intValue());
+        int start = (int) ((page.getCurrent() - 1) * page.getSize());
+        List<PatientDto> results = patientMapper.queryByRegisterUser(currentUserId, start, (int) page.getSize());
         log.debug("查询当前用户的有关患者成功!, 有记录: {} 条", results.size());
         return results;
     }
 
     @Override
-    public PatientDto queryByHealthcare(UserDto user, long healthcareCode) {
+    public PatientDto queryByHealthcare(UserDto user, String healthcareCode) {
         Healthcare healthcare = healthcareService.queryByCode(healthcareCode);
         if (healthcare == null) {
             throw new ResourceNotFountException("依据医保号 " + healthcareCode + " 未查询到医保");

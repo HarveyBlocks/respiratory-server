@@ -47,7 +47,7 @@ public class DoctorInterviewController {
         if (identityCardId == null || identityCardId.isEmpty()) {
             throw new UnauthorizedException("未实名, 无权限");
         }
-        doctorInterviewService.interview(interviewDto, identityCardId);
+        doctorInterviewService.interview(interviewDto, currentUser);
         return Result.ok();
     }
 

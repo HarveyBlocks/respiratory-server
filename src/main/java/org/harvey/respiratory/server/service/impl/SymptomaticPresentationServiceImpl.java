@@ -111,7 +111,10 @@ public class SymptomaticPresentationServiceImpl extends
             throw new BadRequestException("更新已删除的字段");
         }
         Long visitDoctorId = old.getVisitDoctorId();
-        if (newData.getVisitDoctorId() != null && newData.getVisitDoctorId().equals(old.getVisitDoctorId())) {
+        if (newData.getVisitDoctorId() == null) {
+            newData.setVisitDoctorId(visitDoctorId);
+        }
+        if (!newData.getVisitDoctorId().equals(old.getVisitDoctorId())) {
             throw new UnauthorizedException("不允许更换有关的就诊");
         }
         validToWrite(currentUserIdentityCardId, visitDoctorId);

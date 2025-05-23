@@ -1,5 +1,7 @@
 package org.harvey.respiratory.server.pojo.enums;
 
+import com.baomidou.mybatisplus.annotation.IEnum;
+
 /**
  * 严重程度
  *
@@ -7,11 +9,16 @@ package org.harvey.respiratory.server.pojo.enums;
  * @version 1.0
  * @date 2025-05-13 00:36
  */
-public enum Severity {
+public enum Severity implements IEnum<String> {
     // 轻微
     SLIGHT,
     // 中度
     MODERATE,
     // 重度
-    SEVERE
+    SEVERE;
+
+    @Override
+    public String getValue() {
+        return name();
+    }
 }

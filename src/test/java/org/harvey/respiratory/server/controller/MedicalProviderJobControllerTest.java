@@ -32,7 +32,8 @@ class MedicalProviderJobControllerTest {
     static void addUser() {
         UserHolder.saveUser(new UserDto(1923431434245177346L, "", Role.DATABASE_ADMINISTRATOR, "330282200410080030"));
     }
-
+    @Resource
+    private JacksonUtil jacksonUtil;
     @AfterAll
     static void removeUser() {
         UserHolder.removeUser();
@@ -101,9 +102,9 @@ class MedicalProviderJobControllerTest {
 
     @Test
     void query() {
-        JacksonUtil.printPretty(medicalProviderJobController.query(2, 3));
-        JacksonUtil.printPretty(medicalProviderJobController.query(1, 3));
-        JacksonUtil.printPretty(medicalProviderJobController.query(3, 3));
+        jacksonUtil.printPretty(medicalProviderJobController.query(2, 3));
+        jacksonUtil.printPretty(medicalProviderJobController.query(1, 3));
+        jacksonUtil.printPretty(medicalProviderJobController.query(3, 3));
         // 缓存+分页
         // 记录页码+页数->保存这种情况下的id
         // 数据库发生更改了, 全部删掉?
@@ -112,13 +113,13 @@ class MedicalProviderJobControllerTest {
         // 如果新增, 缓存排行榜也新增
         // 如果删除, 缓存排行榜也删除
         // 如果更新, 更新到score字段, 缓存排行榜也更新
-        JacksonUtil.printPretty(medicalProviderJobController.query(1));
-        JacksonUtil.printPretty(medicalProviderJobController.query(2));
+        jacksonUtil.printPretty(medicalProviderJobController.query(1));
+        jacksonUtil.printPretty(medicalProviderJobController.query(2));
     }
 
     @Test
     void queryByName() {
-        JacksonUtil.printPretty(medicalProviderJobController.queryByName("A"));
+        jacksonUtil.printPretty(medicalProviderJobController.queryByName("A"));
     }
 
 }

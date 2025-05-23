@@ -62,7 +62,9 @@
         from (
         select patient_id
         from tb_user_patient_intermediation
-        where u.id = #{userId}
+        <where>
+            tb_user_patient_intermediation.user_id = #{userId}
+        </where>
         limit ${start},${len}
         ) AS i
         INNER JOIN tb_patient p

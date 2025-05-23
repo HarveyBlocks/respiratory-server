@@ -52,9 +52,11 @@ public class FamilyHistory {
     @ApiModelProperty(value = "疾病表id")
     private Integer diseaseId;
 
-    @ApiModelProperty(value = "家族居住环境共同暴露因素")
+    @ApiModelProperty(value = "家族居住环境共同暴露因素, varchar")
     private String livingEnvironmentCommonFactor;
 
     @ApiModelProperty(value = "居住在吸烟环境")
     private Boolean livingInSmokingEnvironment;
+
+
 }

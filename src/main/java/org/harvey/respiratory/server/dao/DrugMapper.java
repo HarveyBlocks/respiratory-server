@@ -3,7 +3,10 @@ package org.harvey.respiratory.server.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.harvey.respiratory.server.pojo.entity.Drug;
+
+import java.util.Map;
 
 /**
  * 疾病
@@ -14,4 +17,5 @@ import org.harvey.respiratory.server.pojo.entity.Drug;
  */
 @Mapper
 public interface DrugMapper extends BaseMapper<Drug> {
+    void deplete(@Param("depleteMap") Map<Integer, Integer> depleteMap);
 }

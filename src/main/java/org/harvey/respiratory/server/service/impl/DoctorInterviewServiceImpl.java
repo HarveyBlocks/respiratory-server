@@ -4,6 +4,7 @@ import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.InterviewDto;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.*;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.*;
@@ -42,8 +43,6 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
     private MedicalProviderJobService medicalProviderJobService;
     @Resource
     private MedicalProviderDepartmentService medicalProviderDepartmentService;
-    @Resource
-    private RoleService roleService;
 
 
     @Resource
@@ -95,13 +94,13 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
     }
 
     @Override
-    public void interview(InterviewDto interviewDto, String identityCardId) {
+    public void interview(InterviewDto interviewDto, UserDto user) {
         Long visitDoctorId = interviewDto.getVisitDoctorId();
         List<ExpenseRecord> expenseRecordList = new ArrayList<>();
         if (visitDoctorId == null) {
             throw new BadRequestException("需要visit doctor id");
         }
-        VisitDoctor inDb = visitDoctorService.queryById(visitDoctorId);
+        VisitDoctor inDb = visitDoctorService.querySimplyById(visitDoctorId);
         if (inDb.isInterviewed()) {
             // 已经完成了问诊了
             throw new BadRequestException("请不要重复提交问诊结果");
@@ -112,7 +111,7 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         // 查询出就诊医生的具体信息, 医生职位和所在科室有关费用
         MedicalProvider medicalProvider = medicalProviderService.queryById(medicalProviderId);
         // 这个工作一定要问诊的这个医生做
-        validInterviewRole(medicalProvider.getIdentityCardId(), identityCardId);
+        validInterviewRole(medicalProvider.getIdentityCardId(), user);
         // 添加医生的有关的费用
         createMedicalProviderExpenseRecord(medicalProvider, visitDoctorId, expenseRecordList);
         // 映射症状dto->entity
@@ -128,6 +127,8 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         // 生成药物具体使用的记录, 数据库entity
         List<SpecificUsingDrugRecord> usingDrugRecords = getSpecificUsingDrugRecords(
                 usingDrugDto, visitDoctorId, patientId);
+        // 需要扣除的库存, drug-count
+        Map<Integer, Integer> drugIdToDepleteCountMap = mapDrugIdToDepleteCount(usingDrugRecords);
         // 将所有费用记录相加, 获取总费用
         int totalPrice = summarizeExpense(expenseRecordList);
         // 如果没有概述, 就依据确证的病症生成概述
@@ -137,32 +138,42 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
         // 药品ids
         List<Integer> diseaseIds = interviewDto.getDiseaseIds();
         // 接下来是事务, 插入
-        currentProxy().transitionallySaveRecords(
-                visitDoctor.getId(), expenseRecordList, usingDrugRecords, symptomaticPresentationList, diseaseIds);
+        currentProxy().transitionallySaveRecords(visitDoctor, expenseRecordList, usingDrugRecords,
+                drugIdToDepleteCountMap, symptomaticPresentationList, diseaseIds
+        );
+    }
+
+    private static Map<Integer, Integer> mapDrugIdToDepleteCount(List<SpecificUsingDrugRecord> usingDrugRecords) {
+        // 完成从药品id到drug的消耗的映射
+        return usingDrugRecords.stream()
+                .collect(Collectors.toMap(SpecificUsingDrugRecord::getDrugId, SpecificUsingDrugRecord::getCount));
     }
 
     /**
      * 这个工作一定要问诊的这个医生做
      */
-    private void validInterviewRole(String medicalProviderIdentityCardId, String identityCardId) {
-        if (medicalProviderIdentityCardId.equals(identityCardId)) {
-            Role role = roleService.queryRole(identityCardId);
-            switch (role) {
-                case UNKNOWN:
-                    throw new UnauthorizedException("未知用户");
-                case PATIENT:
-                    throw new UnauthorizedException("患者没有添加信息的权限");
-                case NORMAL_DOCTOR:
-                    throw new UnauthorizedException("只有此次问诊的目标医生有权限进行问诊");
-                case CHARGE_DOCTOR:
-                case MEDICATION_DOCTOR:
-                case DEVELOPER:
-                case DATABASE_ADMINISTRATOR:
-                    break;
-                default:
-                    throw new ServerException("Unexpected role value: " + role);
-            }
+    private void validInterviewRole(String medicalProviderIdentityCardId, UserDto userDto) {
+        if (medicalProviderIdentityCardId.equals(userDto.getIdentityCardId())) {
+            // 指定的医生, 直接过
+            return;
         }
+        Role role = userDto.getRole();
+        switch (role) {
+            case UNKNOWN:
+                throw new UnauthorizedException("未知用户");
+            case PATIENT:
+                throw new UnauthorizedException("患者没有添加信息的权限");
+            case MEDICATION_DOCTOR:
+            case NORMAL_DOCTOR:
+                throw new UnauthorizedException("只有此次问诊的目标医生有权限进行问诊");
+            case CHARGE_DOCTOR: // 专家, 也能问诊
+            case DEVELOPER:
+            case DATABASE_ADMINISTRATOR:
+                break;
+            default:
+                throw new ServerException("Unexpected role value: " + role);
+        }
+
     }
 
     /**
@@ -224,26 +235,29 @@ public class DoctorInterviewServiceImpl implements DoctorInterviewService {
     @Transactional
     @Override
     public void transitionallySaveRecords(
-            long visitDoctorId,
+            VisitDoctor newData,
             List<ExpenseRecord> expenseRecordList,
             List<SpecificUsingDrugRecord> usingDrugRecords,
+            Map<Integer, Integer> drugIdToDepleteCountMap,
             List<SymptomaticPresentation> symptomaticPresentationList,
             List<Integer> diseaseIds) {
-        VisitDoctor visitDoctor = visitDoctorService.queryById(visitDoctorId);
-        if (visitDoctor.isInterviewed()) {
+        VisitDoctor oldData = visitDoctorService.querySimplyById(newData.getId());
+        if (oldData.isInterviewed()) {
             // 另一条线程已经完成, 故跳出
             return;
         }
         // 依据id更新数据库就诊信息, visit doctor 实体
-        visitDoctorService.updateAfterInterview(visitDoctor);
+        visitDoctorService.updateAfterInterview(newData);
         // 插入费用记录
         expenseRecordService.saveOnInterview(expenseRecordList);
         // 插入具体药物使用usingDrugRecords(多个)
         specificUsingDrugRecordService.saveSymptomaticPresentationBatch(usingDrugRecords);
+        // 损耗药品
+        drugService.deplete(drugIdToDepleteCountMap);
         // 依次插入症状信息(多个)
         symptomaticPresentationService.saveSymptomaticPresentationBatch(symptomaticPresentationList);
         // 插入疾病-就诊中间表(多个)
-        diseaseDiagnosisIntermediationService.saveOnInterview(visitDoctor.getId(), diseaseIds);
+        diseaseDiagnosisIntermediationService.saveOnInterview(newData.getId(), diseaseIds);
     }
 
 }

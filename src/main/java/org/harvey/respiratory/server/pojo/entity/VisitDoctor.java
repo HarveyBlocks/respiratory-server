@@ -58,7 +58,7 @@ public class VisitDoctor {
      * 就诊时间
      */
     @ApiModelProperty(value = "就诊时间, 只读")
-    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private LocalDateTime visitTime;
     /**
      * 总费用, 单位分

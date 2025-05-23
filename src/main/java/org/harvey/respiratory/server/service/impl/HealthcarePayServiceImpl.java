@@ -9,6 +9,7 @@ import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
 import org.harvey.respiratory.server.service.HealthcarePayService;
 import org.harvey.respiratory.server.service.HealthcareService;
+import org.harvey.respiratory.server.service.PatientService;
 import org.harvey.respiratory.server.service.VisitDoctorService;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
@@ -47,12 +48,13 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
         if (amount == null || amount <= 0) {
             throw new ResourceNotFountException("充值的金额必须是正数");
         }
-        return currentProxy().updateBalance(rechargeDto.getQueryBalanceDto(), amount);
+        Healthcare healthcare = healthcareService.query(rechargeDto.getQueryBalanceDto());
+        return currentProxy().updateBalance(healthcare, amount);
     }
 
     @Override
-    public void pay(PayDto payDto) {
-        VisitDoctor visitDoctor = visitDoctorService.queryById(payDto.getVisitId());
+    public void pay(long visitId) {
+        VisitDoctor visitDoctor = visitDoctorService.querySimplyById(visitId);
         if (visitDoctor == null) {
             throw new ResourceNotFountException("未能找到就诊单");
         }
@@ -63,13 +65,17 @@ public class HealthcarePayServiceImpl implements HealthcarePayService {
             throw new BadRequestException("目标账单已经付款");
         }
         int totalExpense = visitDoctor.getTotalExpense();
-        currentProxy().updateBalance(payDto.getQueryBalanceDto(), -totalExpense);
+        Long patientId = visitDoctor.getPatientId();
+        // 问诊的目标用户和医保的目标用户必须是同一个人
+        QueryBalanceDto queryBalanceDto = new QueryBalanceDto();
+        queryBalanceDto.setPatientId(patientId);
+        Healthcare healthcare = healthcareService.query(queryBalanceDto);
+        currentProxy().updateBalance(healthcare, -totalExpense);
     }
 
     @Transactional
     @Override
-    public int updateBalance(QueryBalanceDto queryBalanceDto, int deltaExpense) {
-        Healthcare healthcare = healthcareService.query(queryBalanceDto);
+    public int updateBalance(Healthcare healthcare, int deltaExpense) {
         if (healthcare == null) {
             throw new ResourceNotFountException("未能找到医保资源");
         }

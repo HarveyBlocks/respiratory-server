@@ -4,6 +4,7 @@ package org.harvey.respiratory.server.service;
 import org.harvey.respiratory.server.pojo.dto.PayDto;
 import org.harvey.respiratory.server.pojo.dto.QueryBalanceDto;
 import org.harvey.respiratory.server.pojo.dto.RechargeDto;
+import org.harvey.respiratory.server.pojo.entity.Healthcare;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -18,7 +19,7 @@ public interface HealthcarePayService {
 
     int recharge(RechargeDto rechargeDto);
 
-    void pay(PayDto payDto);
+    void pay(long visitId);
 
     /**
      * 事务, 避免脏读啥的
@@ -26,5 +27,5 @@ public interface HealthcarePayService {
      * @return 返回更新后的余额
      */
     @Transactional
-    int updateBalance(QueryBalanceDto queryBalanceDto, int deltaExpense);
+    int updateBalance(Healthcare healthcare, int deltaExpense);
 }

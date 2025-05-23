@@ -72,4 +72,6 @@ public class Drug {
      */
     @ApiModelProperty(value = " 用药指导(TEXT)")
     private String guidance;
+    @ApiModelProperty(value = " 药品库存")
+    private Integer storage;
 }

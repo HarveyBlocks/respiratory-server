@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
 
 import java.util.Date;
 
@@ -87,11 +88,25 @@ public class SpecificUsingDrugRecord {
 
     public void updateFromOldVersionIgnoreNull(SpecificUsingDrugRecord old) {
         // 强制一致
-        this.setVisitDoctorId(old.getVisitDoctorId());
-        this.setDrugId(old.getDrugId());
-        this.setPatientId(old.getPatientId());
-        if (this.getCount() == null) {
+        if (this.getVisitDoctorId() == null || this.getVisitDoctorId().equals(old.getVisitDoctorId())) {
+            this.setVisitDoctorId(old.getVisitDoctorId());
+        } else {
+            throw new UnauthorizedException("visit doctor id, 不能修改的字段");
+        }
+        if (this.getDrugId() == null || this.getDrugId().equals(old.getDrugId())) {
+            this.setDrugId(old.getDrugId());
+        } else {
+            throw new UnauthorizedException("drug id, 不能修改的字段");
+        }
+        if (this.getPatientId() == null || this.getPatientId().equals(old.getPatientId())) {
+            this.setPatientId(old.getPatientId());
+        } else {
+            throw new UnauthorizedException("patient id, 不能修改的字段");
+        }
+        if (this.getCount() == null || this.getCount().equals(old.getCount())) {
             this.setCount(old.getCount());
+        } else {
+            throw new UnauthorizedException("count, 不能修改的字段");
         }
         if (this.getDosageUsed() == null) {
             this.setDosageUsed(old.getDosageUsed());

@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.harvey.respiratory.server.pojo.dto.PayDto;
+import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.pojo.dto.QueryBalanceDto;
 import org.harvey.respiratory.server.pojo.dto.RechargeDto;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
@@ -36,7 +36,7 @@ public class HealthcarePayController {
     @PutMapping("pay")
     @ApiOperation("付款")
     public Result<NullPlaceholder> pay(
-            @RequestBody @ApiParam(value = "付款对象", required = true) PayDto payDto) {
+            @RequestBody @ApiParam(value = "付款的目标问诊", required = true) Long visitId) {
         // 依据问诊号, 获取到账单记录/总费用
         // 依据总费用扣除医保费用
         // 如果余额不足就抛出异常
@@ -45,7 +45,10 @@ public class HealthcarePayController {
         // 有订单->订单已付款->直接返回记录, 不扣费
         // 有订单->订单未付款->尝试付款->扣费->修改订单状态
         // 但是本系统无订单这种东西, 只有visitId, visitId充当订单的部分
-        healthcarePayService.pay(payDto);
+        if (visitId == null) {
+            throw new BadRequestException("必须要有指定问诊号");
+        }
+        healthcarePayService.pay(visitId);
         return Result.ok();
     }
 

@@ -27,32 +27,33 @@ class DiseaseControllerTest {
 
     @Resource
     private DiseaseController diseaseController;
-
+    @Resource
+    private JacksonUtil jacksonUtil;
     @Test
     void register() {
         if (!OPEN_NON_IDEMPOTENT_TEST) {
             return;
         }
-        JacksonUtil.pretty(diseaseController.register(new Disease(null, "A", "描述A")));
-        JacksonUtil.pretty(diseaseController.register(new Disease(null, "B", "描述B")));
-        JacksonUtil.pretty(diseaseController.register(new Disease(null, "C", "描述C")));
-        JacksonUtil.pretty(diseaseController.register(new Disease(null, "D", "描述D")));
+        jacksonUtil.printPretty(diseaseController.register(new Disease(null, "A", "描述A")));
+        jacksonUtil.printPretty(diseaseController.register(new Disease(null, "B", "描述B")));
+        jacksonUtil.printPretty(diseaseController.register(new Disease(null, "C", "描述C")));
+        jacksonUtil.printPretty(diseaseController.register(new Disease(null, "D", "描述D")));
     }
 
     @Test
     void queryByName() {
-        JacksonUtil.printPretty(diseaseController.queryByName("", 1, 10));
-        JacksonUtil.printPretty(diseaseController.queryByName("", 2, 10));
-        JacksonUtil.printPretty(diseaseController.queryByName("", null, null));
-        JacksonUtil.printPretty(diseaseController.queryByName("C", null, null));
+        jacksonUtil.printPretty(diseaseController.queryByName("", 1, 10));
+        jacksonUtil.printPretty(diseaseController.queryByName("", 2, 10));
+        jacksonUtil.printPretty(diseaseController.queryByName("", null, null));
+        jacksonUtil.printPretty(diseaseController.queryByName("C", null, null));
     }
 
     @Test
     void queryById() {
-        JacksonUtil.printPretty(diseaseController.queryById(1));
-        JacksonUtil.printPretty(diseaseController.queryById(2));
-        JacksonUtil.printPretty(diseaseController.queryById(3));
-        JacksonUtil.printPretty(diseaseController.queryById(4));
+        jacksonUtil.printPretty(diseaseController.queryById(1));
+        jacksonUtil.printPretty(diseaseController.queryById(2));
+        jacksonUtil.printPretty(diseaseController.queryById(3));
+        jacksonUtil.printPretty(diseaseController.queryById(4));
     }
 
     @Test
@@ -60,10 +61,10 @@ class DiseaseControllerTest {
         if (!OPEN_NON_IDEMPOTENT_TEST) {
             return;
         }
-        JacksonUtil.printPretty(diseaseController.del(1));
-        JacksonUtil.printPretty(diseaseController.del(2));
-        JacksonUtil.printPretty(diseaseController.del(3));
-        JacksonUtil.printPretty(diseaseController.del(4));
+        jacksonUtil.printPretty(diseaseController.del(1));
+        jacksonUtil.printPretty(diseaseController.del(2));
+        jacksonUtil.printPretty(diseaseController.del(3));
+        jacksonUtil.printPretty(diseaseController.del(4));
     }
 
 }

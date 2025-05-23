@@ -1,5 +1,6 @@
 package org.harvey.respiratory.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.UserPatientIntermediationMapper;
@@ -47,13 +48,13 @@ public class UserPatientIntermediationServiceImpl extends
 
     @Override
     public boolean delete(long patientId, long userId) {
-        boolean removed = super.remove(super.lambdaQuery()
+        boolean removed = super.remove(new LambdaQueryWrapper<UserPatientIntermediation>()
                 .eq(UserPatientIntermediation::getUserId, userId)
                 .and(w -> w.eq(UserPatientIntermediation::getPatientId, patientId)));
         if (removed) {
-            log.debug("删除用户{}-患者{},成功", userId, patientId);
+            log.debug("删除用户{}-患者{}记录,成功", userId, patientId);
         } else {
-            log.warn("删除用户{}-患者{},失败", userId, patientId);
+            log.warn("删除用户{}-患者{}记录,失败", userId, patientId);
         }
         return removed;
     }

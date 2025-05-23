@@ -123,6 +123,11 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.71</version>
         </dependency>
+        <!--jackson-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
         <!--加密-->
         <dependency>
             <groupId>org.springframework.security</groupId>

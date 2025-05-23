@@ -101,7 +101,7 @@ public class PatientController {
     @GetMapping("/healthcare/{code}")
     @ApiOperation("依据医保号查询")
     public Result<PatientDto> queryPatientByHealthcareId(
-            @PathVariable("code") @ApiParam("医保号") Long healthcareCode) {
+            @PathVariable("code") @ApiParam("医保号") String healthcareCode) {
         UserDto user = UserHolder.getUser();
         if (user == null) {
             throw new UnauthorizedException("登录后可使用");
@@ -125,7 +125,7 @@ public class PatientController {
 
     @GetMapping("/identityCardId/{cardId}")
     @ApiOperation("依据身份证号吗查询")
-    public Result<PatientDto> queryPatientByPhone(
+    public Result<PatientDto> queryByIdentity(
             @PathVariable("cardId") @ApiParam("身份证号") String cardId) {
         Long currentUserId = UserHolder.currentUserId();
         if (currentUserId == null) {

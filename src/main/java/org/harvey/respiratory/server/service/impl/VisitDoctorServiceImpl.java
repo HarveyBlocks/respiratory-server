@@ -4,15 +4,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.dao.VisitDoctorMapper;
+import org.harvey.respiratory.server.exception.ServerException;
+import org.harvey.respiratory.server.exception.UnauthorizedException;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.VisitDoctor;
+import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.MedicalProviderService;
+import org.harvey.respiratory.server.service.RoleService;
 import org.harvey.respiratory.server.service.UserPatientIntermediationService;
 import org.harvey.respiratory.server.service.VisitDoctorService;
 import org.harvey.respiratory.server.util.RangeDate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -51,7 +57,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     }
 
     @Override
-    public VisitDoctor queryById(long visitDoctorId) {
+    public VisitDoctor querySimplyById(long visitDoctorId) {
         return super.lambdaQuery().eq(VisitDoctor::getId, visitDoctorId).one();
     }
 
@@ -68,6 +74,7 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
     @Override
     public Long createVisitDoctorId(long patientId, long medicalProviderId) {
         VisitDoctor takeTheNumber = VisitDoctor.takeTheNumber(patientId, medicalProviderId);
+        takeTheNumber.setVisitTime(LocalDateTime.now());
         super.save(takeTheNumber);
         return takeTheNumber.getId();
     }
@@ -93,5 +100,41 @@ public class VisitDoctorServiceImpl extends ServiceImpl<VisitDoctorMapper, Visit
                 .page(page)
                 .getRecords();
     }
+
+    @Override
+    public void queryValid(UserDto currentUser, long visitId) {
+        Role role = currentUser.getRole();
+        switch (role) {
+            case UNKNOWN:
+                throw new UnauthorizedException("无权限执行");
+            case PATIENT:
+            case NORMAL_DOCTOR:
+            case MEDICATION_DOCTOR:
+                VisitDoctor related = this.relatedOnPatient(currentUser.getId(), visitId);
+                if (related == null) {
+                    throw new UnauthorizedException("不能访问与自己无关的问诊信息");
+                }
+                break;
+            case CHARGE_DOCTOR:
+            case DEVELOPER:
+            case DATABASE_ADMINISTRATOR:
+                // 直接同行
+                break;
+            default:
+                throw new ServerException("Unexpected role value: " + role);
+        }
+    }
+
+    private VisitDoctor relatedOnPatient(long userId, long visitId) {
+        List<Long> patientIds = userPatientIntermediationService.queryPatientOnUser(userId);
+        if (patientIds == null || patientIds.isEmpty()) {
+            return null;
+        }
+        return super.lambdaQuery()
+                .eq(VisitDoctor::getId, visitId)
+                .in(VisitDoctor::getPatientId, patientIds)
+                .one();
+    }
+
 
 }

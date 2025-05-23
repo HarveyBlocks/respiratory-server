@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.FamilyHistory;
+import org.harvey.respiratory.server.pojo.entity.FamilyRelationshipEntity;
 import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
+import org.harvey.respiratory.server.util.ConstantsInitializer;
 
 import java.util.List;
 
@@ -24,10 +26,11 @@ public interface FamilyHistoryService extends IService<FamilyHistory> {
 
     List<FamilyHistory> queryByDiseaseName(long patientId, String diseaseName, Page<FamilyHistory> page);
 
-    List<FamilyHistory> queryByDisease(long patientId, long diseaseId, Page<FamilyHistory> page);
+    List<FamilyHistory> queryByDisease(long patientId, int diseaseId, Page<FamilyHistory> page);
 
     List<FamilyHistory> queryByRelationship(
-            long patientId, List<FamilyRelationship> relationshipList, Page<FamilyHistory> objectPage);
+            long patientId, List<Integer> relationshipIds, Page<FamilyHistory> objectPage);
 
     void validRoleToRegister(UserDto currentUser, Long patientId);
+
 }

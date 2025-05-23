@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -18,104 +20,106 @@ import java.util.Map;
  * @version 1.0
  * @date 2025-05-08 12:12
  */
+@Component
 public class JacksonUtil {
-    public static final ObjectMapper MAPPER = new ObjectMapper();
+    @Resource
+    private ObjectMapper mapper;
     public static final PrintStream OUT = System.out;
 
     /**
      * 对所有调用次方法之后的转化都生效, 不会报错了
      */
-    public static void ignoreUnknownFieldInJson() {
+    public static void ignoreUnknownFieldInJson(ObjectMapper mapper) {
         // 对于Json中的未知字段选择忽略
-        MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     /**
      * 对所有调用次方法之后的转化都生效, 继续报错
      */
-    public static void emphasisUnknownFieldInJson() {
+    public void emphasisUnknownFieldInJson() {
         // 对于Json中的未知字段选择重视
-        MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
     }
 
-    public static String toJsonStr(Object bean) {
+    public String toJsonStr(Object bean) {
         try {
-            return MAPPER.writeValueAsString(bean);
+            return mapper.writeValueAsString(bean);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String toJsonStr(HashMap<String, Object> map) {
+    public String toJsonStr(HashMap<String, Object> map) {
         //map<String,String>转json
         try {
-            return MAPPER.writeValueAsString(map);
+            return mapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T toBean(String json, Class<T> type) {
+    public <T> T toBean(String json, Class<T> type) {
         try {
-            return MAPPER.readValue(json, type);
+            return mapper.readValue(json, type);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    public static <T> T[] toBeanArray(String arrayJson, Class<T[]> type) {
+    public <T> T[] toBeanArray(String arrayJson, Class<T[]> type) {
         try {
-            return MAPPER.readValue(arrayJson, type);
+            return mapper.readValue(arrayJson, type);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> List<T> toBeanList(String listJson, Class<T> type) {
+    public <T> List<T> toBeanList(String listJson, Class<T> type) {
         try {
-            return MAPPER.readValue(listJson, new TypeReference<List<T>>() {
+            return mapper.readValue(listJson, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Map<String, Object> toMap(String json) {
+    public Map<String, Object> toMap(String json) {
         try {
-            return MAPPER.readValue(json, new TypeReference<>() {
+            return mapper.readValue(json, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Map<String, String> toStringMap(String json) {
+    public Map<String, String> toStringMap(String json) {
         try {
-            return MAPPER.readValue(json, new TypeReference<Map<String, String>>() {
+            return mapper.readValue(json, new TypeReference<Map<String, String>>() {
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> Map<?, ?> toMap(Object bean) {
-        return MAPPER.convertValue(bean, Map.class);
+    public <T> Map<?, ?> toMap(Object bean) {
+        return mapper.convertValue(bean, Map.class);
     }
 
-    public static <T> T toBean(Map<String, Object> map, Class<T> type) {
-        return MAPPER.convertValue(map, type);
+    public <T> T toBean(Map<String, Object> map, Class<T> type) {
+        return mapper.convertValue(map, type);
     }
 
-    public static String pretty(Object bean) {
+    public String pretty(Object bean) {
         try {
-            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(bean);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bean);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void printPretty(Object bean) {
+    public void printPretty(Object bean) {
         OUT.println(pretty(bean));
     }
 }

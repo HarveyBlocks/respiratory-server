@@ -1,17 +1,12 @@
 package org.harvey.respiratory.server.controller;
 
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.service.IService;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.MedicalProvider;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderDepartment;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderForm;
 import org.harvey.respiratory.server.pojo.entity.MedicalProviderJob;
 import org.harvey.respiratory.server.pojo.enums.Role;
-import org.harvey.respiratory.server.service.MedicalProviderDepartmentService;
-import org.harvey.respiratory.server.service.MedicalProviderFormService;
-import org.harvey.respiratory.server.service.MedicalProviderJobService;
-import org.harvey.respiratory.server.service.MedicalProviderService;
+import org.harvey.respiratory.server.service.*;
 import org.harvey.respiratory.server.util.JacksonUtil;
 import org.harvey.respiratory.server.util.RandomUtil;
 import org.harvey.respiratory.server.util.UserHolder;
@@ -24,7 +19,9 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static org.harvey.respiratory.server.service.ServiceUtil.selectIntegerIds;
+import static org.harvey.respiratory.server.service.ServiceUtil.selectLongIds;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local")
@@ -47,13 +44,6 @@ class MedicalProviderControllerTest {
     @Resource
     private MedicalProviderDepartmentService medicalProviderDepartmentService;
 
-    private <T> List<Integer> selectIdSet(IService<T> service, SFunction<T, Integer> mapper) {
-        return service.lambdaQuery().select(mapper).list().stream().map(mapper).distinct().collect(Collectors.toList());
-    }
-
-    private <T> List<Long> selectLongIdSet(IService<T> service, SFunction<T, Long> mapper) {
-        return service.lambdaQuery().select(mapper).list().stream().map(mapper).distinct().collect(Collectors.toList());
-    }
 
     @AfterAll
     static void removeUser() {
@@ -82,9 +72,9 @@ class MedicalProviderControllerTest {
     }
 
     private List<MedicalProvider> createData(int count) {
-        List<Integer> formSet = selectIdSet(medicalProviderFormService, MedicalProviderForm::getId);
-        List<Integer> departmentSet = selectIdSet(medicalProviderDepartmentService, MedicalProviderDepartment::getId);
-        List<Integer> jobSet = selectIdSet(medicalProviderJobService, MedicalProviderJob::getId);
+        List<Integer> formSet = selectIntegerIds(medicalProviderFormService, MedicalProviderForm::getId);
+        List<Integer> departmentSet = selectIntegerIds(medicalProviderDepartmentService, MedicalProviderDepartment::getId);
+        List<Integer> jobSet = selectIntegerIds(medicalProviderJobService, MedicalProviderJob::getId);
         List<MedicalProvider> medicalProviders = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             String identityCardId = "33028220041008" + String.format("%04d", randomUtil.uniform(0, 9999));
@@ -108,7 +98,7 @@ class MedicalProviderControllerTest {
         if (!OPEN_NON_IDEMPOTENT_TEST) {
             return;
         }
-        List<Long> ids = this.selectLongIdSet(medicalProviderService, MedicalProvider::getId);
+        List<Long> ids = selectLongIds(medicalProviderService, MedicalProvider::getId);
         List<MedicalProvider> data = createData(5);
         for (MedicalProvider each : data) {
             each.setId(randomUtil.chose(ids));
@@ -120,7 +110,8 @@ class MedicalProviderControllerTest {
             }
         }
     }
-
+    @Resource
+    private JacksonUtil jacksonUtil;
     @Test
     void del() {
         if (!OPEN_NON_IDEMPOTENT_TEST) {
@@ -132,8 +123,8 @@ class MedicalProviderControllerTest {
 
     @Test
     void query() {
-        JacksonUtil.printPretty(medicalProviderController.query());
-        JacksonUtil.printPretty(medicalProviderController.query("15958295141"));
-        JacksonUtil.printPretty(medicalProviderController.query("A", null, 1, 2));
+        jacksonUtil.printPretty(medicalProviderController.query());
+        jacksonUtil.printPretty(medicalProviderController.query("15958295141"));
+        jacksonUtil.printPretty(medicalProviderController.query("A", null, 1, 2));
     }
 }

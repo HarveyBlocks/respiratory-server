@@ -68,7 +68,7 @@ public class VisitDoctorController {
         // 药物医生能依据具体就诊号查询到需要的具体用药信息, 其余查不到, 也就是说, 这个方法药物医生是查不到任何东西的
         // 普通医生要进行校验
         // 主管医生可以进行查询
-        return Result.success(visitDoctorService.queryById(id));
+        return Result.success(visitDoctorService.querySimplyById(id));
     }
 
 

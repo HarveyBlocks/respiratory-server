@@ -9,6 +9,7 @@ import org.harvey.respiratory.server.pojo.entity.Drug;
 import org.harvey.respiratory.server.pojo.vo.NullPlaceholder;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.DrugService;
+import org.harvey.respiratory.server.service.SpecificUsingDrugRecordService;
 import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
@@ -71,4 +72,7 @@ public class DrugController {
         // 用药物名模糊查询药物
         return Result.success(drugService.queryByName(name, ConstantsInitializer.initPage(page, limit)));
     }
+
+
+
 }

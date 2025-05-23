@@ -21,7 +21,7 @@ public class RandomUtil {
     }
 
     /**
-     * @param left 包含
+     * @param left  包含
      * @param right 不包含
      */
     public int uniform(int left, int right) {
@@ -45,5 +45,20 @@ public class RandomUtil {
 
     public <T> T chose(List<T> list) {
         return list.get(uniform(0, list.size() - 1));
+    }
+
+    public <T> T chose(T[] array) {
+        return array[uniform(0, array.length - 1)];
+    }
+
+    /**
+     * @param probability to create 1
+     * @return true for 1;
+     */
+    public boolean bit(double probability) {
+        if (probability < 0 || probability > 1) {
+            throw new IllegalArgumentException("概率差超范围[0,1]: " + probability);
+        }
+        return random.nextDouble()<probability;
     }
 }

@@ -116,7 +116,7 @@ public class SymptomaticPresentation {
         this.deleted = false;
         this.id = null;
         this.oldVersionId = null;
-        this.createTime = null;
+        this.createTime = new Date(System.currentTimeMillis());
     }
 
     public void updateFromOldVersionIgnoreNull(SymptomaticPresentation old) {

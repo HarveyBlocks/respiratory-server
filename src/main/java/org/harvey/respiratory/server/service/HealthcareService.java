@@ -18,7 +18,7 @@ public interface HealthcareService extends IService<Healthcare> {
      */
     void register(Healthcare healthcare);
 
-    Healthcare queryByCode(long healthcareCode);
+    Healthcare queryByCode(String healthcareCode);
 
 
     Healthcare queryById(long healthcareId);

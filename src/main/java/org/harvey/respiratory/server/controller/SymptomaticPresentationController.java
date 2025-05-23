@@ -53,7 +53,7 @@ public class SymptomaticPresentationController {
     @PutMapping("/")
     @ApiOperation("更新症状")
     @ApiResponse(code = 200, message = "对症状更新后的新ID")
-    public Result<Long> updatePatientDrugHistory(
+    public Result<Long> updatePatientSymptomaticPresentation(
             @RequestBody @ApiParam("symptomaticPresentation") SymptomaticPresentation symptomaticPresentation) {
         // 更新
         UserDto user = UserHolder.getUser();

@@ -8,14 +8,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.harvey.respiratory.server.Constants;
 import org.harvey.respiratory.server.exception.BadRequestException;
 import org.harvey.respiratory.server.pojo.entity.FamilyHistory;
-import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
+import org.harvey.respiratory.server.pojo.entity.FamilyRelationshipEntity;
 import org.harvey.respiratory.server.pojo.vo.Result;
 import org.harvey.respiratory.server.service.FamilyHistoryService;
+import org.harvey.respiratory.server.service.FamilyRelationshipEntityService;
 import org.harvey.respiratory.server.util.ConstantsInitializer;
 import org.harvey.respiratory.server.util.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +85,7 @@ public class FamilyHistoryController {
     @ApiOperation("家族病史, 用疾病id查询")
     public Result<List<FamilyHistory>> queryFamilyHistoryByDiseaseId(
             @PathVariable("patientId") @ApiParam(value = "病患名", required = true) Long patientId,
-            @PathVariable("diseaseId") @ApiParam(value = "疾病id", required = true) Long diseaseId,
+            @PathVariable("diseaseId") @ApiParam(value = "疾病id", required = true) Integer diseaseId,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
             @PathVariable(value = "limit", required = false)
@@ -100,7 +102,7 @@ public class FamilyHistoryController {
     public Result<List<FamilyHistory>> queryFamilyHistoryByRelationship(
             @PathVariable("patientId") @ApiParam(value = "病患名", required = true) Long patientId,
             @PathVariable("relationship")
-            @ApiParam(value = "病患关系数组.用逗号分割", example = "`FATHER,MATHER,UNCLE`", required = true)
+            @ApiParam(value = "病患关系数组的id序列.用逗号分割", example = "`1,2,3`", required = true)
             String relationships,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
             Integer page,
@@ -108,21 +110,39 @@ public class FamilyHistoryController {
             @ApiParam(value = "页长", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
         // 查询某patientId的, 用家族成员学习查询
         familyHistoryService.validRoleToRegister(UserHolder.getUser(), patientId);
-        List<FamilyRelationship> relationshipList = splitRelationship(relationships);
-        return Result.success(familyHistoryService.queryByRelationship(patientId, relationshipList,
+        List<Integer> relationshipIds = splitRelationshipIds(relationships);
+        return Result.success(familyHistoryService.queryByRelationship(patientId, relationshipIds,
                 ConstantsInitializer.initPage(page, limit)
         ));
     }
 
-    private List<FamilyRelationship> splitRelationship(String relationshipRaw) {
+
+    private List<Integer> splitRelationshipIds(String relationshipRaw) {
+        if (relationshipRaw == null) {
+            return null;
+        }
+        if (relationshipRaw.isEmpty()) {
+            return Collections.emptyList();
+        }
         return StrUtil.split(relationshipRaw, ',').stream().map(v -> {
-            FamilyRelationship relationship;
             try {
-                relationship = FamilyRelationship.valueOf(v);
+                return Integer.parseInt(v);
             } catch (IllegalArgumentException e) {
-                throw new BadRequestException("Unknown name in family relation ship: " + v, e);
+                throw new BadRequestException("Not a id of relationship: " + v, e);
             }
-            return relationship;
         }).collect(Collectors.toList());
+    }
+
+    @Resource
+    private FamilyRelationshipEntityService familyRelationshipEntityService;
+
+    @GetMapping(value = {"relationship/enum/{page}/{limit}"})
+    @ApiOperation("家族病史, 用成员关系查询")
+    public Result<List<FamilyRelationshipEntity>> queryFamilyRelationship(
+            @PathVariable(value = "page", required = false) @ApiParam(value = "页码, 从1开始", defaultValue = "1")
+            Integer page,
+            @PathVariable(value = "limit", required = false)
+            @ApiParam(value = "页长", defaultValue = Constants.DEFAULT_PAGE_SIZE_MSG) Integer limit) {
+        return Result.success(familyRelationshipEntityService.query(ConstantsInitializer.initPage(page, limit)));
     }
 }

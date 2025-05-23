@@ -55,7 +55,7 @@ public class DiseaseController {
 
     @GetMapping("/visit/{id}")
     @ApiOperation("查询问诊号下所有疾病信息")
-    public Result<List<Disease>> queryDrugForFill(
+    public Result<List<Disease>> queryDiseases(
             @PathVariable("id") @ApiParam(value = "问诊号", required = true) Long visitId) {
         // 病人可以查, 医生可以查
         UserDto user = UserHolder.getUser();

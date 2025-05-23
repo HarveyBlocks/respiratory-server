@@ -19,9 +19,9 @@ import java.util.List;
  */
 
 public interface SpecificUsingDrugRecordService extends IService<SpecificUsingDrugRecord> {
-    void validOnWrite(UserDto user, long visitDoctorId);
+    void validOnWrite(UserDto user, Long visitDoctorId);
 
-    void validOnVisitRead(UserDto user, long visitId);
+    void validOnVisitRead(UserDto user, Long visitId);
 
     void validOnPatientRead(UserDto user, Long patientId);
 
@@ -37,9 +37,9 @@ public interface SpecificUsingDrugRecordService extends IService<SpecificUsingDr
     @Transactional
     void logicUpdate(long oldId, SpecificUsingDrugRecord newData);
 
-    SpecificUsingDrugRecord queryByIdIgnoreDeleted(Long oldVersionId);
+    SpecificUsingDrugRecord queryByIdIgnoreDeleted(Long id);
 
-    SpecificUsingDrugRecord queryById(Long oldVersionId);
+    SpecificUsingDrugRecord queryById(Long id);
 
     List<DrugDto> queryDrugInVisit(long visitId);
 

@@ -9,7 +9,6 @@ import org.harvey.respiratory.server.exception.ServerException;
 import org.harvey.respiratory.server.exception.UnauthorizedException;
 import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.FamilyHistory;
-import org.harvey.respiratory.server.pojo.enums.FamilyRelationship;
 import org.harvey.respiratory.server.pojo.enums.Role;
 import org.harvey.respiratory.server.service.DiseaseService;
 import org.harvey.respiratory.server.service.FamilyHistoryService;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -112,7 +110,7 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
     }
 
     @Override
-    public List<FamilyHistory> queryByDisease(long patientId, long diseaseId, Page<FamilyHistory> page) {
+    public List<FamilyHistory> queryByDisease(long patientId, int diseaseId, Page<FamilyHistory> page) {
         return super.lambdaQuery()
                 .eq(FamilyHistory::getPatientId, patientId)
                 .eq(FamilyHistory::getDiseaseId, diseaseId)
@@ -122,11 +120,11 @@ public class FamilyHistoryServiceImpl extends ServiceImpl<FamilyHistoryMapper, F
 
     @Override
     public List<FamilyHistory> queryByRelationship(
-            long patientId, List<FamilyRelationship> relationshipList, Page<FamilyHistory> page) {
-        List<Integer> ids = relationshipList.stream().map(Enum::ordinal).collect(Collectors.toList());
+            long patientId, List<Integer> relationshipIds, Page<FamilyHistory> page) {
+        boolean relationshipIdsValid = relationshipIds != null && !relationshipIds.isEmpty();
         return super.lambdaQuery()
                 .eq(FamilyHistory::getPatientId, patientId)
-                .in(FamilyHistory::getFamilyRelationshipId, ids)
+                .in(relationshipIdsValid, FamilyHistory::getFamilyRelationshipId, relationshipIds)
                 .page(page)
                 .getRecords();
     }

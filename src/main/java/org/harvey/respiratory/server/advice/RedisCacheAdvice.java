@@ -19,6 +19,7 @@ import java.util.function.Supplier;
  * 写操作1. 异步写 2. 写完后删除缓存
  * 怎么设计? 写操作的参数全部都序列化, 然后指定函数?
  * 两边都注册一个
+ *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
  * @date 2025-05-22 01:09
@@ -88,6 +89,9 @@ public class RedisCacheAdvice {
         return entity;
     }
 
+    @Resource
+    private JacksonUtil jacksonUtil;
+
     private <T> void saveEntityFromSlowQuery(CacheExecutor<T> cacheExecutor, T entity) {
         if (entity == null) {
             // 防止穿透
@@ -98,7 +102,7 @@ public class RedisCacheAdvice {
         } else {
             log.warn("将查到数据, 放到缓存");
             cacheExecutor.saveEntityCache(
-                    JacksonUtil.toJsonStr(entity), ttlRandom(cacheExecutor.ttl()), TimeUnit.SECONDS);
+                    jacksonUtil.toJsonStr(entity), ttlRandom(cacheExecutor.ttl()), TimeUnit.SECONDS);
         }
     }
 
@@ -113,7 +117,7 @@ public class RedisCacheAdvice {
             return null;
         } else {
             log.debug("从缓存中成功获取数据");
-            return JacksonUtil.toBean(value, targetType);
+            return jacksonUtil.toBean(value, targetType);
         }
     }
 

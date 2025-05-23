@@ -27,7 +27,8 @@ class MedicalProviderDepartmentControllerTest {
      * 开启非幂等测试
      */
     public static boolean OPEN_NON_IDEMPOTENT_TEST = false;
-
+    @Resource
+    private JacksonUtil jacksonUtil;
     @BeforeAll
     static void addUser() {
         UserHolder.saveUser(new UserDto(1923431434245177346L, "", Role.DATABASE_ADMINISTRATOR, "330282200410080030"));
@@ -100,16 +101,16 @@ class MedicalProviderDepartmentControllerTest {
 
     @Test
     void query() {
-        JacksonUtil.printPretty(medicalProviderDepartmentController.query(2, 3));
-        JacksonUtil.printPretty(medicalProviderDepartmentController.query(1, 3));
-        JacksonUtil.printPretty(medicalProviderDepartmentController.query(3, 3));
-        JacksonUtil.printPretty(medicalProviderDepartmentController.query(1));
-        JacksonUtil.printPretty(medicalProviderDepartmentController.query(2));
+        jacksonUtil.printPretty(medicalProviderDepartmentController.query(2, 3));
+        jacksonUtil.printPretty(medicalProviderDepartmentController.query(1, 3));
+        jacksonUtil.printPretty(medicalProviderDepartmentController.query(3, 3));
+        jacksonUtil.printPretty(medicalProviderDepartmentController.query(1));
+        jacksonUtil.printPretty(medicalProviderDepartmentController.query(2));
     }
 
     @Test
     void queryByName() {
-        JacksonUtil.printPretty(medicalProviderDepartmentController.queryByName("A"));
+        jacksonUtil.printPretty(medicalProviderDepartmentController.queryByName("A"));
     }
 
 }

@@ -97,6 +97,7 @@ public class InterviewDto {
         @ApiModelProperty("其他用药指导(TEXT)")
         private String otherMedicationGuidance;
 
+
         public SpecificUsingDrugRecord buildSpecificUsingDrugRecord(long visitDoctorId, long patientId) {
             return new SpecificUsingDrugRecord(null, visitDoctorId, drugId, count, patientId, dosageUsed, dayTimeUsed,
                     frequencyUsed, treatStart, treatEnd, otherMedicationGuidance, false, null

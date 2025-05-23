@@ -2,6 +2,7 @@ package org.harvey.respiratory.server.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.harvey.respiratory.server.pojo.dto.UserDto;
 import org.harvey.respiratory.server.pojo.entity.ExpenseRecord;
 
 import java.util.List;
@@ -16,4 +17,6 @@ import java.util.List;
 
 public interface ExpenseRecordService extends IService<ExpenseRecord> {
     void saveOnInterview(List<ExpenseRecord> expenseRecordList);
+
+    List<ExpenseRecord> querySelfExpenseRecord(UserDto userDto, long visitId);
 }
